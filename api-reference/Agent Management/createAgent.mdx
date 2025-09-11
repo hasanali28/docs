@@ -1,0 +1,73 @@
+---
+title: "Create Agent"
+description: ""
+---
+
+## Documentation
+
+Create a new agent with voice, capability, and behavior settings.
+
+## Endpoint
+
+- Method: POST
+- URL: `{{baseUrl}}/api/agents/`
+
+## Headers
+
+- Authorization: `Bearer {{authToken}}`
+- Content-Type: `application/json`
+- Cookie: `auth=<token>` (optional)
+
+## Request Body
+
+```json
+{
+  "agent_name": "Customer Support Agent",
+  "gender": "Female",
+  "type": "premium",
+  "capability": "Customer Service",
+  "description": "AI assistant trained to handle customer inquiries and support tickets",
+  "voice": "60a7b1c2d3e4f5a6b7c8d9e0",
+  "callSetting": {
+    "voiceSpeed": 1.0,
+    "vocabulary": ["support", "ticket", "refund", "order"],
+    "callTimeout": 30
+  },
+  "tags": ["support", "customer-service", "help-desk"],
+  "startMessage": "Hello! I'm your support assistant. How can I help you today?",
+  "systemMessage": "You are a helpful customer support agent for Acme Inc. Your goal is to assist customers with their inquiries about products, orders, and services.",
+  "selectedLanguage": ["en-US", "en-IN"],
+  "conversationType": "single_prompt"
+}
+```
+
+## Response
+
+- 201 Created — returns the created agent.
+
+## cURL
+
+```bash
+curl --location 'http://localhost:5001/api/agents/' \
+--header 'Authorization: Bearer {{authToken}}' \
+--header 'Content-Type: application/json' \
+--header 'Cookie: auth=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4MDIwMWNmNWIzNjQ0YjQ4YmNiMzU4YSIsInJvbGUiOiJ1c2VyIiwic3RhdHVzIjoiYXBwcm92ZWQiLCJpYXQiOjE3NTc0OTkzNTgsImV4cCI6MTc2MDA5MTM1OH0.sLuF-XybcpHVs-Z3lTRUGGzeh3Omk1YsLAcWvSgfZYc' \
+--data '{
+  "agent_name": "Customer Support Agent",
+  "gender": "Female",
+  "type": "premium",
+  "capability": "Customer Service",
+  "description": "AI assistant trained to handle customer inquiries and support tickets",
+  "voice": "60a7b1c2d3e4f5a6b7c8d9e0",
+  "callSetting": {
+    "voiceSpeed": 1.0,
+    "vocabulary": ["support", "ticket", "refund", "order"],
+    "callTimeout": 30
+  },
+  "tags": ["support", "customer-service", "help-desk"],
+  "startMessage": "Hello! I'\''m your support assistant. How can I help you today?",
+  "systemMessage": "You are a helpful customer support agent for Acme Inc. Your goal is to assist customers with their inquiries about products, orders, and services.",
+  "selectedLanguage": ["en-US", "en-IN"],
+  "conversationType": "single_prompt"
+}'
+```

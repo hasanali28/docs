@@ -57,12 +57,25 @@
             ]
           },
           {
-            "group": "Endpoint examples",
+            "group": "Authentication APIs",
             "pages": [
-              "api-reference/endpoint/get",
-              "api-reference/endpoint/create",
-              "api-reference/endpoint/delete",
-              "api-reference/endpoint/webhook"
+              "api-reference/Authentication/signup",
+              "api-reference/Authentication/login",
+              "api-reference/Authentication/googleLogin",
+              "api-reference/Authentication/sendOtpRequest",
+              "api-reference/Authentication/requestPasswordReset",
+              "api-reference/Authentication/resetPassword",
+              "api-reference/Authentication/getStatus",
+              "api-reference/Authentication/getProfile",
+              "api-reference/Authentication/updateProfile"
+            ]
+          },
+          {
+            "group": "Agent Management APIs",
+            "pages": [
+              "api-reference/Agent Management/getAgents",
+              "api-reference/Agent Management/getAgentById",
+              "api-reference/Agent Management/getAgentIdFromPhoneId"
             ]
           }
         ]
@@ -105,6 +118,10 @@
       "href": "https://dashboard.mintlify.com"
     }
   },
+  "api": {
+    "baseUrl": "https://nexusdev-wjs-api-dev.mangoforest-291de162.swedencentral.azurecontainerapps.io"
+  },
+  "openapi": "/api-reference/openapi.json",
   "contextual": {
     "options": [
      "copy",

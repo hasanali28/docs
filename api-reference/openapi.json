@@ -10,7 +10,7 @@
   },
   "servers": [
     {
-      "url": "http://sandbox.mintlify.com"
+      "url": "https://nexusdev-wjs-api-dev.mangoforest-291de162.swedencentral.azurecontainerapps.io"
     }
   ],
   "security": [
@@ -19,145 +19,821 @@
     }
   ],
   "paths": {
-    "/plants": {
-      "get": {
-        "description": "Returns all plants from the system that the user has access to",
+    "/api/auth/request-password-reset": {
+      "post": {
+        "summary": "Request Password Reset",
+        "description": "Documentation\n{{baseUrl}}/api/auth/request-password-reset\n\n### Request Description\nThis endpoint is used to initiate a request for resetting the user's password. The request should be sent as an HTTP POST to the specified URL with the user's email provided in the request body.\n\n### Request Body\n- email (string, required): The email address of the user for whom the password reset request is being initiated.\n\n### Response Description\nThe response to this request will provide information about the status of the password reset request. The response body will include relevant details such as a success message or an error message, depending on the outcome of the request.",
+        "tags": ["Authentication"],
+        "operationId": "authRequestPasswordReset",
+        "security": [],
         "parameters": [
           {
-            "name": "limit",
-            "in": "query",
-            "description": "The maximum number of results to return",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
+            "name": "Content-Type",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string", "enum": ["application/json"] }
+          },
+          {
+            "name": "Cookie",
+            "in": "header",
+            "required": false,
+            "schema": { "type": "string", "example": "auth=<token>" }
           }
         ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestPasswordResetRequest"
+              },
+              "examples": {
+                "default": { "value": { "email": "arvind@weya.ai" } }
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
-            "description": "Plant response",
+            "description": "Password reset request accepted",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Plant"
+                  "$ref": "#/components/schemas/RequestPasswordResetResponse"
+                },
+                "examples": {
+                  "default": {
+                    "value": {
+                      "message": "If an account exists for this email, a reset link has been sent."
+                    }
                   }
                 }
               }
             }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "cURL",
+            "label": "cURL",
+            "source": "curl --location '{{baseUrl}}/api/auth/request-password-reset' --header 'Content-Type: application/json' --header 'Cookie: auth=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4MDIwMWNmNWIzNjQ0YjQ4YmNiMzU4YSIsInJvbGUiOiJ1c2VyIiwic3RhdHVzIjoiYXBwcm92ZWQiLCJpYXQiOjE3NTc0OTkzNTgsImV4cCI6MTc2MDA5MTM1OH0.sLuF-XybcpHVs-Z3lTRUGGzeh3Omk1YsLAcWvSgfZYc' --data-raw '{\\n    \"email\": \"arvind@weya.ai\"\\n}'"
+          }
+        ]
+      }
+    },
+
+    "/api/auth/google/login": {
+      "post": {
+        "summary": "Google Login",
+        "description": "Documentation\n{{baseUrl}}/api/auth/google/login\n\n### API Request Description\nThis endpoint is used to initiate a Google login by sending an HTTP POST request to the specified URL. The request should include the Google authorization code in the request body.\n\n### Request Body\n- authCode (string, required): The Google authorization code obtained during the Google authentication process.\n\n### Response Body\nThe response to this request will include the authentication result or any relevant data based on the successful processing of the Google login request.",
+        "tags": ["Authentication"],
+        "operationId": "authGoogleLogin",
+        "security": [],
+        "parameters": [
+          {
+            "name": "authCode",
+            "in": "query",
+            "required": false,
+            "schema": { "type": ["string", "null"] },
+            "description": "Google authorization code (optional when provided in body)"
           },
-          "400": {
-            "description": "Unexpected error",
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string", "enum": ["application/json"] }
+          },
+          {
+            "name": "Cookie",
+            "in": "header",
+            "required": false,
+            "schema": { "type": "string", "example": "auth=<token>" }
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/GoogleLoginRequest" },
+              "examples": {
+                "default": {
+                  "value": { "authCode": "GOOGLE_AUTHORIZATION_CODE_HERE" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Authenticated via Google",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
+                "schema": { "$ref": "#/components/schemas/LoginResponse" },
+                "examples": {
+                  "default": {
+                    "value": {
+                      "access_token": "<token>",
+                      "tokenExpiration": 1760091358000
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "cURL",
+            "label": "cURL",
+            "source": "curl --location '{{baseUrl}}/api/auth/google/login?authCode=null' --header 'Content-Type: application/json' --header 'Cookie: auth=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4MDIwMWNmNWIzNjQ0YjQ4YmNiMzU4YSIsInJvbGUiOiJ1c2VyIiwic3RhdHVzIjoiYXBwcm92ZWQiLCJpYXQiOjE3NTc0OTkzNTgsImV4cCI6MTc2MDA5MTM1OH0.sLuF-XybcpHVs-Z3lTRUGGzeh3Omk1YsLAcWvSgfZYc' --data '{\n    \"authCode\": \"GOOGLE_AUTHORIZATION_CODE_HERE\"\n}'"
+          }
+        ]
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "summary": "Login",
+        "description": "Documentation\n{{baseUrl}}/api/auth/login\n\n### API Request Description\nThis API endpoint allows users to log in and obtain an access token for authentication.\n\n### Request Body\n- email (string): The email address of the user.\n- password (string): The password for the user's account.\n\n### Response Body\nUpon successful login, the server responds with a status code of 201 and a JSON object containing the user's information and access token.",
+        "tags": ["Authentication"],
+        "operationId": "authLogin",
+        "security": [],
+        "parameters": [
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string", "enum": ["application/json"] }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/LoginRequest" },
+              "examples": {
+                "default": {
+                  "value": { "email": "team@weya.ai", "password": "1234" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Authenticated",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/LoginResponse" },
+                "examples": {
+                  "default": {
+                    "value": {
+                      "address": {},
+                      "_id": "680201cf5b3644b48bcb358a",
+                      "username": "Praveen",
+                      "email": "team@weya.ai",
+                      "role": "user",
+                      "status": "approved",
+                      "totalCalls": 3,
+                      "totalCost": 301911,
+                      "profilePicture": "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png",
+                      "phoneNumbers": ["6802043b5b3644b48bcb3621"],
+                      "topup": 0,
+                      "organization": {},
+                      "resetPasswordToken": null,
+                      "resetPasswordExpires": null,
+                      "teamSize": "50-100",
+                      "createdAt": "2025-04-18T07:39:59.859Z",
+                      "updatedAt": "2025-07-25T10:16:46.282Z",
+                      "access_token": "<token>",
+                      "tokenExpiration": 1760091358000
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "cURL",
+            "label": "cURL",
+            "source": "curl --location '{{baseUrl}}/api/auth/login' --header 'Content-Type: application/json' --data-raw '{\\n    \"email\": \"team@weya.ai\",\\n    \"password\": \"1234\"\\n}'"
+          }
+        ]
+      }
+    },
+   "/api/auth/profile": {
+  "get": {
+    "summary": "Get Profile",
+    "description": "Documentation\n{{baseUrl}}/api/auth/profile\n\n### Request Description\nThis endpoint retrieves the profile information of the authenticated user.\n\n### Request\n- This is a simple GET request and does not require a request body.\n- Must include a valid Authorization header (Bearer token).",
+    "tags": ["Authentication"],
+    "operationId": "authGetProfile",
+    "security": [{"bearerAuth": []}],
+    "parameters": [
+      {
+        "name": "Authorization",
+        "in": "header",
+        "required": true,
+        "schema": {"type": "string","example": "Bearer {{authToken}}"}
+      },
+      {
+        "name": "Content-Type",
+        "in": "header",
+        "required": true,
+        "schema": {"type": "string","enum": ["application/json"]}
+      },
+      {
+        "name": "Cookie",
+        "in": "header",
+        "required": false,
+        "schema": {"type": "string","example": "auth=<token>"}
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "User profile retrieved successfully",
+        "content": {
+          "application/json": {
+            "schema": {"$ref": "#/components/schemas/GetProfileResponse"},
+            "examples": {
+              "default": {
+                "value": {
+                  "success": true,
+                  "user": {
+                    "_id": "680201cf5b3644b48bcb358a",
+                    "username": "Praveen",
+                    "email": "team@weya.ai",
+                    "role": "user",
+                    "status": "approved",
+                    "totalCalls": 3,
+                    "totalCost": 301911,
+                    "profilePicture": "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png",
+                    "phoneNumbers": ["6802043b5b3644b48bcb3621"],
+                    "topup": 0,
+                    "organization": "Company",
+                    "teamSize": "50-100",
+                    "createdAt": "2025-04-18T07:39:59.859Z",
+                    "updatedAt": "2025-07-25T10:16:46.282Z",
+                    "__v": 0
+                  }
                 }
               }
             }
           }
         }
       },
-      "post": {
-        "description": "Creates a new plant in the store",
-        "requestBody": {
-          "description": "Plant to add to the store",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/NewPlant"
-              }
+      "401": {
+        "description": "Unauthorized - Invalid or expired token",
+        "content": {
+          "application/json": {
+            "schema": {"$ref": "#/components/schemas/ErrorResponse"},
+            "examples": {"default": {"value": {"message": "Unauthorized"}}}
+          }
+        }
+      }
+    },
+    "x-codeSamples": [
+      {
+        "lang": "cURL",
+        "label": "cURL",
+        "source": "curl --location '{{baseUrl}}/api/auth/profile' \\\n--header 'Authorization: Bearer {{authToken}}' \\\n--header 'Content-Type: application/json' \\\n--header 'Cookie: auth=<token>'"
+      }
+    ]
+  },
+  "put": {
+    "summary": "Update Profile",
+    "description": "Documentation\n{{baseUrl}}/api/auth/profile\n\n### Request Description\nThis endpoint allows the authenticated user to update their profile information.\n\n### Request\n- Method: PUT\n- Content-Type: multipart/form-data\n- Must include a valid Authorization header (Bearer token)\n- The request body accepts form-data with the following fields:\n  - firstName (string, optional)\n  - lastName (string, optional)\n  - mobile (string, optional)\n  - companyName (string, optional)\n  - address (string, optional)\n  - profilePicture (file, optional)",
+    "tags": ["Authentication"],
+    "operationId": "authUpdateProfile",
+    "security": [{"bearerAuth": []}],
+    "parameters": [
+      {
+        "name": "Authorization",
+        "in": "header",
+        "required": true,
+        "schema": {"type": "string","example": "Bearer {{authToken}}"}
+      },
+      {
+        "name": "Cookie",
+        "in": "header",
+        "required": false,
+        "schema": {"type": "string","example": "auth=<token>"}
+      }
+    ],
+    "requestBody": {
+      "required": true,
+      "content": {
+        "multipart/form-data": {
+          "schema": {
+            "type": "object",
+            "properties": {
+              "firstName": {"type": "string"},
+              "lastName": {"type": "string"},
+              "mobile": {"type": "string"},
+              "companyName": {"type": "string"},
+              "address": {"type": "string"},
+              "profilePicture": {"type": "string","format": "binary"}
             }
           },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "plant response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Plant"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
+          "examples": {
+            "default": {
+              "value": {
+                "firstName": "TestUser",
+                "lastName": "420",
+                "mobile": "1234567890",
+                "companyName": "Acme Inc.",
+                "address": "123 Main Street, New York, NY",
+                "profilePicture": "/path/to/file"
               }
             }
           }
         }
       }
     },
-    "/plants/{id}": {
-      "delete": {
-        "description": "Deletes a single plant based on the ID supplied",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "ID of plant to delete",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "Plant deleted",
-            "content": {}
-          },
-          "400": {
-            "description": "unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
+    "responses": {
+      "200": {
+        "description": "User profile updated successfully",
+        "content": {
+          "application/json": {
+            "schema": {"$ref": "#/components/schemas/UpdateProfileResponse"},
+            "examples": {
+              "default": {
+                "value": {
+                  "success": true,
+                  "message": "Profile updated successfully",
+                  "user": {
+                    "_id": "680201cf5b3644b48bcb358a",
+                    "username": "Praveen",
+                    "email": "team@weya.ai",
+                    "role": "user",
+                    "status": "approved",
+                    "totalCalls": 3,
+                    "totalCost": 301911,
+                    "profilePicture": "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png",
+                    "phoneNumbers": ["6802043b5b3644b48bcb3621"],
+                    "topup": 0,
+                    "organization": "Company",
+                    "teamSize": "50-100",
+                    "createdAt": "2025-04-18T07:39:59.859Z",
+                    "updatedAt": "2025-07-25T10:16:46.282Z",
+                    "__v": 0,
+                    "companyName": "Acme Inc."
+                  }
                 }
               }
             }
           }
         }
+      },
+      "401": {
+        "description": "Unauthorized - Invalid or expired token",
+        "content": {
+          "application/json": {
+            "schema": {"$ref": "#/components/schemas/ErrorResponse"},
+            "examples": {"default": {"value": {"message": "Unauthorized"}}}
+          }
+        }
       }
-    }
-  },
-  "webhooks": {
-    "/plant/webhook": {
+    },
+    "x-codeSamples": [
+      {
+        "lang": "cURL",
+        "label": "cURL",
+        "source": "curl --location --request PUT '{{baseUrl}}/api/auth/profile' \\\n--header 'Authorization: Bearer {{authToken}}' \\\n--form 'firstName=\"TestUser\"' \\\n--form 'lastName=\"420\"' \\\n--form 'mobile=\"1234567890\"' \\\n--form 'companyName=\"Acme Inc.\"' \\\n--form 'address=\"123 Main Street, New York, NY\"' \\\n--form 'profilePicture=@\"/path/to/file\"'"
+      }
+    ]
+  }
+}
+,
+    "/api/auth/reset-password": {
       "post": {
-        "description": "Information about a new plant added to the store",
+        "summary": "Reset Password",
+        "description": "Documentation\n{{baseUrl}}/api/auth/reset-password\n\n### Request Description\nThis endpoint is used to reset the user's password. The request should be sent as an HTTP POST to the specified URL with the reset token (received via email) and the new password in the request body.\n\n### Request Body\n- token (string, required): The reset token received via email.\n- newPassword (string, required): The new password to be set.\n\n### Response Description\nThe response will indicate whether the password reset was successful or failed. On success, a confirmation message is returned. On failure, an error message is provided (e.g., invalid or expired token).",
+        "tags": ["Authentication"],
+        "operationId": "authResetPassword",
+        "security": [],
+        "parameters": [
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string", "enum": ["application/json"] }
+          },
+          {
+            "name": "Cookie",
+            "in": "header",
+            "required": false,
+            "schema": { "type": "string", "example": "auth=<token>" }
+          }
+        ],
         "requestBody": {
-          "description": "Plant added to the store",
+          "required": true,
           "content": {
             "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/NewPlant"
+              "schema": { "$ref": "#/components/schemas/ResetPasswordRequest" },
+              "examples": {
+                "default": {
+                  "value": {
+                    "token": "your_reset_token_received_via_email",
+                    "newPassword": "your_new_password"
+                  }
+                }
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Return a 200 status to indicate that the data was received successfully"
+            "description": "Password reset successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResetPasswordResponse"
+                },
+                "examples": {
+                  "default": {
+                    "value": { "message": "Password reset successful" }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid or expired token",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" },
+                "examples": {
+                  "default": {
+                    "value": { "message": "Invalid or expired token" }
+                  }
+                }
+              }
+            }
           }
-        }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "cURL",
+            "label": "cURL",
+            "source": "curl --location '{{baseUrl}}/api/auth/reset-password' --header 'Content-Type: application/json' --header 'Cookie: auth=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4MDIwMWNmNWIzNjQ0YjQ4YmNiMzU4YSIsInJvbGUiOiJ1c2VyIiwic3RhdHVzIjoiYXBwcm92ZWQiLCJpYXQiOjE3NTc0OTkzNTgsImV4cCI6MTc2MDA5MTM1OH0.sLuF-XybcpHVs-Z3lTRUGGzeh3Omk1YsLAcWvSgfZYc' --data-raw '{\\n    \"token\": \"your_reset_token_received_via_email\",\\n    \"newPassword\": \"your_new_password\"\\n}'"
+          }
+        ]
+      }
+    },
+    "/api/auth/status": {
+      "get": {
+        "summary": "Auth Status",
+        "description": "Documentation\n{{baseUrl}}/api/auth/status\n\n### Request Description\nThis endpoint is used to retrieve the status of the authentication.\n\n### Request\n- No request body is required.\n- The request must include a valid Authorization header (Bearer token).\n\n### Response Description\n- **200 OK** – The request was successful, and the authentication status is returned in the response body.\n- **Error Handling** – If the token is invalid or expired, an error response will be returned.\n\n### Response Body\n- status (string): The authentication status.\n\n### Example Response\n```json\n{\n  \"status\": \"approved\"\n}\n```",
+        "tags": ["Authentication"],
+        "operationId": "authStatus",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "Bearer {{authToken}}"
+            }
+          },
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": ["application/json"]
+            }
+          },
+          {
+            "name": "Cookie",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "auth=<token>"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Authentication status retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthStatusResponse"
+                },
+                "examples": {
+                  "default": {
+                    "value": {
+                      "status": "approved"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or expired token",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" },
+                "examples": {
+                  "default": { "value": { "message": "Unauthorized" } }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "cURL",
+            "label": "cURL",
+            "source": "curl --location '{{baseUrl}}/api/auth/status' \\\n--header 'Authorization: Bearer {{authToken}}' \\\n--header 'Content-Type: application/json' \\\n--header 'Cookie: auth=<token>'"
+          }
+        ]
+      }
+    },
+
+    "/api/auth/signup": {
+      "post": {
+        "summary": "Signup",
+        "description": "Documentation\n{{baseUrl}}/api/auth/signup\n\n### API Request Description\nThis API endpoint allows the user to sign up by providing necessary details such as username, email, password, phone number, team name, and team size.\n\n### Request Body\n- username (string): The username of the user.\n- email (string): The email address of the user.\n- password (string): The password for the user account.\n- phoneNumber (string): The phone number of the user.\n- teamName (string): The name of the team the user belongs to.\n- teamSize (number): The size of the team.\n\n### Response Body\nUpon successful execution, the API returns a status code of 201 and a JSON object with the listed fields (see schema).",
+        "tags": ["Authentication"],
+        "operationId": "authSignup",
+        "security": [],
+        "parameters": [
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string", "enum": ["application/json"] }
+          },
+          {
+            "name": "Cookie",
+            "in": "header",
+            "required": false,
+            "schema": { "type": "string", "example": "auth=<token>" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/SignupRequest" },
+              "examples": {
+                "default": {
+                  "value": {
+                    "username": "testuser",
+                    "email": "testuser@company.com",
+                    "password": "password123",
+                    "phoneNumber": "1234567890",
+                    "teamName": "Engineering",
+                    "teamSize": 10
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User created",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SignupResponse" },
+                "examples": {
+                  "default": {
+                    "value": {
+                      "username": "testuser",
+                      "email": "testuser@company.com",
+                      "role": "user",
+                      "status": "approved",
+                      "totalCalls": 0,
+                      "totalCost": 0,
+                      "profilePicture": "https://example.com/pfp.png",
+                      "phoneNumbers": ["1234567890"],
+                      "topup": 0,
+                      "organization": "Company",
+                      "resetPasswordToken": null,
+                      "resetPasswordExpires": null,
+                      "teamSize": "10-50",
+                      "address": {},
+                      "_id": "67c8feb4e9b6889e7f59e10c",
+                      "createdAt": "2025-09-10T12:00:00.000Z",
+                      "updatedAt": "2025-09-10T12:00:00.000Z",
+                      "__v": 0,
+                      "access_token": "<token>",
+                      "tokenExpiration": 3600
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "cURL",
+            "label": "cURL",
+            "source": "curl --location '{{baseUrl}}/api/auth/signup' --header 'Content-Type: application/json' --header 'Cookie: auth=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4MDIwMWNmNWIzNjQ0YjQ4YmNiMzU4YSIsInJvbGUiOiJ1c2VyIiwic3RhdHVzIjoiYXBwcm92ZWQiLCJpYXQiOjE3NTc0OTkzNTgsImV4cCI6MTc2MDA5MTM1OH0.sLuF-XybcpHVs-Z3lTRUGGzeh3Omk1YsLAcWvSgfZYc' --data-raw '{\n    \"username\": \"testuser\",\n    \"email\": \"testuser@company.com\",\n    \"password\": \"password123\",\n    \"phoneNumber\": \"1234567890\",\n    \"teamName\": \"Engineering\",\n    \"teamSize\": 10\n}'"
+          }
+        ]
       }
     }
   },
+
   "components": {
     "schemas": {
-      "Plant": {
+      "ResetPasswordRequest": {
+        "type": "object",
+        "required": ["token", "newPassword"],
+        "properties": {
+          "token": { "type": "string" },
+          "newPassword": { "type": "string" }
+        }
+      },
+      "ResetPasswordResponse": {
+        "type": "object",
+        "properties": { "message": { "type": "string" } }
+      },
+      "RequestPasswordResetRequest": {
+        "type": "object",
+        "required": ["email"],
+        "properties": { "email": { "type": "string", "format": "email" } }
+      },
+      "RequestPasswordResetResponse": {
+        "type": "object",
+        "properties": { "message": { "type": "string" } }
+      },
+      "GoogleLoginRequest": {
+        "type": "object",
+        "properties": {
+          "authCode": {
+            "type": "string",
+            "description": "Google authorization code"
+          }
+        }
+      },
+      "AuthStatusResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "The authentication status",
+            "example": "approved"
+          }
+        }
+      },
+
+      "LoginRequest": {
+        "type": "object",
+        "required": ["email", "password"],
+        "properties": {
+          "email": { "type": "string", "format": "email" },
+          "password": { "type": "string", "format": "password" }
+        }
+      },
+      "LoginResponse": {
+        "type": "object",
+        "properties": {
+          "address": { "type": "object" },
+          "authMethod": { "type": "string" },
+          "_id": { "type": "string" },
+          "username": { "type": "string" },
+          "email": { "type": "string" },
+          "role": { "type": "string" },
+          "status": { "type": "string" },
+          "totalCalls": { "type": "number" },
+          "totalCost": { "type": "number" },
+          "profilePicture": { "type": "string" },
+          "phoneNumbers": { "type": "array", "items": { "type": "string" } },
+          "topup": { "type": "number" },
+          "organization": { "type": "object" },
+          "resetPasswordToken": { "type": ["string", "null"] },
+          "resetPasswordExpires": { "type": ["string", "null"] },
+          "teamSize": { "type": "string" },
+          "createdAt": { "type": "string" },
+          "updatedAt": { "type": "string" },
+          "__v": { "type": "number" },
+          "avgCallDuration": { "type": "number" },
+          "totalDuration": { "type": "number" },
+          "access_token": { "type": "string" },
+          "tokenExpiration": { "type": "number" }
+        }
+      },
+      "GetProfileResponse": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean" },
+          "user": {
+            "type": "object",
+            "properties": {
+              "_id": { "type": "string" },
+              "username": { "type": "string" },
+              "email": { "type": "string" },
+              "role": { "type": "string" },
+              "status": { "type": "string" },
+              "totalCalls": { "type": "integer" },
+              "totalCost": { "type": "integer" },
+              "profilePicture": { "type": "string" },
+              "phoneNumbers": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "topup": { "type": "integer" },
+              "organization": { "type": "string" },
+              "teamSize": { "type": "string" },
+              "createdAt": { "type": "string" },
+              "updatedAt": { "type": "string" },
+              "__v": { "type": "integer" }
+            }
+          }
+        }
+      },
+      "SignupRequest": {
+        "type": "object",
         "required": [
-          "name"
+          "username",
+          "email",
+          "password",
+          "phoneNumber",
+          "teamName",
+          "teamSize"
         ],
+        "properties": {
+          "username": { "type": "string" },
+          "email": { "type": "string", "format": "email" },
+          "password": { "type": "string", "format": "password" },
+          "phoneNumber": { "type": "string" },
+          "teamName": { "type": "string" },
+          "teamSize": { "type": "integer" }
+        }
+      },
+      "UpdateProfileResponse": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean" },
+          "message": { "type": "string" },
+          "user": {
+            "type": "object",
+            "properties": {
+              "_id": { "type": "string" },
+              "username": { "type": "string" },
+              "email": { "type": "string" },
+              "role": { "type": "string" },
+              "status": { "type": "string" },
+              "totalCalls": { "type": "integer" },
+              "totalCost": { "type": "integer" },
+              "profilePicture": { "type": "string" },
+              "phoneNumbers": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "topup": { "type": "integer" },
+              "organization": { "type": "string" },
+              "teamSize": { "type": "string" },
+              "createdAt": { "type": "string" },
+              "updatedAt": { "type": "string" },
+              "__v": { "type": "integer" },
+              "companyName": { "type": "string" }
+            }
+          }
+        }
+      },
+      "SignupResponse": {
+        "type": "object",
+        "properties": {
+          "username": { "type": "string" },
+          "email": { "type": "string" },
+          "role": { "type": "string" },
+          "status": { "type": "string" },
+          "totalCalls": { "type": "number" },
+          "totalCost": { "type": "number" },
+          "profilePicture": { "type": "string" },
+          "phoneNumbers": { "type": "array", "items": { "type": "string" } },
+          "topup": { "type": "number" },
+          "organization": { "type": "string" },
+          "resetPasswordToken": { "type": "string" },
+          "resetPasswordExpires": { "type": "string" },
+          "teamSize": { "type": "string" },
+          "address": { "type": "object" },
+          "_id": { "type": "string" },
+          "createdAt": { "type": "string" },
+          "updatedAt": { "type": "string" },
+          "__v": { "type": "number" },
+          "access_token": { "type": "string" },
+          "tokenExpiration": { "type": "number" }
+        }
+      },
+      "Plant": {
+        "required": ["name"],
         "type": "object",
         "properties": {
           "name": {
@@ -176,9 +852,7 @@
             "$ref": "#/components/schemas/Plant"
           },
           {
-            "required": [
-              "id"
-            ],
+            "required": ["id"],
             "type": "object",
             "properties": {
               "id": {
@@ -191,10 +865,7 @@
         ]
       },
       "Error": {
-        "required": [
-          "error",
-          "message"
-        ],
+        "required": ["error", "message"],
         "type": "object",
         "properties": {
           "error": {
