@@ -81,6 +81,471 @@
         ]
       }
     },
+    "/api/agents/create/call": {
+      "post": {
+        "summary": "Create Call for Agent",
+        "description": "Initiates a call session with a specified agent. The call is associated with the given agent ID and optionally a name for reference.",
+        "tags": ["Agents"],
+        "operationId": "createAgentCall",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string", "example": "Bearer {{authToken}}" }
+          },
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string", "enum": ["application/json"] }
+          },
+          {
+            "name": "Cookie",
+            "in": "header",
+            "required": false,
+            "schema": { "type": "string", "example": "auth=<token>" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["agentId", "name"],
+                "properties": {
+                  "agentId": {
+                    "type": "string",
+                    "description": "The ID of the agent to call"
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "Name of the person or reference for the call"
+                  }
+                }
+              },
+              "examples": {
+                "default": {
+                  "value": {
+                    "agentId": "684135442bc2d87ddfe0697f",
+                    "name": "Arvind"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Call created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Call created successfully"
+                    },
+                    "call": {
+                      "type": "object",
+                      "properties": {
+                        "callId": { "type": "string", "example": "12345abcde" },
+                        "agentId": {
+                          "type": "string",
+                          "example": "684135442bc2d87ddfe0697f"
+                        },
+                        "name": { "type": "string", "example": "Arvind" },
+                        "status": { "type": "string", "example": "initiated" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": { "description": "Missing agentId or name" },
+          "401": { "description": "Unauthorized: User must be logged in" },
+          "500": { "description": "Internal server error while creating call" }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "cURL",
+            "label": "cURL",
+            "source": "curl --location --request POST '{{baseUrl}}/api/agents/create/call' \\\n--header 'Authorization: Bearer {{authToken}}' \\\n--header 'Content-Type: application/json' \\\n--data '{\"agentId\":\"684135442bc2d87ddfe0697f\",\"name\":\"Arvind\"}'"
+          }
+        ]
+      }
+    },
+    "/api/agents/validate-conversation": {
+      "post": {
+        "summary": "Validate Conversation",
+        "description": "Documentation\n{{baseUrl}}/api/agents/validate-conversation\n\n### API Request Description\nThis endpoint validates a conversation configuration for an agent. It checks if the conversation type, system instructions, and states are properly defined. Useful for ensuring the agent's workflow is correctly structured before deployment.",
+        "tags": ["Agents"],
+        "operationId": "validateConversation",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string", "example": "Bearer {{authToken}}" }
+          },
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string", "enum": ["application/json"] }
+          },
+          {
+            "name": "Cookie",
+            "in": "header",
+            "required": false,
+            "schema": { "type": "string", "example": "auth=<token>" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ValidateConversationRequest"
+              },
+              "examples": {
+                "default": {
+                  "value": {
+                    "conversationType": "multi_prompt",
+                    "systemMessage": {
+                      "common": {
+                        "agent_information": "You are a customer service agent."
+                      },
+                      "states": {
+                        "START": {
+                          "goal": "Identify customer issue"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Conversation validated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidateConversationResponse"
+                },
+                "examples": {
+                  "default": {
+                    "value": {
+                      "message": "Conversation configuration is valid",
+                      "isValid": true,
+                      "errors": []
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "cURL",
+            "label": "cURL",
+            "source": "curl --location '{{baseUrl}}/api/agents/validate-conversation' \\\n--header 'Authorization: Bearer {{authToken}}' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"conversationType\": \"multi_prompt\",\n  \"systemMessage\": {\n    \"common\": {\"agent_information\": \"You are a customer service agent.\"},\n    \"states\": {\"START\": {\"goal\": \"Identify customer issue\"}}\n  }\n}'"
+          }
+        ]
+      }
+    },
+    "/api/agents/addKnowledgeBase": {
+      "post": {
+        "summary": "Add Knowledge Base",
+        "description": "Documentation\n{{baseUrl}}/api/agents/addKnowledgeBase\n\n### API Request Description\nThis endpoint uploads documents to a knowledge base associated with the authenticated user's organization. Files are stored on S3 and processed via an external API to generate a vector database collection.",
+        "tags": ["Knowledge Base"],
+        "operationId": "addKnowledgeBase",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string", "example": "Bearer {{authToken}}" }
+          },
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string", "enum": ["multipart/form-data"] }
+          },
+          {
+            "name": "Cookie",
+            "in": "header",
+            "required": false,
+            "schema": { "type": "string", "example": "auth=<token>" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": ["knowledgeBaseName", "files"],
+                "properties": {
+                  "knowledgeBaseName": {
+                    "type": "string",
+                    "description": "Name of the knowledge base"
+                  },
+                  "files": {
+                    "type": "array",
+                    "items": { "type": "string", "format": "binary" },
+                    "description": "One or more files to upload (PDF, TXT, etc.)"
+                  }
+                }
+              },
+              "examples": {
+                "default": {
+                  "value": {
+                    "knowledgeBaseName": "Support Documentation",
+                    "files": [
+                      "/path/to/document1.pdf",
+                      "/path/to/document2.txt"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Files uploaded successfully, vectorDbCollection updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AddKnowledgeBaseResponse"
+                },
+                "examples": {
+                  "default": {
+                    "value": {
+                      "message": "Files uploaded successfully, vectorDbCollection updated",
+                      "data": {
+                        "_id": "64f0b3e5d6c8a2e5d72b5c91",
+                        "organizationId": "649dcbf1e947f20f4ab2c58b",
+                        "knowledgeBaseName": "Support Documentation",
+                        "bucketUrl": "https://your-bucket.s3.region.amazonaws.com/orgId/knowledgeBaseId/",
+                        "vectorDbCollection": "collection_id_123456",
+                        "__v": 0
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing knowledgeBaseName or no files uploaded"
+          },
+          "401": {
+            "description": "Unauthorized: User must be logged in and associated with an organization"
+          },
+          "500": {
+            "description": "File upload failed or invalid response from external API"
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "cURL",
+            "label": "cURL",
+            "source": "curl --location '{{baseUrl}}/api/agents/addKnowledgeBase' \\\n--header 'Authorization: Bearer {{authToken}}' \\\n--form 'knowledgeBaseName=\"Support Documentation\"' \\\n--form 'files=@\"/path/to/document1.pdf\"' \\\n--form 'files=@\"/path/to/document2.txt\"'"
+          }
+        ]
+      }
+    },
+    "/api/agents/conversation-templates": {
+      "get": {
+        "summary": "Get Conversation Templates",
+        "description": "Retrieves all available conversation templates for agents. Templates include metadata such as name, description, and type (single or multi-prompt).",
+        "tags": ["Agents"],
+        "operationId": "getConversationTemplates",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "Cookie",
+            "in": "header",
+            "required": false,
+            "schema": { "type": "string", "example": "auth=<token>" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of conversation templates retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConversationTemplatesResponse"
+                },
+                "examples": {
+                  "default": {
+                    "value": {
+                      "message": "Conversation templates retrieved successfully",
+                      "templates": [
+                        {
+                          "_id": "64f0b3e5d6c8a2e5d72b5c91",
+                          "name": "Customer Support - Basic",
+                          "description": "Handles basic customer support inquiries",
+                          "conversationType": "single_prompt",
+                          "createdAt": "2025-01-01T10:00:00Z",
+                          "updatedAt": "2025-01-05T12:00:00Z"
+                        },
+                        {
+                          "_id": "64f0b3e5d6c8a2e5d72b5c92",
+                          "name": "Sales Inquiry - Multi-step",
+                          "description": "Guides the customer through a multi-step sales conversation",
+                          "conversationType": "multi_prompt",
+                          "createdAt": "2025-01-02T11:00:00Z",
+                          "updatedAt": "2025-01-06T13:00:00Z"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "cURL",
+            "label": "cURL",
+            "source": "curl --location '{{baseUrl}}/api/agents/conversation-templates' \\\n--header 'Cookie: auth=<token>'"
+          }
+        ]
+      }
+    },
+    "/api/agents/{id}/ambient-noise": {
+      "put": {
+        "summary": "Update Ambient Noise Settings",
+        "description": "Documentation\n{{baseUrl}}/api/agents/{id}/ambient-noise\n\n### Request Description\nUpdates the ambient noise configuration for a specific agent, including toggling ambient noise, adjusting volume, and specifying audio characteristics.",
+        "tags": ["Agents"],
+        "operationId": "updateAmbientNoise",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "6815701194899f4a2b71c0bc"
+            },
+            "description": "Agent ID to update"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string", "example": "Bearer {{authToken}}" }
+          },
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string", "enum": ["application/json"] }
+          },
+          {
+            "name": "Cookie",
+            "in": "header",
+            "required": false,
+            "schema": { "type": "string", "example": "auth=<token>" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "enable": { "type": "boolean", "example": true },
+                  "name": { "type": "string", "example": "restaurant" },
+                  "volume": { "type": "number", "example": 0.5 },
+                  "tts_model_id": {
+                    "type": "string",
+                    "example": "eleven_turbo_v2_5"
+                  },
+                  "audio_file_name": {
+                    "type": "string",
+                    "example": "restaurant-ambience.wav"
+                  }
+                },
+                "required": ["enable", "name"]
+              },
+              "examples": {
+                "default": {
+                  "value": {
+                    "enable": true,
+                    "name": "restaurant",
+                    "volume": 0.5,
+                    "tts_model_id": "eleven_turbo_v2_5"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ambient noise settings updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" },
+                    "settings": {
+                      "type": "object",
+                      "properties": {
+                        "enable": { "type": "boolean" },
+                        "name": { "type": "string" },
+                        "volume": { "type": "number" },
+                        "tts_model_id": { "type": "string" },
+                        "audio_file_name": { "type": "string" }
+                      }
+                    }
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "value": {
+                      "message": "Ambient noise settings updated successfully",
+                      "settings": {
+                        "enable": true,
+                        "volume": 0.5,
+                        "name": "restaurant",
+                        "tts_model_id": "eleven_turbo_v2_5"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "cURL",
+            "label": "cURL",
+            "source": "curl --location --request PUT '{{baseUrl}}/api/agents/6815701194899f4a2b71c0bc/ambient-noise' \\\n--header 'Authorization: Bearer {{authToken}}' \\\n--header 'Content-Type: application/json' \\\n--data '{\"enable\":true,\"name\":\"restaurant\",\"volume\":0.5,\"tts_model_id\":\"eleven_turbo_v2_5\"}'"
+          }
+        ]
+      }
+    },
 
     "/api/auth/google/login": {
       "post": {
@@ -146,6 +611,207 @@
             "lang": "cURL",
             "label": "cURL",
             "source": "curl --location '{{baseUrl}}/api/auth/google/login?authCode=null' --header 'Content-Type: application/json' --header 'Cookie: auth=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4MDIwMWNmNWIzNjQ0YjQ4YmNiMzU4YSIsInJvbGUiOiJ1c2VyIiwic3RhdHVzIjoiYXBwcm92ZWQiLCJpYXQiOjE3NTc0OTkzNTgsImV4cCI6MTc2MDA5MTM1OH0.sLuF-XybcpHVs-Z3lTRUGGzeh3Omk1YsLAcWvSgfZYc' --data '{\n    \"authCode\": \"GOOGLE_AUTHORIZATION_CODE_HERE\"\n}'"
+          }
+        ]
+      }
+    },
+    "/api/agents/get-agent-id-by-phone-id": {
+      "post": {
+        "summary": "Get Agent IDs by Phone IDs",
+        "description": "This endpoint retrieves agent IDs associated with a list of phone IDs. Useful to map multiple phone numbers to their corresponding agents.",
+        "tags": ["Agents"],
+        "operationId": "getAgentIdByPhoneId",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string", "example": "Bearer {{authToken}}" }
+          },
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string", "enum": ["application/json"] }
+          },
+          {
+            "name": "Cookie",
+            "in": "header",
+            "required": false,
+            "schema": { "type": "string", "example": "auth=<token>" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetAgentIdByPhoneIdRequest"
+              },
+              "examples": {
+                "default": {
+                  "value": {
+                    "phoneId": [
+                      "68ac46f39388e151abc5e388",
+                      "6853d286b819d90c0f6e77cc",
+                      "68516459045d02277594be99"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "List of agent IDs retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetAgentIdByPhoneIdResponse"
+                },
+                "examples": {
+                  "default": {
+                    "value": {
+                      "message": "Agent IDs retrieved successfully",
+                      "agents": [
+                        {
+                          "phoneId": "68ac46f39388e151abc5e388",
+                          "agentId": "684135442bc2d87ddfe0697f"
+                        },
+                        {
+                          "phoneId": "6853d286b819d90c0f6e77cc",
+                          "agentId": "684135442bc2d87ddfe0698"
+                        },
+                        {
+                          "phoneId": "68516459045d02277594be99",
+                          "agentId": "684135442bc2d87ddfe0699"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "cURL",
+            "label": "cURL",
+            "source": "curl --location '{{baseUrl}}/api/agents/get-agent-id-by-phone-id' \\\n--header 'Authorization: Bearer {{authToken}}' \\\n--header 'Content-Type: application/json' \\\n--header 'Cookie: auth=<token>' \\\n--data '{\"phoneId\":[\"68ac46f39388e151abc5e388\",\"6853d286b819d90c0f6e77cc\",\"68516459045d02277594be99\"]}'"
+          }
+        ]
+      }
+    },
+    "/api/agents/unlink-agent": {
+      "post": {
+        "summary": "Unlink Agent from Phone",
+        "description": "Documentation\n{{baseUrl}}/api/agents/unlink-agent\n\n### Request Description\nThis endpoint removes the association between an agent and a phone by clearing the agentId reference from the phone record.\n\n### Request\n- Method: POST\n- Content-Type: application/json\n- Must include the phoneId of the phone to unlink.",
+        "tags": ["Agents"],
+        "operationId": "unlinkAgentFromPhone",
+        "parameters": [
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string", "enum": ["application/json"] }
+          },
+          {
+            "name": "Cookie",
+            "in": "header",
+            "required": false,
+            "schema": { "type": "string", "example": "auth=<token>" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "phoneId": {
+                    "type": "string",
+                    "example": "68516459045d02277594be99"
+                  },
+                  "workflowType": { "type": "string", "example": "outbound" },
+                  "type": { "type": "string", "example": "workflow" }
+                },
+                "required": ["phoneId"]
+              },
+              "examples": {
+                "default": {
+                  "value": {
+                    "phoneId": "68516459045d02277594be99",
+                    "workflowType": "outbound",
+                    "type": "workflow"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Agent unlinked from phone successfully",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PhoneResponse" },
+                "examples": {
+                  "default": {
+                    "value": {
+                      "message": "Agent unlinked from phone successfully",
+                      "phone": {
+                        "_id": "68516459045d02277594be99",
+                        "agentId": null,
+                        "phoneNumber": "+1234567890",
+                        "status": "active",
+                        "workflowType": "outbound",
+                        "type": "workflow",
+                        "createdAt": "2025-07-25T10:16:46.282Z",
+                        "updatedAt": "2025-09-11T12:00:00.000Z"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Missing phoneId or no agent linked",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" },
+                "examples": {
+                  "missingPhoneId": {
+                    "value": { "message": "phoneId is required" }
+                  },
+                  "noAgentLinked": {
+                    "value": { "message": "No agent linked to this phone" }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Phone not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" },
+                "examples": {
+                  "default": { "value": { "message": "Phone not found" } }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "cURL",
+            "label": "cURL",
+            "source": "curl --location '{{baseUrl}}/api/agents/unlink-agent' \\\n--header 'Content-Type: application/json' \\\n--data '{\"phoneId\":\"68516459045d02277594be99\",\"workflowType\":\"outbound\",\"type\":\"workflow\"}'"
           }
         ]
       }
@@ -222,189 +888,390 @@
         ]
       }
     },
-   "/api/auth/profile": {
-  "get": {
-    "summary": "Get Profile",
-    "description": "Documentation\n{{baseUrl}}/api/auth/profile\n\n### Request Description\nThis endpoint retrieves the profile information of the authenticated user.\n\n### Request\n- This is a simple GET request and does not require a request body.\n- Must include a valid Authorization header (Bearer token).",
-    "tags": ["Authentication"],
-    "operationId": "authGetProfile",
-    "security": [{"bearerAuth": []}],
-    "parameters": [
-      {
-        "name": "Authorization",
-        "in": "header",
-        "required": true,
-        "schema": {"type": "string","example": "Bearer {{authToken}}"}
-      },
-      {
-        "name": "Content-Type",
-        "in": "header",
-        "required": true,
-        "schema": {"type": "string","enum": ["application/json"]}
-      },
-      {
-        "name": "Cookie",
-        "in": "header",
-        "required": false,
-        "schema": {"type": "string","example": "auth=<token>"}
-      }
-    ],
-    "responses": {
-      "200": {
-        "description": "User profile retrieved successfully",
-        "content": {
-          "application/json": {
-            "schema": {"$ref": "#/components/schemas/GetProfileResponse"},
-            "examples": {
-              "default": {
-                "value": {
-                  "success": true,
-                  "user": {
-                    "_id": "680201cf5b3644b48bcb358a",
-                    "username": "Praveen",
-                    "email": "team@weya.ai",
-                    "role": "user",
-                    "status": "approved",
-                    "totalCalls": 3,
-                    "totalCost": 301911,
-                    "profilePicture": "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png",
-                    "phoneNumbers": ["6802043b5b3644b48bcb3621"],
-                    "topup": 0,
-                    "organization": "Company",
-                    "teamSize": "50-100",
-                    "createdAt": "2025-04-18T07:39:59.859Z",
-                    "updatedAt": "2025-07-25T10:16:46.282Z",
-                    "__v": 0
+    "/api/agents/ambient-noise/options": {
+      "get": {
+        "summary": "Get Ambient Noise Options",
+        "description": "Documentation\n{{baseUrl}}/api/agents/ambient-noise/options\n\n### Request Description\nThis endpoint retrieves the list of available ambient noise audio configurations that can be applied to enhance the realism of agent voice responses.\n\n### Request\n- This is a simple GET request and does not require a request body.\n- Must include a valid Authorization header (Bearer token).",
+        "tags": ["Ambient Noise"],
+        "operationId": "getAmbientNoiseOptions",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string", "example": "Bearer {{authToken}}" }
+          },
+          {
+            "name": "Cookie",
+            "in": "header",
+            "required": false,
+            "schema": { "type": "string", "example": "auth=<token>" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ambient noise options retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AmbientNoiseOptionsResponse"
+                },
+                "examples": {
+                  "default": {
+                    "value": [
+                      {
+                        "tts_model_id": "eleven_turbo_v2_5",
+                        "volume": 0.5,
+                        "_id": "6803c781faedd4d54e53f286",
+                        "audio_file_name": "office-ambience-6322.wav",
+                        "name": "office"
+                      }
+                    ]
                   }
                 }
               }
             }
           }
-        }
-      },
-      "401": {
-        "description": "Unauthorized - Invalid or expired token",
-        "content": {
-          "application/json": {
-            "schema": {"$ref": "#/components/schemas/ErrorResponse"},
-            "examples": {"default": {"value": {"message": "Unauthorized"}}}
+        },
+        "x-codeSamples": [
+          {
+            "lang": "cURL",
+            "label": "cURL",
+            "source": "curl --location '{{baseUrl}}/api/agents/ambient-noise/options' \\\n--header 'Authorization: Bearer {{authToken}}' \\\n--header 'Cookie: auth=<token>'"
           }
-        }
+        ]
       }
     },
-    "x-codeSamples": [
-      {
-        "lang": "cURL",
-        "label": "cURL",
-        "source": "curl --location '{{baseUrl}}/api/auth/profile' \\\n--header 'Authorization: Bearer {{authToken}}' \\\n--header 'Content-Type: application/json' \\\n--header 'Cookie: auth=<token>'"
-      }
-    ]
-  },
-  "put": {
-    "summary": "Update Profile",
-    "description": "Documentation\n{{baseUrl}}/api/auth/profile\n\n### Request Description\nThis endpoint allows the authenticated user to update their profile information.\n\n### Request\n- Method: PUT\n- Content-Type: multipart/form-data\n- Must include a valid Authorization header (Bearer token)\n- The request body accepts form-data with the following fields:\n  - firstName (string, optional)\n  - lastName (string, optional)\n  - mobile (string, optional)\n  - companyName (string, optional)\n  - address (string, optional)\n  - profilePicture (file, optional)",
-    "tags": ["Authentication"],
-    "operationId": "authUpdateProfile",
-    "security": [{"bearerAuth": []}],
-    "parameters": [
-      {
-        "name": "Authorization",
-        "in": "header",
-        "required": true,
-        "schema": {"type": "string","example": "Bearer {{authToken}}"}
-      },
-      {
-        "name": "Cookie",
-        "in": "header",
-        "required": false,
-        "schema": {"type": "string","example": "auth=<token>"}
-      }
-    ],
-    "requestBody": {
-      "required": true,
-      "content": {
-        "multipart/form-data": {
-          "schema": {
-            "type": "object",
-            "properties": {
-              "firstName": {"type": "string"},
-              "lastName": {"type": "string"},
-              "mobile": {"type": "string"},
-              "companyName": {"type": "string"},
-              "address": {"type": "string"},
-              "profilePicture": {"type": "string","format": "binary"}
+    "/api/agents/link-agent": {
+      "post": {
+        "summary": "Link Agent to Phone",
+        "description": "Documentation\n{{baseUrl}}/api/agents/link-agent\n\n### Request Description\nThis endpoint associates an existing agent with a specific phone by updating the phone record to reference the agent.\n\n### Request\n- Method: POST\n- Content-Type: application/json\n- Must include a valid Authorization header (Bearer token if required) or Cookie header.\n- The request body must include the following fields:\n  - agentId (string, required): The ID of the agent to link\n  - phoneId (string, required): The ID of the phone to be updated\n  - agentType (string, optional): Type of agent (e.g., outbound)\n  - workflowId (string, optional): Associated workflow ID\n  - workflowType (string, optional): Type of workflow (e.g., outbound)\n  - type (string, optional): Entity type, usually 'agent'",
+        "tags": ["Agents"],
+        "operationId": "linkAgentToPhone",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "schema": { "type": "string", "example": "Bearer {{authToken}}" }
+          },
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string", "enum": ["application/json"] }
+          },
+          {
+            "name": "Cookie",
+            "in": "header",
+            "required": false,
+            "schema": { "type": "string", "example": "auth=<token>" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["agentId", "phoneId"],
+                "properties": {
+                  "agentId": {
+                    "type": "string",
+                    "description": "The ID of the agent to link"
+                  },
+                  "phoneId": {
+                    "type": "string",
+                    "description": "The ID of the phone to be updated"
+                  },
+                  "agentType": {
+                    "type": "string",
+                    "description": "Type of agent (e.g., outbound)"
+                  },
+                  "workflowId": {
+                    "type": "string",
+                    "description": "Associated workflow ID"
+                  },
+                  "workflowType": {
+                    "type": "string",
+                    "description": "Type of workflow (e.g., outbound)"
+                  },
+                  "type": {
+                    "type": "string",
+                    "description": "Entity type, usually 'agent'"
+                  }
+                }
+              },
+              "examples": {
+                "default": {
+                  "value": {
+                    "agentId": "684135442bc2d87ddfe0697f",
+                    "phoneId": "68516459045d02277594be99",
+                    "agentType": "outbound",
+                    "workflowId": "68a45da7d4b3035aee9cb690",
+                    "workflowType": "outbound",
+                    "type": "agent"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Agent linked to phone successfully",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PhoneResponse" },
+                "examples": {
+                  "default": {
+                    "value": {
+                      "message": "Agent linked to phone successfully",
+                      "phone": {
+                        "_id": "68516459045d02277594be99",
+                        "agentId": "684135442bc2d87ddfe0697f"
+                      }
+                    }
+                  }
+                }
+              }
             }
           },
-          "examples": {
-            "default": {
-              "value": {
-                "firstName": "TestUser",
-                "lastName": "420",
-                "mobile": "1234567890",
-                "companyName": "Acme Inc.",
-                "address": "123 Main Street, New York, NY",
-                "profilePicture": "/path/to/file"
+          "400": {
+            "description": "phoneId and agentId are required",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "default": {
+                    "value": { "message": "phoneId and agentId are required" }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Phone or Agent not found",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "phoneNotFound": {
+                    "value": { "message": "Phone not found" }
+                  },
+                  "agentNotFound": { "value": { "message": "Agent not found" } }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "default": { "value": { "message": "Internal Server Error" } }
+                }
               }
             }
           }
-        }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "cURL",
+            "label": "cURL",
+            "source": "curl --location '{{baseUrl}}/api/agents/link-agent' \\\n--header 'Content-Type: application/json' \\\n--header 'Cookie: auth=<token>' \\\n--data '{\n  \"agentId\": \"684135442bc2d87ddfe0697f\",\n  \"phoneId\": \"68516459045d02277594be99\",\n  \"agentType\": \"outbound\",\n  \"workflowId\": \"68a45da7d4b3035aee9cb690\",\n  \"workflowType\": \"outbound\",\n  \"type\": \"agent\"\n}'"
+          }
+        ]
       }
     },
-    "responses": {
-      "200": {
-        "description": "User profile updated successfully",
-        "content": {
-          "application/json": {
-            "schema": {"$ref": "#/components/schemas/UpdateProfileResponse"},
-            "examples": {
-              "default": {
-                "value": {
-                  "success": true,
-                  "message": "Profile updated successfully",
-                  "user": {
-                    "_id": "680201cf5b3644b48bcb358a",
-                    "username": "Praveen",
-                    "email": "team@weya.ai",
-                    "role": "user",
-                    "status": "approved",
-                    "totalCalls": 3,
-                    "totalCost": 301911,
-                    "profilePicture": "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png",
-                    "phoneNumbers": ["6802043b5b3644b48bcb3621"],
-                    "topup": 0,
-                    "organization": "Company",
-                    "teamSize": "50-100",
-                    "createdAt": "2025-04-18T07:39:59.859Z",
-                    "updatedAt": "2025-07-25T10:16:46.282Z",
-                    "__v": 0,
-                    "companyName": "Acme Inc."
+    "/api/auth/profile": {
+      "get": {
+        "summary": "Get Profile",
+        "description": "Documentation\n{{baseUrl}}/api/auth/profile\n\n### Request Description\nThis endpoint retrieves the profile information of the authenticated user.\n\n### Request\n- This is a simple GET request and does not require a request body.\n- Must include a valid Authorization header (Bearer token).",
+        "tags": ["Authentication"],
+        "operationId": "authGetProfile",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string", "example": "Bearer {{authToken}}" }
+          },
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string", "enum": ["application/json"] }
+          },
+          {
+            "name": "Cookie",
+            "in": "header",
+            "required": false,
+            "schema": { "type": "string", "example": "auth=<token>" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User profile retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/GetProfileResponse" },
+                "examples": {
+                  "default": {
+                    "value": {
+                      "success": true,
+                      "user": {
+                        "_id": "680201cf5b3644b48bcb358a",
+                        "username": "Praveen",
+                        "email": "team@weya.ai",
+                        "role": "user",
+                        "status": "approved",
+                        "totalCalls": 3,
+                        "totalCost": 301911,
+                        "profilePicture": "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png",
+                        "phoneNumbers": ["6802043b5b3644b48bcb3621"],
+                        "topup": 0,
+                        "organization": "Company",
+                        "teamSize": "50-100",
+                        "createdAt": "2025-04-18T07:39:59.859Z",
+                        "updatedAt": "2025-07-25T10:16:46.282Z",
+                        "__v": 0
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or expired token",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" },
+                "examples": {
+                  "default": { "value": { "message": "Unauthorized" } }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "cURL",
+            "label": "cURL",
+            "source": "curl --location '{{baseUrl}}/api/auth/profile' \\\n--header 'Authorization: Bearer {{authToken}}' \\\n--header 'Content-Type: application/json' \\\n--header 'Cookie: auth=<token>'"
+          }
+        ]
+      },
+      "put": {
+        "summary": "Update Profile",
+        "description": "Documentation\n{{baseUrl}}/api/auth/profile\n\n### Request Description\nThis endpoint allows the authenticated user to update their profile information.\n\n### Request\n- Method: PUT\n- Content-Type: multipart/form-data\n- Must include a valid Authorization header (Bearer token)\n- The request body accepts form-data with the following fields:\n  - firstName (string, optional)\n  - lastName (string, optional)\n  - mobile (string, optional)\n  - companyName (string, optional)\n  - address (string, optional)\n  - profilePicture (file, optional)",
+        "tags": ["Authentication"],
+        "operationId": "authUpdateProfile",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string", "example": "Bearer {{authToken}}" }
+          },
+          {
+            "name": "Cookie",
+            "in": "header",
+            "required": false,
+            "schema": { "type": "string", "example": "auth=<token>" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "firstName": { "type": "string" },
+                  "lastName": { "type": "string" },
+                  "mobile": { "type": "string" },
+                  "companyName": { "type": "string" },
+                  "address": { "type": "string" },
+                  "profilePicture": { "type": "string", "format": "binary" }
+                }
+              },
+              "examples": {
+                "default": {
+                  "value": {
+                    "firstName": "TestUser",
+                    "lastName": "420",
+                    "mobile": "1234567890",
+                    "companyName": "Acme Inc.",
+                    "address": "123 Main Street, New York, NY",
+                    "profilePicture": "/path/to/file"
                   }
                 }
               }
             }
           }
-        }
-      },
-      "401": {
-        "description": "Unauthorized - Invalid or expired token",
-        "content": {
-          "application/json": {
-            "schema": {"$ref": "#/components/schemas/ErrorResponse"},
-            "examples": {"default": {"value": {"message": "Unauthorized"}}}
+        },
+        "responses": {
+          "200": {
+            "description": "User profile updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateProfileResponse"
+                },
+                "examples": {
+                  "default": {
+                    "value": {
+                      "success": true,
+                      "message": "Profile updated successfully",
+                      "user": {
+                        "_id": "680201cf5b3644b48bcb358a",
+                        "username": "Praveen",
+                        "email": "team@weya.ai",
+                        "role": "user",
+                        "status": "approved",
+                        "totalCalls": 3,
+                        "totalCost": 301911,
+                        "profilePicture": "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png",
+                        "phoneNumbers": ["6802043b5b3644b48bcb3621"],
+                        "topup": 0,
+                        "organization": "Company",
+                        "teamSize": "50-100",
+                        "createdAt": "2025-04-18T07:39:59.859Z",
+                        "updatedAt": "2025-07-25T10:16:46.282Z",
+                        "__v": 0,
+                        "companyName": "Acme Inc."
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or expired token",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" },
+                "examples": {
+                  "default": { "value": { "message": "Unauthorized" } }
+                }
+              }
+            }
           }
-        }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "cURL",
+            "label": "cURL",
+            "source": "curl --location --request PUT '{{baseUrl}}/api/auth/profile' \\\n--header 'Authorization: Bearer {{authToken}}' \\\n--form 'firstName=\"TestUser\"' \\\n--form 'lastName=\"420\"' \\\n--form 'mobile=\"1234567890\"' \\\n--form 'companyName=\"Acme Inc.\"' \\\n--form 'address=\"123 Main Street, New York, NY\"' \\\n--form 'profilePicture=@\"/path/to/file\"'"
+          }
+        ]
       }
     },
-    "x-codeSamples": [
-      {
-        "lang": "cURL",
-        "label": "cURL",
-        "source": "curl --location --request PUT '{{baseUrl}}/api/auth/profile' \\\n--header 'Authorization: Bearer {{authToken}}' \\\n--form 'firstName=\"TestUser\"' \\\n--form 'lastName=\"420\"' \\\n--form 'mobile=\"1234567890\"' \\\n--form 'companyName=\"Acme Inc.\"' \\\n--form 'address=\"123 Main Street, New York, NY\"' \\\n--form 'profilePicture=@\"/path/to/file\"'"
-      }
-    ]
-  }
-}
-,
     "/api/auth/reset-password": {
       "post": {
         "summary": "Reset Password",
@@ -561,6 +1428,496 @@
       }
     },
 
+    "/api/agents/{id}": {
+      "delete": {
+        "summary": "Delete Agent",
+        "description": "Permanently deletes an agent by its unique identifier. This operation is irreversible. Only authenticated users with appropriate access to the agent or its organization can perform deletions.",
+        "tags": ["Agents"],
+        "operationId": "deleteAgent",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "The unique identifier of the agent to delete"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string", "example": "Bearer {{authToken}}" }
+          },
+          {
+            "name": "Cookie",
+            "in": "header",
+            "required": false,
+            "schema": { "type": "string", "example": "auth=<token>" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Agent deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Agent deleted successfully"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Agent not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "No agent exists for the given ID"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "An unexpected error occurred during deletion"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "cURL",
+            "label": "cURL",
+            "source": "curl --location --request DELETE '{{baseUrl}}/api/agents/64e5f12345abcdef12345678' \\\n--header 'Authorization: Bearer {{authToken}}'"
+          }
+        ]
+      },
+      "put": {
+        "summary": "Update Agent",
+        "description": "Updates the details of an existing agent by ID. Supports updating metadata, call settings, system messages, and tags. Multi-prompt agents have structured systemMessage updates, and role-based restrictions apply for websocketUrl updates.",
+        "tags": ["Agents"],
+        "operationId": "updateAgent",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Unique identifier of the agent to update"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string", "example": "Bearer {{authToken}}" }
+          },
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string", "enum": ["application/json"] }
+          },
+          {
+            "name": "Cookie",
+            "in": "header",
+            "required": false,
+            "schema": { "type": "string", "example": "auth=<token>" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateAgentRequest" },
+              "examples": {
+                "default": {
+                  "value": {
+                    "agent_name": "Updated Agent Name",
+                    "description": "Updated description for this agent",
+                    "tags": ["updated", "modified"],
+                    "callSetting": {
+                      "voiceSpeed": 1.1,
+                      "callTimeout": 40
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Agent updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateAgentResponse"
+                },
+                "examples": {
+                  "default": {
+                    "value": {
+                      "success": true,
+                      "message": "Agent updated successfully",
+                      "agent": {
+                        "_id": "6815701194899f4a2b71c0bc",
+                        "agent_name": "Updated Agent Name",
+                        "description": "Updated description for this agent",
+                        "tags": ["updated", "modified"],
+                        "callSetting": {
+                          "voiceSpeed": 1.1,
+                          "callTimeout": 40
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "cURL",
+            "label": "cURL",
+            "source": "curl --location --request PUT '{{baseUrl}}/api/agents/6815701194899f4a2b71c0bc' \\\n--header 'Authorization: Bearer {{authToken}}' \\\n--header 'Content-Type: application/json' \\\n--header 'Cookie: auth=<token>' \\\n--data '{\"agent_name\":\"Updated Agent Name\",\"description\":\"Updated description for this agent\",\"tags\":[\"updated\",\"modified\"],\"callSetting\":{\"voiceSpeed\":1.1,\"callTimeout\":40}}'"
+          }
+        ]
+      }
+    },
+    "/api/agents/test-agent-chat": {
+      "post": {
+        "summary": "Test Agent Chat",
+        "description": "Simulate a chat session with a specific agent. Send chat history, dynamic variables, and timezone information to get the agent's response.",
+        "tags": ["Agents"],
+        "operationId": "testAgentChat",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string", "example": "Bearer {{authToken}}" }
+          },
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string", "enum": ["application/json"] }
+          },
+          {
+            "name": "Cookie",
+            "in": "header",
+            "required": false,
+            "schema": { "type": "string", "example": "auth=<token>" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["agentId", "chat_history", "timezone"],
+                "properties": {
+                  "agentId": {
+                    "type": "string",
+                    "description": "ID of the agent to test chat with"
+                  },
+                  "variable": {
+                    "type": "object",
+                    "description": "Dynamic variables to inject into agent responses",
+                    "additionalProperties": { "type": "string" }
+                  },
+                  "chat_history": {
+                    "type": "array",
+                    "description": "List of previous messages in the conversation",
+                    "items": {
+                      "type": "object",
+                      "required": ["role", "content"],
+                      "properties": {
+                        "role": {
+                          "type": "string",
+                          "enum": ["USER", "AGENT"],
+                          "description": "Sender of the message"
+                        },
+                        "content": {
+                          "type": "string",
+                          "description": "Message content"
+                        }
+                      }
+                    }
+                  },
+                  "timezone": {
+                    "type": "string",
+                    "description": "Timezone of the user sending the messages"
+                  }
+                },
+                "example": {
+                  "agentId": "684135442bc2d87ddfe0697f",
+                  "variable": { "customer_name": "Arvind" },
+                  "chat_history": [
+                    { "role": "USER", "content": "Hello" },
+                    {
+                      "role": "AGENT",
+                      "content": "Hello Viju! This is Zara from i-SON Health. I wanted to remind you that your next medication refill is scheduled for the 25th of May, 2025. Have you had a chance to refill your medication since your last refill on the 10th of May?"
+                    },
+                    { "role": "USER", "content": "Bye Bye" }
+                  ],
+                  "timezone": "Asia/Kolkata"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Agent response returned successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Chat processed successfully"
+                    },
+                    "response": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "role": {
+                            "type": "string",
+                            "enum": ["USER", "AGENT"]
+                          },
+                          "content": { "type": "string" }
+                        }
+                      }
+                    }
+                  },
+                  "example": {
+                    "message": "Chat processed successfully",
+                    "response": [
+                      {
+                        "role": "AGENT",
+                        "content": "Hello Arvind! How can I assist you today?"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "cURL",
+            "label": "cURL",
+            "source": "curl --location '{{baseUrl}}/api/agents/test-agent-chat' \\\n--header 'Authorization: Bearer {{authToken}}' \\\n--header 'Content-Type: application/json' \\\n--header 'Cookie: auth=<token>' \\\n--data '{\"agentId\":\"684135442bc2d87ddfe0697f\",\"variable\":{\"customer_name\":\"Arvind\"},\"chat_history\":[{\"role\":\"USER\",\"content\":\"Hello\"},{\"role\":\"AGENT\",\"content\":\"Hello Viju! This is Zara from i-SON Health...\"},{\"role\":\"USER\",\"content\":\"Bye Bye\"}],\"timezone\":\"Asia/Kolkata\"}'"
+          }
+        ]
+      }
+    },
+    "/api/agents": {
+      "get": {
+        "summary": "Get Agents",
+        "description": "Documentation\n{{baseUrl}}/api/agents/\n\n### API Request Description\nThis endpoint retrieves the list of agents associated with the authenticated user's organization. Each agent includes details such as their type, status, assigned workflows, and configuration settings.",
+        "tags": ["Agents"],
+        "operationId": "getAgents",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string", "example": "Bearer {{authToken}}" }
+          },
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string", "enum": ["application/json"] }
+          },
+          {
+            "name": "Cookie",
+            "in": "header",
+            "required": false,
+            "schema": { "type": "string", "example": "auth=<token>" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of agents retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/GetAgentsResponse" },
+                "examples": {
+                  "default": {
+                    "value": {
+                      "message": "Agents retrieved successfully",
+                      "agents": [
+                        {
+                          "_id": "684135442bc2d87ddfe0697f",
+                          "name": "Agent 1",
+                          "type": "outbound",
+                          "status": "active",
+                          "workflowId": "68a45da7d4b3035aee9cb690",
+                          "workflowType": "outbound",
+                          "ambientNoise": {
+                            "enable": true,
+                            "name": "office",
+                            "volume": 0.5,
+                            "tts_model_id": "eleven_turbo_v2_5"
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "cURL",
+            "label": "cURL",
+            "source": "curl --location '{{baseUrl}}/api/agents/' \\\n--header 'Authorization: Bearer {{authToken}}' \\\n--header 'Content-Type: application/json' \\\n--header 'Cookie: auth=<token>'"
+          }
+        ]
+      },
+
+      "post": {
+        "summary": "Create Agent",
+        "description": "Documentation\n{{baseUrl}}/api/agents/\n\n### API Request Description\nThis endpoint creates a new agent with the specified configuration. The agent can be assigned a voice, call settings, tags, and system messages to guide its behavior.",
+        "tags": ["Agents"],
+        "operationId": "createAgent",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string", "example": "Bearer {{authToken}}" }
+          },
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string", "enum": ["application/json"] }
+          },
+          {
+            "name": "Cookie",
+            "in": "header",
+            "required": false,
+            "schema": { "type": "string", "example": "auth=<token>" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateAgentRequest" },
+              "examples": {
+                "default": {
+                  "value": {
+                    "agent_name": "Customer Support Agent",
+                    "gender": "Female",
+                    "type": "premium",
+                    "capability": "Customer Service",
+                    "description": "AI assistant trained to handle customer inquiries and support tickets",
+                    "voice": "60a7b1c2d3e4f5a6b7c8d9e0",
+                    "callSetting": {
+                      "voiceSpeed": 1.0,
+                      "vocabulary": ["support", "ticket", "refund", "order"],
+                      "callTimeout": 30
+                    },
+                    "tags": ["support", "customer-service", "help-desk"],
+                    "startMessage": "Hello! I'm your support assistant. How can I help you today?",
+                    "systemMessage": "You are a helpful customer support agent for Acme Inc. Your goal is to assist customers with their inquiries about products, orders, and services.",
+                    "selectedLanguage": ["en-US", "en-IN"],
+                    "conversationType": "single_prompt"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Agent created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateAgentResponse"
+                },
+                "examples": {
+                  "default": {
+                    "value": {
+                      "message": "Agent created successfully",
+                      "agent": {
+                        "_id": "684135442bc2d87ddfe0697f",
+                        "agent_name": "Customer Support Agent",
+                        "gender": "Female",
+                        "type": "premium",
+                        "capability": "Customer Service",
+                        "description": "AI assistant trained to handle customer inquiries and support tickets",
+                        "voice": "60a7b1c2d3e4f5a6b7c8d9e0",
+                        "callSetting": {
+                          "voiceSpeed": 1.0,
+                          "vocabulary": [
+                            "support",
+                            "ticket",
+                            "refund",
+                            "order"
+                          ],
+                          "callTimeout": 30
+                        },
+                        "tags": ["support", "customer-service", "help-desk"],
+                        "startMessage": "Hello! I'm your support assistant. How can I help you today?",
+                        "systemMessage": "You are a helpful customer support agent for Acme Inc. Your goal is to assist customers with their inquiries about products, orders, and services.",
+                        "selectedLanguage": ["en-US", "en-IN"],
+                        "conversationType": "single_prompt"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "cURL",
+            "label": "cURL",
+            "source": "curl --location '{{baseUrl}}/api/agents/' \\\n--header 'Authorization: Bearer {{authToken}}' \\\n--header 'Content-Type: application/json' \\\n--header 'Cookie: auth=<token>' \\\n--data '{\"agent_name\":\"Customer Support Agent\",\"gender\":\"Female\",\"type\":\"premium\",\"capability\":\"Customer Service\",\"description\":\"AI assistant trained to handle customer inquiries and support tickets\",\"voice\":\"60a7b1c2d3e4f5a6b7c8d9e0\",\"callSetting\":{\"voiceSpeed\":1.0,\"vocabulary\":[\"support\",\"ticket\",\"refund\",\"order\"],\"callTimeout\":30},\"tags\":[\"support\",\"customer-service\",\"help-desk\"],\"startMessage\":\"Hello! I'm your support assistant. How can I help you today?\",\"systemMessage\":\"You are a helpful customer support agent for Acme Inc. Your goal is to assist customers with their inquiries about products, orders, and services.\",\"selectedLanguage\":[\"en-US\",\"en-IN\"],\"conversationType\":\"single_prompt\"}'"
+          }
+        ]
+      }
+    },
     "/api/auth/signup": {
       "post": {
         "summary": "Signup",
@@ -691,13 +2048,130 @@
           }
         }
       },
-
+      "AmbientNoiseOption": {
+        "type": "object",
+        "required": [
+          "_id",
+          "tts_model_id",
+          "volume",
+          "audio_file_name",
+          "name"
+        ],
+        "properties": {
+          "_id": {
+            "type": "string",
+            "description": "Unique identifier for the ambient noise option"
+          },
+          "tts_model_id": {
+            "type": "string",
+            "description": "The ID of the text-to-speech model associated with this noise"
+          },
+          "volume": {
+            "type": "number",
+            "description": "The volume level (0.0 to 1.0) for mixing the ambient noise"
+          },
+          "audio_file_name": {
+            "type": "string",
+            "description": "Name of the associated audio file"
+          },
+          "name": {
+            "type": "string",
+            "description": "Friendly name of the ambient noise setting"
+          }
+        }
+      },
+      "AmbientNoiseOptionsResponse": {
+        "type": "array",
+        "items": { "$ref": "#/components/schemas/AmbientNoiseOption" }
+      },
       "LoginRequest": {
         "type": "object",
         "required": ["email", "password"],
         "properties": {
           "email": { "type": "string", "format": "email" },
           "password": { "type": "string", "format": "password" }
+        }
+      },
+      "TestAgentChatRequest": {
+        "type": "object",
+        "required": ["agentId", "chat_history", "timezone"],
+        "properties": {
+          "agentId": {
+            "type": "string",
+            "description": "ID of the agent to test chat with"
+          },
+          "variable": {
+            "type": "object",
+            "description": "Dynamic variables to inject into agent responses",
+            "additionalProperties": { "type": "string" }
+          },
+          "chat_history": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["role", "content"],
+              "properties": {
+                "role": { "type": "string", "enum": ["USER", "AGENT"] },
+                "content": { "type": "string" }
+              }
+            }
+          },
+          "timezone": { "type": "string" }
+        }
+      },
+      "TestAgentChatResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Chat processed successfully"
+          },
+          "response": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "role": { "type": "string", "enum": ["USER", "AGENT"] },
+                "content": { "type": "string" }
+              }
+            }
+          }
+        }
+      },
+      "GetAgentIdByPhoneIdRequest": {
+        "type": "object",
+        "required": ["phoneId"],
+        "properties": {
+          "phoneId": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "List of phone IDs to retrieve corresponding agent IDs"
+          }
+        }
+      },
+      "GetAgentIdByPhoneIdResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Agent IDs retrieved successfully"
+          },
+          "agents": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "phoneId": {
+                  "type": "string",
+                  "description": "Phone ID associated with agent"
+                },
+                "agentId": {
+                  "type": "string",
+                  "description": "Agent ID linked to the phone"
+                }
+              }
+            }
+          }
         }
       },
       "LoginResponse": {
@@ -757,6 +2231,128 @@
           }
         }
       },
+
+      "UpdateAmbientNoiseRequest": {
+        "type": "object",
+        "required": ["enable", "name"],
+        "properties": {
+          "enable": {
+            "type": "boolean",
+            "description": "Whether ambient noise should be enabled",
+            "example": true
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the ambient noise configuration (e.g., 'office', 'restaurant')",
+            "example": "restaurant"
+          },
+          "volume": {
+            "type": "number",
+            "description": "Volume level (must be between 0.2 and 0.8)",
+            "example": 0.5
+          },
+          "tts_model_id": {
+            "type": "string",
+            "description": "TTS model to use (eleven_turbo_v2_5 or eleven_ultra_v2_5)",
+            "example": "eleven_turbo_v2_5"
+          },
+          "audio_file_name": {
+            "type": "string",
+            "description": "Optional custom audio file name",
+            "example": "restaurant-ambience.wav"
+          }
+        }
+      },
+      "ValidateConversationRequest": {
+        "type": "object",
+        "required": ["conversationType", "systemMessage"],
+        "properties": {
+          "conversationType": {
+            "type": "string",
+            "description": "The type of conversation, e.g., 'single_prompt' or 'multi_prompt'. Determines how the system will process the conversation.",
+            "example": "multi_prompt"
+          },
+          "systemMessage": {
+            "type": "object",
+            "description": "Configuration object containing common instructions and states for the agent in the conversation.",
+            "properties": {
+              "common": {
+                "type": "object",
+                "description": "Common instructions and metadata for the agent.",
+                "properties": {
+                  "agent_information": {
+                    "type": "string",
+                    "description": "Information describing the agent's role or behavior.",
+                    "example": "You are a customer service agent."
+                  }
+                }
+              },
+              "states": {
+                "type": "object",
+                "description": "Defines the states in a multi-step conversation and their goals.",
+                "properties": {
+                  "START": {
+                    "type": "object",
+                    "properties": {
+                      "goal": {
+                        "type": "string",
+                        "description": "The goal or objective of the conversation at this state.",
+                        "example": "Identify customer issue"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "ValidateConversationResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Result of the validation process",
+            "example": "Conversation configuration is valid"
+          },
+          "isValid": {
+            "type": "boolean",
+            "description": "Indicates whether the conversation configuration is valid or not",
+            "example": true
+          },
+          "errors": {
+            "type": "array",
+            "description": "List of validation errors, if any",
+            "items": { "type": "string" },
+            "example": []
+          }
+        }
+      },
+      "UpdateAmbientNoiseResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Ambient noise settings updated successfully"
+          },
+          "settings": {
+            "type": "object",
+            "properties": {
+              "enable": { "type": "boolean", "example": true },
+              "name": { "type": "string", "example": "restaurant" },
+              "volume": { "type": "number", "example": 0.5 },
+              "tts_model_id": {
+                "type": "string",
+                "example": "eleven_turbo_v2_5"
+              },
+              "audio_file_name": {
+                "type": "string",
+                "example": "restaurant-ambience.wav"
+              }
+            }
+          }
+        }
+      },
       "SignupRequest": {
         "type": "object",
         "required": [
@@ -774,6 +2370,58 @@
           "phoneNumber": { "type": "string" },
           "teamName": { "type": "string" },
           "teamSize": { "type": "integer" }
+        }
+      },
+      "AddKnowledgeBaseResponse": {
+        "type": "object",
+        "properties": {
+          "message": { "type": "string" },
+          "data": {
+            "type": "object",
+            "properties": {
+              "_id": { "type": "string" },
+              "organizationId": { "type": "string" },
+              "knowledgeBaseName": { "type": "string" },
+              "bucketUrl": { "type": "string" },
+              "vectorDbCollection": { "type": "string" },
+              "__v": { "type": "integer" }
+            }
+          }
+        }
+      },
+      "GetAgentsResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Agents retrieved successfully"
+          },
+          "agents": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "_id": { "type": "string" },
+                "name": { "type": "string" },
+                "type": {
+                  "type": "string",
+                  "description": "Agent type (inbound/outbound)"
+                },
+                "status": { "type": "string" },
+                "workflowId": { "type": "string" },
+                "workflowType": { "type": "string" },
+                "ambientNoise": {
+                  "type": "object",
+                  "properties": {
+                    "enable": { "type": "boolean" },
+                    "name": { "type": "string" },
+                    "volume": { "type": "number" },
+                    "tts_model_id": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
         }
       },
       "UpdateProfileResponse": {
@@ -807,6 +2455,111 @@
           }
         }
       },
+      "ConversationTemplate": {
+        "type": "object",
+        "required": ["_id", "name", "description", "conversationType"],
+        "properties": {
+          "_id": {
+            "type": "string",
+            "description": "Unique identifier of the template"
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the conversation template"
+          },
+          "description": {
+            "type": "string",
+            "description": "Brief description of the template"
+          },
+          "conversationType": {
+            "type": "string",
+            "description": "Type of conversation (single_prompt or multi_prompt)"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Last update timestamp"
+          }
+        }
+      },
+      "CallResponse": {
+        "type": "object",
+        "required": ["message", "call"],
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Status message of the call creation",
+            "example": "Call created successfully"
+          },
+          "call": {
+            "type": "object",
+            "required": ["callId", "agentId", "name", "status"],
+            "properties": {
+              "callId": {
+                "type": "string",
+                "description": "Unique identifier of the created call",
+                "example": "12345abcde"
+              },
+              "agentId": {
+                "type": "string",
+                "description": "ID of the agent associated with the call",
+                "example": "684135442bc2d87ddfe0697f"
+              },
+              "name": {
+                "type": "string",
+                "description": "Name of the person or reference for the call",
+                "example": "Arvind"
+              },
+              "status": {
+                "type": "string",
+                "description": "Current status of the call",
+                "example": "initiated"
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time",
+                "description": "Timestamp when the call was created",
+                "example": "2025-09-11T12:00:00Z"
+              },
+              "updatedAt": {
+                "type": "string",
+                "format": "date-time",
+                "description": "Timestamp when the call was last updated",
+                "example": "2025-09-11T12:00:00Z"
+              }
+            }
+          }
+        }
+      },
+      "CallResponseExample": {
+        "message": "Call created successfully",
+        "call": {
+          "callId": "12345abcde",
+          "agentId": "684135442bc2d87ddfe0697f",
+          "name": "Arvind",
+          "status": "initiated",
+          "createdAt": "2025-09-11T12:00:00Z",
+          "updatedAt": "2025-09-11T12:00:00Z"
+        }
+      },
+      "ConversationTemplatesResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Conversation templates retrieved successfully"
+          },
+          "templates": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/ConversationTemplate" }
+          }
+        }
+      },
       "SignupResponse": {
         "type": "object",
         "properties": {
@@ -830,6 +2583,247 @@
           "__v": { "type": "number" },
           "access_token": { "type": "string" },
           "tokenExpiration": { "type": "number" }
+        }
+      },
+      "DeleteAgentResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Agent deleted successfully"
+          },
+          "agent": {
+            "type": "object",
+            "properties": {
+              "_id": {
+                "type": "string",
+                "example": "64e5f12345abcdef12345678"
+              },
+              "agent_name": {
+                "type": "string",
+                "example": "Customer Support Agent"
+              },
+              "type": {
+                "type": "string",
+                "example": "premium"
+              },
+              "capability": {
+                "type": "string",
+                "example": "Customer Service"
+              },
+              "status": {
+                "type": "string",
+                "example": "deleted"
+              },
+              "tags": {
+                "type": "array",
+                "items": { "type": "string" },
+                "example": ["support", "customer-service"]
+              },
+              "callSetting": {
+                "type": "object",
+                "properties": {
+                  "voiceSpeed": { "type": "number", "example": 1.0 },
+                  "callTimeout": { "type": "number", "example": 30 }
+                }
+              },
+              "deletedAt": {
+                "type": "string",
+                "example": "2025-09-11T12:34:56.789Z"
+              }
+            }
+          }
+        }
+      },
+      "PhoneResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Agent linked to phone successfully"
+          },
+          "phone": {
+            "type": "object",
+            "properties": {
+              "_id": {
+                "type": "string",
+                "example": "68516459045d02277594be99"
+              },
+              "agentId": {
+                "type": "string",
+                "example": "684135442bc2d87ddfe0697f"
+              },
+              "phoneNumber": {
+                "type": "string",
+                "example": "+1234567890"
+              },
+              "status": {
+                "type": "string",
+                "example": "active"
+              },
+              "workflowId": {
+                "type": "string",
+                "example": "68a45da7d4b3035aee9cb690"
+              },
+              "workflowType": {
+                "type": "string",
+                "example": "outbound"
+              },
+              "agentType": {
+                "type": "string",
+                "example": "outbound"
+              },
+              "type": {
+                "type": "string",
+                "example": "agent"
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time",
+                "example": "2025-07-25T10:16:46.282Z"
+              },
+              "updatedAt": {
+                "type": "string",
+                "format": "date-time",
+                "example": "2025-09-11T12:00:00.000Z"
+              }
+            },
+            "required": ["_id", "agentId"]
+          }
+        },
+        "required": ["message", "phone"]
+      },
+      "CreateAgentRequest": {
+        "type": "object",
+        "required": [
+          "agent_name",
+          "gender",
+          "type",
+          "capability",
+          "description",
+          "voice",
+          "callSetting",
+          "conversationType"
+        ],
+        "properties": {
+          "agent_name": { "type": "string" },
+          "gender": { "type": "string" },
+          "type": { "type": "string", "description": "Agent tier or level" },
+          "capability": { "type": "string" },
+          "description": { "type": "string" },
+          "voice": { "type": "string", "description": "Voice ID for TTS" },
+          "callSetting": {
+            "type": "object",
+            "properties": {
+              "voiceSpeed": { "type": "number" },
+              "vocabulary": { "type": "array", "items": { "type": "string" } },
+              "callTimeout": { "type": "number" }
+            }
+          },
+          "tags": { "type": "array", "items": { "type": "string" } },
+          "startMessage": { "type": "string" },
+          "systemMessage": { "type": "string" },
+          "selectedLanguage": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "conversationType": {
+            "type": "string",
+            "enum": ["single_prompt", "multi_prompt"]
+          }
+        }
+      },
+      "CreateAgentResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Agent created successfully"
+          },
+          "agent": { "$ref": "#/components/schemas/CreateAgentRequest" }
+        }
+      },
+      "UpdateAgentRequest": {
+        "type": "object",
+        "properties": {
+          "agent_name": { "type": "string" },
+          "description": { "type": "string" },
+          "tags": { "type": "array", "items": { "type": "string" } },
+          "callSetting": {
+            "type": "object",
+            "properties": {
+              "voiceSpeed": { "type": "number" },
+              "callTimeout": { "type": "number" }
+            }
+          },
+          "conversationType": {
+            "type": "string",
+            "enum": ["single_prompt", "multi_prompt"]
+          },
+          "systemMessage": {
+            "oneOf": [{ "type": "string" }, { "type": "object" }]
+          },
+          "backendSchema": { "type": "object" },
+          "websocketUrl": {
+            "type": "string",
+            "description": "Super Admin only; must start with wss://"
+          },
+          "profilePicture": { "type": "string", "format": "binary" }
+        }
+      },
+      "UpdateAgentResponse": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean" },
+          "message": { "type": "string" },
+          "agent": {
+            "type": "object",
+            "properties": {
+              "_id": { "type": "string" },
+              "agent_name": { "type": "string" },
+              "description": { "type": "string" },
+              "tags": { "type": "array", "items": { "type": "string" } },
+              "callSetting": {
+                "type": "object",
+                "properties": {
+                  "voiceSpeed": { "type": "number" },
+                  "callTimeout": { "type": "number" }
+                }
+              }
+            }
+          }
+        }
+      },
+      "GetAgentByIdResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Agent retrieved successfully"
+          },
+          "agent": {
+            "type": "object",
+            "properties": {
+              "_id": { "type": "string" },
+              "name": { "type": "string" },
+              "type": {
+                "type": "string",
+                "description": "Agent type (inbound/outbound)"
+              },
+              "status": { "type": "string" },
+              "workflowId": { "type": "string" },
+              "workflowType": { "type": "string" },
+              "ambientNoise": {
+                "type": "object",
+                "properties": {
+                  "enable": { "type": "boolean" },
+                  "name": { "type": "string" },
+                  "volume": { "type": "number" },
+                  "tts_model_id": { "type": "string" }
+                }
+              }
+            }
+          }
         }
       },
       "Plant": {

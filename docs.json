@@ -15,18 +15,11 @@
         "groups": [
           {
             "group": "Getting started",
-            "pages": [
-              "index",
-              "quickstart",
-              "development"
-            ]
+            "pages": ["index", "quickstart", "development"]
           },
           {
             "group": "Customization",
-            "pages": [
-              "essentials/settings",
-              "essentials/navigation"
-            ]
+            "pages": ["essentials/settings", "essentials/navigation"]
           },
           {
             "group": "Writing content",
@@ -52,9 +45,7 @@
         "groups": [
           {
             "group": "API documentation",
-            "pages": [
-              "api-reference/introduction"
-            ]
+            "pages": ["api-reference/introduction"]
           },
           {
             "group": "Authentication APIs",
@@ -73,9 +64,24 @@
           {
             "group": "Agent Management APIs",
             "pages": [
-              "api-reference/Agent Management/getAgents",
+              "api-reference/Agent Management/addKnowledgeBase",
+              "api-reference/Agent Management/ambientNoise",
+              "api-reference/Agent Management/conversationTemplates",
+              "api-reference/Agent Management/createAgent",
+              "api-reference/Agent Management/createCallsForTestAgent",
+              "api-reference/Agent Management/createMultiStateAgent",
+              "api-reference/Agent Management/deleteAgent",
               "api-reference/Agent Management/getAgentById",
-              "api-reference/Agent Management/getAgentIdFromPhoneId"
+              "api-reference/Agent Management/getAgentIdFromPhoneId",
+              "api-reference/Agent Management/getAgents",
+              "api-reference/Agent Management/getAgentTestingResult",
+              "api-reference/Agent Management/getAgentVariablesByPhoneIds",
+              "api-reference/Agent Management/linkAgentPhone",
+              "api-reference/Agent Management/testAgentByChat",
+              "api-reference/Agent Management/unlinkAgent",
+              "api-reference/Agent Management/updateAgent",
+              "api-reference/Agent Management/updateAmbientNoise",
+              "api-reference/Agent Management/validateConversation"
             ]
           }
         ]
@@ -124,15 +130,15 @@
   "openapi": "/api-reference/openapi.json",
   "contextual": {
     "options": [
-     "copy",
-     "view",
-     "chatgpt",
-     "claude",
-     "perplexity",
-     "mcp",
-     "cursor",
-     "vscode"
-   ]
+      "copy",
+      "view",
+      "chatgpt",
+      "claude",
+      "perplexity",
+      "mcp",
+      "cursor",
+      "vscode"
+    ]
   },
   "footer": {
     "socials": {
