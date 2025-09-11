@@ -840,6 +840,239 @@
         ]
       }
     },
+    "/api/voices/{id}": {
+      "put": {
+        "summary": "Update Voice",
+        "description": "Update an existing voice agent's details by its unique identifier. Only the provided fields will be updated.",
+        "tags": ["Voices"],
+        "operationId": "updateVoice",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Unique ID of the voice agent to update",
+            "schema": {
+              "type": "string",
+              "example": "64e5f12345abcdef12345678"
+            }
+          },
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "application/json"
+            }
+          },
+          {
+            "name": "Cookie",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "auth=<jwt-token>"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateVoiceRequest"
+              },
+              "example": {
+                "name": "Emma Updated",
+                "description": "Updated description for this voice",
+                "speed": 1.2,
+                "tags": ["updated", "customer-service", "professional"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Voice updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VoiceResponse"
+                },
+                "example": {
+                  "_id": "64e5f12345abcdef12345678",
+                  "name": "Emma Updated",
+                  "description": "Updated description for this voice",
+                  "speed": 1.2,
+                  "tags": ["updated", "customer-service", "professional"],
+                  "provider": "elevenlabs",
+                  "provider_voice_id": "21m00Tcm4TlvDq8ikWAM",
+                  "pitch": 1.0,
+                  "language": "en-US",
+                  "sample_url": "https://example.com/voice-samples/emma.mp3",
+                  "createdAt": "2025-03-04T19:16:09.610Z",
+                  "updatedAt": "2025-05-03T14:00:00.000Z",
+                  "__v": 0
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request data"
+          },
+          "404": {
+            "description": "Voice not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "cURL",
+            "label": "cURL",
+            "source": "curl --location --request PUT '{{baseUrl}}/api/voices/{id}' \\\n--header 'Content-Type: application/json' \\\n--header 'Cookie: auth=<jwt-token>' \\\n--data '{\n  \"name\": \"Emma Updated\",\n  \"description\": \"Updated description for this voice\",\n  \"speed\": 1.2,\n  \"tags\": [\"updated\", \"customer-service\", \"professional\"]\n}'"
+          }
+        ]
+      },
+      "delete": {
+        "summary": "Delete Voice",
+        "description": "Delete a voice agent by its unique identifier. This action is irreversible.",
+        "tags": ["Voices"],
+        "operationId": "deleteVoice",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Unique ID of the voice agent to delete",
+            "schema": {
+              "type": "string",
+              "example": "64e5f12345abcdef12345678"
+            }
+          },
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "application/json"
+            }
+          },
+          {
+            "name": "Cookie",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "auth=<jwt-token>"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Voice deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteVoiceResponse"
+                },
+                "example": {
+                  "message": "Voice deleted successfully"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Voice not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "cURL",
+            "label": "cURL",
+            "source": "curl --location --request DELETE '{{baseUrl}}/api/voices/{id}' \\\n--header 'Content-Type: application/json' \\\n--header 'Cookie: auth=<jwt-token>'"
+          }
+        ]
+      },
+      "get": {
+        "summary": "Get Voice by ID",
+        "description": "Retrieve details of a single voice agent by its unique identifier.",
+        "tags": ["Voices"],
+        "operationId": "getVoiceById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Unique ID of the voice agent",
+            "schema": {
+              "type": "string",
+              "example": "67c75179663b11a3fcbbcb85"
+            }
+          },
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string", "example": "application/json" }
+          },
+          {
+            "name": "Cookie",
+            "in": "header",
+            "required": false,
+            "schema": { "type": "string", "example": "auth=<jwt-token>" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Voice retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/VoiceAgent" },
+                "examples": {
+                  "default": {
+                    "value": {
+                      "_id": "67c75179663b11a3fcbbcb85",
+                      "modelId": "iWNf11sz1GrUE4ppxTOL",
+                      "agent_name": "Rajesh",
+                      "trait": "calm, receptionist, event scheduler, Advertisement/infomercial",
+                      "imageUrl": "https://agent-image-1.s3.ap-south-1.amazonaws.com/Rajesh.jpeg",
+                      "languages": [
+                        "Hindi_hi-IN",
+                        "English_en-IN",
+                        "Tamil_ta-IN"
+                      ],
+                      "gender": "Male",
+                      "createdAt": "2025-03-04T19:16:09.610Z",
+                      "updatedAt": "2025-03-04T19:16:09.610Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Voice not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "cURL",
+            "label": "cURL",
+            "source": "curl --location '{{baseUrl}}/api/voices/{id}' \\\n--header 'Content-Type: application/json' \\\n--header 'Cookie: auth=<jwt-token>'"
+          }
+        ]
+      }
+    },
     "/api/agents/get-agent-id-by-phone-id": {
       "post": {
         "summary": "Get Agent IDs by Phone IDs",
@@ -1037,6 +1270,181 @@
             "lang": "cURL",
             "label": "cURL",
             "source": "curl --location '{{baseUrl}}/api/agents/unlink-agent' \\\n--header 'Content-Type: application/json' \\\n--data '{\"phoneId\":\"68516459045d02277594be99\",\"workflowType\":\"outbound\",\"type\":\"workflow\"}'"
+          }
+        ]
+      }
+    },
+    "/api/voices": {
+      "post": {
+        "summary": "Create Voice",
+        "description": "Creates a new voice agent with the given details such as name, gender, type, provider, provider voice ID, pitch, speed, language, tags, sample URL, and description.",
+        "tags": ["Voices"],
+        "operationId": "createVoice",
+        "parameters": [
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string", "example": "application/json" }
+          },
+          {
+            "name": "Cookie",
+            "in": "header",
+            "required": false,
+            "schema": { "type": "string", "example": "auth=<jwt-token>" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateVoiceRequest" },
+              "examples": {
+                "default": {
+                  "value": {
+                    "name": "Emma",
+                    "gender": "Female",
+                    "type": "premium",
+                    "provider": "elevenlabs",
+                    "provider_voice_id": "21m00Tcm4TlvDq8ikWAM",
+                    "pitch": 1.0,
+                    "speed": 1.0,
+                    "language": "en-US",
+                    "tags": ["customer-service", "professional"],
+                    "sample_url": "https://example.com/voice-samples/emma.mp3",
+                    "description": "Professional female voice with a friendly tone"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Voice created successfully",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Voice" },
+                "examples": {
+                  "default": {
+                    "value": {
+                      "_id": "67c75179663b11a3fcbbcb85",
+                      "name": "Emma",
+                      "gender": "Female",
+                      "type": "premium",
+                      "provider": "elevenlabs",
+                      "provider_voice_id": "21m00Tcm4TlvDq8ikWAM",
+                      "pitch": 1.0,
+                      "speed": 1.0,
+                      "language": "en-US",
+                      "tags": ["customer-service", "professional"],
+                      "sample_url": "https://example.com/voice-samples/emma.mp3",
+                      "description": "Professional female voice with a friendly tone",
+                      "createdAt": "2025-05-03T12:00:00.000Z",
+                      "updatedAt": "2025-05-03T12:00:00.000Z",
+                      "__v": 0
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Invalid data or missing fields"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "cURL",
+            "label": "cURL",
+            "source": "curl --location '{{baseUrl}}/api/voices/' \\\n--header 'Content-Type: application/json' \\\n--header 'Cookie: auth=<jwt-token>' \\\n--data '{\n  \"name\": \"Emma\",\n  \"gender\": \"Female\",\n  \"type\": \"premium\",\n  \"provider\": \"elevenlabs\",\n  \"provider_voice_id\": \"21m00Tcm4TlvDq8ikWAM\",\n  \"pitch\": 1.0,\n  \"speed\": 1.0,\n  \"language\": \"en-US\",\n  \"tags\": [\"customer-service\", \"professional\"],\n  \"sample_url\": \"https://example.com/voice-samples/emma.mp3\",\n  \"description\": \"Professional female voice with a friendly tone\"\n}'"
+          }
+        ]
+      },
+      "get": {
+        "summary": "Get Voices",
+        "description": "Retrieves a list of available voice agents with details such as name, language support, traits, gender, and metadata.",
+        "tags": ["Voices"],
+        "operationId": "getVoices",
+        "parameters": [
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string", "example": "application/json" }
+          },
+          {
+            "name": "Cookie",
+            "in": "header",
+            "required": false,
+            "schema": { "type": "string", "example": "auth=<jwt-token>" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of voices retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/VoiceAgent" }
+                },
+                "examples": {
+                  "default": {
+                    "value": [
+                      {
+                        "_id": "67c75179663b11a3fcbbcb85",
+                        "modelId": "iWNf11sz1GrUE4ppxTOL",
+                        "agent_name": "Rajesh",
+                        "trait": "calm, receptionist, event scheduler, Advertisement/infomercial",
+                        "imageUrl": "https://agent-image-1.s3.ap-south-1.amazonaws.com/Rajesh.jpeg",
+                        "languages": [
+                          "Hindi_hi-IN",
+                          "English_en-IN",
+                          "Tamil_ta-IN"
+                        ],
+                        "gender": "Male",
+                        "createdAt": "2025-03-04T19:16:09.610Z",
+                        "updatedAt": "2025-03-04T19:16:09.610Z"
+                      },
+                      {
+                        "_id": "67c75185663b11a3fcbbcb8a",
+                        "modelId": "en-GB-AdaMultilingualNeural",
+                        "agent_name": "Nirmala",
+                        "trait": "calm, receptionist, event scheduler, Advertisement/infomercial",
+                        "imageUrl": "https://agent-image-1.s3.ap-south-1.amazonaws.com/Nirmala.jpeg",
+                        "languages": [
+                          "English_en-IN",
+                          "Hindi_hi-IN",
+                          "Tamil_ta-IN",
+                          "Telugu_te-IN",
+                          "Malyalam_ml-IN",
+                          "Bengali_bn-IN",
+                          "Kannada_kn-IN",
+                          "Czech_cs-CZ"
+                        ],
+                        "gender": "Female",
+                        "createdAt": "2025-03-04T19:16:21.737Z",
+                        "updatedAt": "2025-04-02T14:22:01.830Z"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error - Unable to fetch voices"
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "cURL",
+            "label": "cURL",
+            "source": "curl --location '{{baseUrl}}/api/voices/' \\\n--header 'Content-Type: application/json' \\\n--header 'Cookie: auth=<jwt-token>'"
           }
         ]
       }
@@ -2344,6 +2752,80 @@
           "timezone": { "type": "string" }
         }
       },
+      "CreateVoiceRequest": {
+        "type": "object",
+        "required": [
+          "name",
+          "gender",
+          "type",
+          "provider",
+          "provider_voice_id",
+          "pitch",
+          "speed",
+          "language"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the voice agent",
+            "example": "Emma"
+          },
+          "gender": {
+            "type": "string",
+            "description": "Gender of the voice agent",
+            "example": "Female"
+          },
+          "type": {
+            "type": "string",
+            "description": "Type of the voice (e.g., standard, premium)",
+            "example": "premium"
+          },
+          "provider": {
+            "type": "string",
+            "description": "Name of the voice provider",
+            "example": "elevenlabs"
+          },
+          "provider_voice_id": {
+            "type": "string",
+            "description": "Unique provider identifier for the voice model",
+            "example": "21m00Tcm4TlvDq8ikWAM"
+          },
+          "pitch": {
+            "type": "number",
+            "format": "float",
+            "description": "Pitch of the voice (0.5–2.0)",
+            "example": 1.0
+          },
+          "speed": {
+            "type": "number",
+            "format": "float",
+            "description": "Speed of the voice (0.5–2.0)",
+            "example": 1.0
+          },
+          "language": {
+            "type": "string",
+            "description": "Language spoken by the voice",
+            "example": "en-US"
+          },
+          "tags": {
+            "type": "array",
+            "description": "Tags describing the voice",
+            "items": { "type": "string" },
+            "example": ["customer-service", "professional"]
+          },
+          "sample_url": {
+            "type": "string",
+            "description": "URL to a sample audio file",
+            "example": "https://example.com/voice-samples/emma.mp3"
+          },
+          "description": {
+            "type": "string",
+            "description": "Short description of the voice agent",
+            "example": "Professional female voice with a friendly tone"
+          }
+        }
+      },
+
       "TestAgentChatResponse": {
         "type": "object",
         "properties": {
@@ -2649,6 +3131,7 @@
           }
         }
       },
+
       "UpdateProfileResponse": {
         "type": "object",
         "properties": {
@@ -2810,6 +3293,7 @@
           "tokenExpiration": { "type": "number" }
         }
       },
+
       "DeleteAgentResponse": {
         "type": "object",
         "properties": {
@@ -2857,6 +3341,15 @@
                 "example": "2025-09-11T12:34:56.789Z"
               }
             }
+          }
+        }
+      },
+      "DeleteVoiceResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Voice deleted successfully"
           }
         }
       },
@@ -2917,6 +3410,70 @@
           }
         },
         "required": ["message", "phone"]
+      },
+      "VoiceAgent": {
+        "type": "object",
+        "required": [
+          "_id",
+          "modelId",
+          "agent_name",
+          "trait",
+          "imageUrl",
+          "languages",
+          "gender",
+          "createdAt",
+          "updatedAt"
+        ],
+        "properties": {
+          "_id": {
+            "type": "string",
+            "description": "Unique identifier for the voice agent",
+            "example": "67c75179663b11a3fcbbcb85"
+          },
+          "modelId": {
+            "type": "string",
+            "description": "ID of the voice model used",
+            "example": "iWNf11sz1GrUE4ppxTOL"
+          },
+          "agent_name": {
+            "type": "string",
+            "description": "Name of the voice agent",
+            "example": "Rajesh"
+          },
+          "trait": {
+            "type": "string",
+            "description": "Describes the characteristics of the voice",
+            "example": "calm, receptionist, event scheduler, Advertisement/infomercial"
+          },
+          "imageUrl": {
+            "type": "string",
+            "description": "URL to the agent's image",
+            "example": "https://agent-image-1.s3.ap-south-1.amazonaws.com/Rajesh.jpeg"
+          },
+          "languages": {
+            "type": "array",
+            "description": "Languages supported by the voice agent",
+            "items": { "type": "string" },
+            "example": ["Hindi_hi-IN", "English_en-IN", "Tamil_ta-IN"]
+          },
+          "gender": {
+            "type": "string",
+            "description": "Gender of the voice agent",
+            "example": "Male"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the voice agent was created",
+            "example": "2025-03-04T19:16:09.610Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the voice agent was last updated",
+            "example": "2025-04-02T14:22:01.830Z"
+          }
+        }
       },
       "CreateAgentRequest": {
         "type": "object",
@@ -2989,6 +3546,70 @@
             "type": "string",
             "description": "Identifier of the organization associated with the knowledge base",
             "example": "org1234567890"
+          },
+          "VoiceAgent": {
+            "type": "object",
+            "required": [
+              "_id",
+              "modelId",
+              "agent_name",
+              "trait",
+              "imageUrl",
+              "languages",
+              "gender",
+              "createdAt",
+              "updatedAt"
+            ],
+            "properties": {
+              "_id": {
+                "type": "string",
+                "description": "Unique identifier for the voice agent",
+                "example": "67c75179663b11a3fcbbcb85"
+              },
+              "modelId": {
+                "type": "string",
+                "description": "ID of the voice model used",
+                "example": "iWNf11sz1GrUE4ppxTOL"
+              },
+              "agent_name": {
+                "type": "string",
+                "description": "Name of the voice agent",
+                "example": "Rajesh"
+              },
+              "trait": {
+                "type": "string",
+                "description": "Describes the characteristics of the voice",
+                "example": "calm, receptionist, event scheduler, Advertisement/infomercial"
+              },
+              "imageUrl": {
+                "type": "string",
+                "description": "URL to the agent's image",
+                "example": "https://agent-image-1.s3.ap-south-1.amazonaws.com/Rajesh.jpeg"
+              },
+              "languages": {
+                "type": "array",
+                "description": "Languages supported by the voice agent",
+                "items": { "type": "string" },
+                "example": ["Hindi_hi-IN", "English_en-IN", "Tamil_ta-IN"]
+              },
+              "gender": {
+                "type": "string",
+                "description": "Gender of the voice agent",
+                "example": "Male"
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time",
+                "description": "Timestamp when the voice agent was created",
+                "example": "2025-03-04T19:16:09.610Z"
+              },
+              "updatedAt": {
+                "type": "string",
+                "format": "date-time",
+                "description": "Timestamp when the voice agent was last updated",
+                "example": "2025-03-04T19:16:09.610Z"
+              }
+            }
           },
           "knowledgeBaseName": {
             "type": "string",
@@ -3082,6 +3703,76 @@
           }
         }
       },
+
+      "Voice": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "description": "Unique identifier for the created voice agent",
+            "example": "67c75179663b11a3fcbbcb85"
+          },
+          "name": {
+            "type": "string",
+            "example": "Emma"
+          },
+          "gender": {
+            "type": "string",
+            "example": "Female"
+          },
+          "type": {
+            "type": "string",
+            "example": "premium"
+          },
+          "provider": {
+            "type": "string",
+            "example": "elevenlabs"
+          },
+          "provider_voice_id": {
+            "type": "string",
+            "example": "21m00Tcm4TlvDq8ikWAM"
+          },
+          "pitch": {
+            "type": "number",
+            "example": 1.0
+          },
+          "speed": {
+            "type": "number",
+            "example": 1.0
+          },
+          "language": {
+            "type": "string",
+            "example": "en-US"
+          },
+          "tags": {
+            "type": "array",
+            "items": { "type": "string" },
+            "example": ["customer-service", "professional"]
+          },
+          "sample_url": {
+            "type": "string",
+            "example": "https://example.com/voice-samples/emma.mp3"
+          },
+          "description": {
+            "type": "string",
+            "example": "Professional female voice with a friendly tone"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-05-03T12:00:00.000Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-05-03T12:00:00.000Z"
+          },
+          "__v": {
+            "type": "integer",
+            "example": 0
+          }
+        }
+      },
       "GetAgentByIdResponse": {
         "type": "object",
         "properties": {
@@ -3112,6 +3803,61 @@
               }
             }
           }
+        }
+      },
+      "UpdateVoiceRequest": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "example": "Emma Updated" },
+          "description": {
+            "type": "string",
+            "example": "Updated description for this voice"
+          },
+          "speed": { "type": "number", "example": 1.2 },
+          "tags": {
+            "type": "array",
+            "items": { "type": "string" },
+            "example": ["updated", "customer-service", "professional"]
+          }
+        }
+      },
+      "VoiceResponse": {
+        "type": "object",
+        "properties": {
+          "_id": { "type": "string", "example": "64e5f12345abcdef12345678" },
+          "name": { "type": "string", "example": "Emma Updated" },
+          "description": {
+            "type": "string",
+            "example": "Updated description for this voice"
+          },
+          "speed": { "type": "number", "example": 1.2 },
+          "tags": {
+            "type": "array",
+            "items": { "type": "string" },
+            "example": ["updated", "customer-service", "professional"]
+          },
+          "provider": { "type": "string", "example": "elevenlabs" },
+          "provider_voice_id": {
+            "type": "string",
+            "example": "21m00Tcm4TlvDq8ikWAM"
+          },
+          "pitch": { "type": "number", "example": 1.0 },
+          "language": { "type": "string", "example": "en-US" },
+          "sample_url": {
+            "type": "string",
+            "example": "https://example.com/voice-samples/emma.mp3"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-03-04T19:16:09.610Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-05-03T14:00:00.000Z"
+          },
+          "__v": { "type": "integer", "example": 0 }
         }
       },
       "Plant": {

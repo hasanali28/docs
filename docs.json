@@ -90,7 +90,16 @@
               "api-reference/Knowledge Base/createKB",
               "api-reference/Knowledge Base/getKB",
               "api-reference/Knowledge Base/getKBById"
-            
+            ]
+          },
+          {
+            "group": "Voice Management APIs",
+            "pages": [
+              "api-reference/Voice Management/createVoice",
+              "api-reference/Voice Management/deleteVoice",
+              "api-reference/Voice Management/getVoices",
+              "api-reference/Voice Management/getVoicesById",
+              "api-reference/Voice Management/updateVoice"
             ]
           }
         ]
