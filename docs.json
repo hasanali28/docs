@@ -83,6 +83,15 @@
               "api-reference/Agent Management/updateAmbientNoise",
               "api-reference/Agent Management/validateConversation"
             ]
+          },
+          {
+            "group": "Knowledge Base APIs",
+            "pages": [
+              "api-reference/Knowledge Base/createKB",
+              "api-reference/Knowledge Base/getKB",
+              "api-reference/Knowledge Base/getKBById"
+            
+            ]
           }
         ]
       }

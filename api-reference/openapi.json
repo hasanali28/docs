@@ -263,6 +263,231 @@
         ]
       }
     },
+    "/api/knowledgeBase": {
+      "get": {
+        "summary": "Get All Knowledge Bases",
+        "description": "Retrieve all knowledge bases associated with the authenticated user's organization.",
+        "tags": ["Knowledge Base"],
+        "operationId": "getAllKnowledgeBases",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string", "example": "Bearer <token>" }
+          },
+          {
+            "name": "Cookie",
+            "in": "header",
+            "required": false,
+            "schema": { "type": "string", "example": "auth=<jwt-token>" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Knowledge bases retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KnowledgeBasesResponse"
+                },
+                "examples": {
+                  "default": {
+                    "value": {
+                      "message": "Knowledge bases retrieved successfully",
+                      "data": [
+                        {
+                          "_id": "64e5f12345abcdef12345678",
+                          "organizationId": "org1234567890",
+                          "knowledgeBaseName": "Technical Documentation",
+                          "bucketUrl": "https://bucket-name.s3.region.amazonaws.com/org1234567890/64e5f12345abcdef12345678/",
+                          "vectorDbCollection": "generated-collection-id",
+                          "createdAt": "2025-01-15T08:21:33.000Z",
+                          "updatedAt": "2025-01-15T08:21:33.000Z"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized request" },
+          "500": { "description": "Internal server error" }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "cURL",
+            "label": "cURL",
+            "source": "curl --location 'http://localhost:5001/api/knowledgeBase/' \\\n--header 'Authorization: Bearer {{authToken}}' \\\n--header 'Cookie: auth=<jwt-token>'"
+          }
+        ]
+      }
+    },
+
+    "/api/knowledgeBase/{id}": {
+      "get": {
+        "summary": "Get Knowledge Base by ID",
+        "description": "Retrieve a single knowledge base by its unique identifier.",
+        "tags": ["Knowledge Base"],
+        "operationId": "getKnowledgeBaseById",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Unique identifier of the knowledge base"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string", "example": "Bearer <token>" }
+          },
+          {
+            "name": "Cookie",
+            "in": "header",
+            "required": false,
+            "schema": { "type": "string", "example": "auth=<jwt-token>" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Knowledge base retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KnowledgeBaseResponse"
+                },
+                "examples": {
+                  "default": {
+                    "value": {
+                      "message": "Knowledge base retrieved successfully",
+                      "data": {
+                        "_id": "64e5f12345abcdef12345678",
+                        "organizationId": "org1234567890",
+                        "knowledgeBaseName": "Technical Documentation",
+                        "bucketUrl": "https://bucket-name.s3.region.amazonaws.com/org1234567890/64e5f12345abcdef12345678/",
+                        "vectorDbCollection": "generated-collection-id",
+                        "createdAt": "2025-01-15T08:21:33.000Z",
+                        "updatedAt": "2025-01-15T08:21:33.000Z"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": { "description": "Knowledge base not found" },
+          "401": { "description": "Unauthorized request" },
+          "500": { "description": "Internal server error" }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "cURL",
+            "label": "cURL",
+            "source": "curl --location 'http://localhost:5001/api/knowledgeBase/{id}' \\\n--header 'Authorization: Bearer {{authToken}}' \\\n--header 'Cookie: auth=<jwt-token>'"
+          }
+        ]
+      }
+    },
+    "/api/knowledgeBase/createKnowledgeBase": {
+      "post": {
+        "summary": "Create Knowledge Base",
+        "description": "Documentation\n{{baseUrl}}/api/knowledgeBase/createKnowledgeBase\n\n### API Request Description\nThis API endpoint allows users to create or update a knowledge base by uploading one or more files. Files are stored in Amazon S3, and a vector database collection is generated for semantic search.\n\n### Request Body\n- knowledgeBaseName (string): Name of the knowledge base to be created or updated.\n- files (file[]): Files (PDF, DOCX, TXT, etc.) to be uploaded.\n\n### Response Body\nUpon successful execution, the API returns status 200 and details of the created or updated knowledge base.",
+        "tags": ["Knowledge Base"],
+        "operationId": "createKnowledgeBase",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string", "example": "Bearer <token>" }
+          },
+          {
+            "name": "Cookie",
+            "in": "header",
+            "required": false,
+            "schema": { "type": "string", "example": "auth=<jwt-token>" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": ["knowledgeBaseName", "files"],
+                "properties": {
+                  "knowledgeBaseName": {
+                    "type": "string",
+                    "description": "Name of the knowledge base",
+                    "example": "Technical Documentation"
+                  },
+                  "files": {
+                    "type": "array",
+                    "items": { "type": "string", "format": "binary" },
+                    "description": "Array of files to be uploaded"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Knowledge base created/updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KnowledgeBaseResponse"
+                },
+                "examples": {
+                  "default": {
+                    "value": {
+                      "message": "Files uploaded successfully, vectorDbCollection updated",
+                      "data": {
+                        "_id": "64e5f12345abcdef12345678",
+                        "organizationId": "org1234567890",
+                        "knowledgeBaseName": "Technical Documentation",
+                        "bucketUrl": "https://bucket-name.s3.region.amazonaws.com/org1234567890/64e5f12345abcdef12345678/",
+                        "vectorDbCollection": "generated-collection-id",
+                        "createdAt": "2025-01-15T08:21:33.000Z",
+                        "updatedAt": "2025-01-15T08:21:33.000Z"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing required fields or invalid input"
+          },
+          "401": {
+            "description": "Unauthorized request"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "cURL",
+            "label": "cURL",
+            "source": "curl --location '{{baseUrl}}/api/knowledgeBase/createKnowledgeBase' \\\n--header 'Authorization: Bearer {{authToken}}' \\\n--form 'knowledgeBaseName=\"Technical Documentation\"' \\\n--form 'files=@\"/path/to/document1.pdf\"' \\\n--form 'files=@\"/path/to/document2.docx\"' \\\n--form 'files=@\"/path/to/document3.txt\"'"
+          }
+        ]
+      }
+    },
     "/api/agents/addKnowledgeBase": {
       "post": {
         "summary": "Add Knowledge Base",
@@ -2741,6 +2966,69 @@
             "example": "Agent created successfully"
           },
           "agent": { "$ref": "#/components/schemas/CreateAgentRequest" }
+        }
+      },
+      "KnowledgeBase": {
+        "type": "object",
+        "required": [
+          "_id",
+          "organizationId",
+          "knowledgeBaseName",
+          "bucketUrl",
+          "vectorDbCollection",
+          "createdAt",
+          "updatedAt"
+        ],
+        "properties": {
+          "_id": {
+            "type": "string",
+            "description": "Unique identifier of the knowledge base",
+            "example": "64e5f12345abcdef12345678"
+          },
+          "organizationId": {
+            "type": "string",
+            "description": "Identifier of the organization associated with the knowledge base",
+            "example": "org1234567890"
+          },
+          "knowledgeBaseName": {
+            "type": "string",
+            "description": "Name of the knowledge base",
+            "example": "Technical Documentation"
+          },
+          "bucketUrl": {
+            "type": "string",
+            "description": "Amazon S3 bucket URL where files are uploaded",
+            "example": "https://bucket-name.s3.region.amazonaws.com/org1234567890/64e5f12345abcdef12345678/"
+          },
+          "vectorDbCollection": {
+            "type": "string",
+            "description": "Generated vector database collection ID for semantic search",
+            "example": "generated-collection-id"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the knowledge base was created",
+            "example": "2025-01-15T08:21:33.000Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the knowledge base was last updated",
+            "example": "2025-01-15T08:21:33.000Z"
+          }
+        }
+      },
+      "KnowledgeBaseResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Files uploaded successfully, vectorDbCollection updated"
+          },
+          "data": {
+            "$ref": "#/components/schemas/KnowledgeBase"
+          }
         }
       },
       "UpdateAgentRequest": {
