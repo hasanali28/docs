@@ -103,9 +103,31 @@
             ]
           },
           {
-            "group": "Use CallResponse APIs",
+            "group": "Use Cases APIs",
+            "pages": ["api-reference/Use Cases/createUseCase"]
+          },
+          {
+            "group": "Calling Management APIs",
             "pages": [
-              "api-reference/Use Cases/createUseCase"
+              "api-reference/Calling Management/addCallsToBatch",
+              "api-reference/Calling Management/addPhone",
+              "api-reference/Calling Management/createBatch",
+              "api-reference/Calling Management/deleteBatch",
+              "api-reference/Calling Management/deletePhone",
+              "api-reference/Calling Management/downloadSampleCsv",
+              "api-reference/Calling Management/exportCsvCallData",
+              "api-reference/Calling Management/fetchBatchDataByID",
+              "api-reference/Calling Management/getAllCallsInBatches",
+              "api-reference/Calling Management/getBatch",
+              "api-reference/Calling Management/getBatchById",
+              "api-reference/Calling Management/getPhone",
+              "api-reference/Calling Management/immediateCallingApi",
+              "api-reference/Calling Management/plivoutbondwebhook",
+              "api-reference/Calling Management/startCalling",
+              "api-reference/Calling Management/stopCalling",
+              "api-reference/Calling Management/updateBatch",
+              "api-reference/Calling Management/updatePhone",
+              "api-reference/Calling Management/uploadCSV"
             ]
           }
         ]

@@ -263,6 +263,105 @@
         ]
       }
     },
+    "/api/call/add-phone": {
+      "post": {
+        "summary": "Add Phone Number",
+        "description": "Add a phone number to a user's account, associated with a specific integration (e.g., Twilio). The phone number is validated, saved, and linked to the user for future call-related operations.",
+        "tags": ["Calls"],
+        "operationId": "addPhoneNumber",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "Bearer <jwt-token>"
+            }
+          },
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "application/json"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddPhoneRequest"
+              },
+              "example": {
+                "userId": "64e5f12345abcdef12345678",
+                "phoneNumber": "+15551234567",
+                "integration": "twilio",
+                "authToken": "your_twilio_auth_token",
+                "accSId": "your_twilio_account_sid"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Phone number added successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AddPhoneResponse"
+                },
+                "example": {
+                  "success": true,
+                  "phone": {
+                    "_id": "605c72ef1532073ac924d4bc",
+                    "userId": "64e5f12345abcdef12345678",
+                    "phoneNumber": "+15551234567",
+                    "integration": "twilio",
+                    "authToken": "your_twilio_auth_token",
+                    "accSId": "your_twilio_account_sid"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request — Invalid input or phone number duplication",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "invalidUser": { "value": { "error": "Invalid User ID" } },
+                  "notFound": { "value": { "error": "User not found" } },
+                  "duplicate": {
+                    "value": {
+                      "error": "Phone number already exists for this user"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "example": { "error": "Internal Server Error" }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "cURL",
+            "label": "cURL",
+            "source": "curl --location '{{baseUrl}}/api/call/add-phone' \\\n--header 'Authorization: Bearer {{authToken}}' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"userId\": \"64e5f12345abcdef12345678\",\n  \"phoneNumber\": \"+15551234567\",\n  \"integration\": \"twilio\",\n  \"authToken\": \"your_twilio_auth_token\",\n  \"accSId\": \"your_twilio_account_sid\"\n}'"
+          }
+        ]
+      }
+    },
     "/api/knowledgeBase": {
       "get": {
         "summary": "Get All Knowledge Bases",
@@ -3672,6 +3771,81 @@
           "conversationType": {
             "type": "string",
             "enum": ["single_prompt", "multi_prompt"]
+          }
+        }
+      },
+      "AddPhoneRequest": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string",
+            "description": "Unique identifier of the user to associate with the phone number",
+            "example": "64e5f12345abcdef12345678"
+          },
+          "phoneNumber": {
+            "type": "string",
+            "description": "Phone number to be added (must be in E.164 format)",
+            "example": "+15551234567"
+          },
+          "integration": {
+            "type": "string",
+            "description": "Third-party integration provider (e.g., Twilio)",
+            "example": "twilio"
+          },
+          "authToken": {
+            "type": "string",
+            "description": "Integration authentication token",
+            "example": "your_twilio_auth_token"
+          },
+          "accSId": {
+            "type": "string",
+            "description": "Integration account SID",
+            "example": "your_twilio_account_sid"
+          }
+        },
+        "required": [
+          "userId",
+          "phoneNumber",
+          "integration",
+          "authToken",
+          "accSId"
+        ]
+      },
+      "AddPhoneResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "phone": {
+            "type": "object",
+            "properties": {
+              "_id": {
+                "type": "string",
+                "example": "605c72ef1532073ac924d4bc"
+              },
+              "userId": {
+                "type": "string",
+                "example": "64e5f12345abcdef12345678"
+              },
+              "phoneNumber": {
+                "type": "string",
+                "example": "+15551234567"
+              },
+              "integration": {
+                "type": "string",
+                "example": "twilio"
+              },
+              "authToken": {
+                "type": "string",
+                "example": "your_twilio_auth_token"
+              },
+              "accSId": {
+                "type": "string",
+                "example": "your_twilio_account_sid"
+              }
+            }
           }
         }
       },
