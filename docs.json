@@ -101,6 +101,12 @@
               "api-reference/Voice Management/getVoicesById",
               "api-reference/Voice Management/updateVoice"
             ]
+          },
+          {
+            "group": "Use CallResponse APIs",
+            "pages": [
+              "api-reference/Use Cases/createUseCase"
+            ]
           }
         ]
       }

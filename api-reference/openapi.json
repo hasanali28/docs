@@ -488,6 +488,82 @@
         ]
       }
     },
+    "/api/usecases": {
+      "post": {
+        "summary": "Create Use Case",
+        "description": "Create a new use case for a given agent. Supports uploading a file along with other use case details such as name, description, link, and phone numbers.",
+        "tags": ["Use Cases"],
+        "operationId": "createUseCase",
+        "parameters": [
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "multipart/form-data"
+            }
+          },
+          {
+            "name": "Cookie",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "auth=<jwt-token>"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUseCaseRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Use case created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UseCaseResponse"
+                },
+                "example": {
+                  "_id": "6853e3a46b819d90c0f6e77dd",
+                  "userId": "684132694e7d1273d10e499a",
+                  "agentId": "684135442bc2d87ddfe0697f",
+                  "useCaseName": "TestingAgent",
+                  "useCaseLink": "",
+                  "useCaseDesc": "",
+                  "fileUrl": "https://bucket-name.s3.region.amazonaws.com/usecases/file.pdf",
+                  "batchId": "684137042bc2d87ddfe06a30",
+                  "phoneNumbers": ["6853d286b819d90c0f6e77cc"],
+                  "createdAt": "2025-05-03T15:00:00.000Z",
+                  "updatedAt": "2025-05-03T15:00:00.000Z"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or missing required fields"
+          },
+          "500": {
+            "description": "Internal server error while creating use case"
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "cURL",
+            "label": "cURL",
+            "source": "curl --location '{{baseUrl}}/api/usecases' \\\n--header 'Content-Type: multipart/form-data' \\\n--header 'Cookie: auth=<jwt-token>' \\\n--form 'userId=\"684132694e7d1273d10e499a\"' \\\n--form 'agentId=\"684135442bc2d87ddfe0697f\"' \\\n--form 'useCaseLink=\"\"' \\\n--form 'useCaseDesc=\"\"' \\\n--form 'file=@\"/path/to/file\"' \\\n--form 'useCaseName=\"TestingAgent\"' \\\n--form 'batchId=\"684137042bc2d87ddfe06a30\"' \\\n--form 'phoneNumbers=\"6853d286b819d90c0f6e77cc\"'"
+          }
+        ]
+      }
+    },
     "/api/agents/addKnowledgeBase": {
       "post": {
         "summary": "Add Knowledge Base",
@@ -3472,6 +3548,90 @@
             "format": "date-time",
             "description": "Timestamp when the voice agent was last updated",
             "example": "2025-04-02T14:22:01.830Z"
+          }
+        }
+      },
+      "CreateUseCaseRequest": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string",
+            "description": "Unique identifier of the user creating the use case",
+            "example": "684132694e7d1273d10e499a"
+          },
+          "agentId": {
+            "type": "string",
+            "description": "Unique identifier of the agent associated with this use case",
+            "example": "684135442bc2d87ddfe0697f"
+          },
+          "useCaseLink": {
+            "type": "string",
+            "description": "Optional link related to the use case",
+            "example": ""
+          },
+          "useCaseDesc": {
+            "type": "string",
+            "description": "Optional description of the use case",
+            "example": ""
+          },
+          "file": {
+            "type": "string",
+            "format": "binary",
+            "description": "File upload associated with the use case"
+          },
+          "useCaseName": {
+            "type": "string",
+            "description": "Name of the use case",
+            "example": "TestingAgent"
+          },
+          "batchId": {
+            "type": "string",
+            "description": "Batch ID associated with the use case",
+            "example": "684137042bc2d87ddfe06a30"
+          },
+          "phoneNumbers": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Phone numbers linked to the use case",
+            "example": ["6853d286b819d90c0f6e77cc"]
+          }
+        },
+        "required": ["userId", "agentId", "useCaseName", "batchId"]
+      },
+      "UseCaseResponse": {
+        "type": "object",
+        "properties": {
+          "_id": { "type": "string", "example": "6853e3a46b819d90c0f6e77dd" },
+          "userId": { "type": "string", "example": "684132694e7d1273d10e499a" },
+          "agentId": {
+            "type": "string",
+            "example": "684135442bc2d87ddfe0697f"
+          },
+          "useCaseName": { "type": "string", "example": "TestingAgent" },
+          "useCaseLink": { "type": "string", "example": "" },
+          "useCaseDesc": { "type": "string", "example": "" },
+          "fileUrl": {
+            "type": "string",
+            "example": "https://bucket-name.s3.region.amazonaws.com/usecases/file.pdf"
+          },
+          "batchId": {
+            "type": "string",
+            "example": "684137042bc2d87ddfe06a30"
+          },
+          "phoneNumbers": {
+            "type": "array",
+            "items": { "type": "string" },
+            "example": ["6853d286b819d90c0f6e77cc"]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-05-03T15:00:00.000Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-05-03T15:00:00.000Z"
           }
         }
       },
