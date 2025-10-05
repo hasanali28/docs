@@ -1,0 +1,52 @@
+---
+title: "Delete Phone Number"
+description: "Remove an outbound phone number and detach it from future campaigns."
+openapi: "DELETE /api/call/delete-phone/{phoneId}"
+---
+
+## Overview
+Delete phone numbers that you no longer pay for or that have been reassigned. The number is removed from the workspace and no longer appears in batch or agent pickers.
+
+## Prerequisites
+- Bearer token for an admin user.
+- The `phoneId` of the record you want to remove.
+- Confirm that no active batches rely on the number.
+
+## Request
+<ParamField path="phoneId" type="string" required>
+Identifier of the phone record to delete.
+</ParamField>
+
+<ParamField header="Authorization" type="string" required>
+Bearer token for the workspace admin.
+</ParamField>
+
+<RequestExample>
+```bash cURL
+curl --location --request DELETE '{{baseUrl}}/api/call/delete-phone/64e5f12345abcdef87654321' \
+  --header 'Authorization: Bearer {{authToken}}'
+```
+</RequestExample>
+
+## Response
+<ResponseExample>
+```json 200 OK
+{
+  "success": true,
+  "deletedId": "64e5f12345abcdef87654321"
+}
+```
+</ResponseExample>
+
+<ResponseField name="deletedId" type="string" required>
+Confirms which phone record was removed.
+</ResponseField>
+
+## Error Handling
+- **400 Bad Request** – `phoneId` missing or invalid.
+- **404 Not Found** – Phone already deleted or does not belong to the workspace.
+- **500 Internal Server Error** – Deletion failed; retry or contact support with the `phoneId`.
+
+<Warning>
+Deleting a number clears it from existing batches. Update those batches first to avoid dialer failures.
+</Warning>

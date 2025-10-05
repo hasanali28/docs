@@ -1,0 +1,64 @@
+---
+title: "Stop Batch Dialing"
+description: "Stop new outbound calls from starting while allowing in-flight calls to finish gracefully."
+openapi: "POST /api/call/stop-calling"
+---
+
+## Overview
+Call this endpoint when you want to pause or end a campaign early. The batch status switches to *stopped*, preventing the dialer from launching additional calls. Existing conversations continue until they complete or hit agent-configured thresholds.
+
+## Prerequisites
+- You know the `batchId` you want to stop.
+- The authenticated user owns or administrates the batch.
+
+## Request
+<ParamField header="Authorization" type="string" required>
+Bearer token for an authorised workspace admin.
+</ParamField>
+
+<ParamField body="batchId" type="string" required>
+Batch identifier to halt.
+</ParamField>
+
+<ParamField body="userId" type="string" required>
+Workspace user responsible for the batch. Used for auditing and scoping.
+</ParamField>
+
+<RequestExample>
+```bash cURL
+curl --location '{{baseUrl}}/api/call/stop-calling' \
+  --header 'Authorization: Bearer {{authToken}}' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "batchId": "64e5f12345abcdef98765432",
+    "userId": "64e5f12345abcdef12345678"
+  }'
+```
+</RequestExample>
+
+## Response
+<ResponseExample>
+```json 200 OK
+{
+  "success": true,
+  "message": "Batch marked as stopped"
+}
+```
+</ResponseExample>
+
+<ResponseField name="success" type="boolean" required>
+Confirms that no new calls will be created for the batch.
+</ResponseField>
+<ResponseField name="message" type="string">
+Provides additional context such as whether calls were still in progress.
+</ResponseField>
+
+## Error Handling
+- **400 Bad Request** – Request body missing `batchId` or `userId`, or payload failed validation.
+- **401 Unauthorized** – Bearer token missing or invalid.
+- **404 Not Found** – Batch does not exist or is already archived.
+- **500 Internal Server Error** – Pausing failed due to a service issue; retry then escalate to support.
+
+<Check>
+Use `GET /api/call/batches/{userId}` afterwards and confirm the batch status is `stopped`.
+</Check>

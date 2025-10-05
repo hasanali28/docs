@@ -1,0 +1,86 @@
+---
+title: "List Batches"
+description: "Retrieve batches for a user and optionally soft delete or restore them."
+openapi: "GET /api/call/batches/{userId}"
+---
+
+## Overview
+This endpoint lists every batch created by a specific user. You can filter out archived batches, soft delete a batch, or restore one by combining the `action` and `batchId` query parameters in the same call.
+
+## Prerequisites
+- Bearer token for the workspace that owns the batches.
+- The `userId` path parameter corresponds to the user scope you want to inspect.
+
+## Request
+<ParamField path="userId" type="string" required>
+Workspace user identifier. Only batches owned by this user are returned.
+</ParamField>
+
+<ParamField query="includeDeleted" type="boolean" default="true">
+Set to `false` to hide batches that were soft deleted within the last 90 days.
+</ParamField>
+
+<ParamField query="action" type="string" allowedValues="delete,restore">
+Optional action to perform before fetching the list. Pair with `batchId`.
+</ParamField>
+
+<ParamField query="batchId" type="string">
+Target batch for the action supplied in `action`.
+</ParamField>
+
+<ParamField header="Authorization" type="string" required>
+Bearer token issued to the workspace administrator.
+</ParamField>
+
+<RequestExample>
+```bash cURL
+curl --location '{{baseUrl}}/api/call/batches/64e5f12345abcdef12345678' \
+  --header 'Authorization: Bearer {{authToken}}' \
+  --data ''
+```
+</RequestExample>
+
+## Response
+<ResponseExample>
+```json 200 OK
+{
+  "success": true,
+  "batches": [
+    {
+      "_id": "64e5f12345abcdef98765432",
+      "batchName": "Marketing Campaign May 2025",
+      "callingNumbers": ["64e5f12345abcdef87654321"],
+      "totalCalls": 100,
+      "callsPicked": 80,
+      "callsCompleted": 70,
+      "totalCost": 42.5,
+      "status": "active",
+      "isDeleted": false,
+      "createdAt": "2025-05-01T12:00:00Z"
+    }
+  ]
+}
+```
+</ResponseExample>
+
+<ResponseField name="batches" type="array" required>
+Each entry summarises a batch with totals, soft-delete status, and owner metadata.
+</ResponseField>
+<ResponseField name="batches[].remainingDays" type="integer">
+Shows how many days remain before a soft-deleted batch is purged.
+</ResponseField>
+
+## Soft Delete & Restore
+<Steps>
+<Step title="Soft delete a batch">
+Call the endpoint with `action=delete&batchId=BATCH_ID`. The batch remains recoverable for 90 days.
+</Step>
+<Step title="Restore a batch">
+Repeat the call with `action=restore&batchId=BATCH_ID` to reactivate it.
+</Step>
+</Steps>
+
+## Error Handling
+- **400 Bad Request** – Invalid `userId`, invalid `batchId`, or `action` provided without `batchId`.
+- **404 Not Found** – No batches exist for the given user or the batch cannot be located.
+- **500 Internal Server Error** – Service could not fetch batch metadata.

@@ -1,0 +1,75 @@
+---
+title: "Export Call Data"
+description: "Download batch call outcomes as a CSV file for analysis or archival."
+openapi: "GET /api/call/export/csv"
+---
+
+## Overview
+Export call data whenever you need to run offline analytics or share results with downstream systems. You can filter the export by time range, status, and even choose specific columns to keep the file lightweight.
+
+## Prerequisites
+- Workspace API key with export permissions.
+- `batchId` of the campaign you want to export.
+
+## Request
+<ParamField header="x-api-key" type="string" required>
+Workspace export API key. Rotate regularly and store securely.
+</ParamField>
+
+<ParamField query="batchId" type="string" required>
+The batch whose call records you want to export.
+</ParamField>
+
+<ParamField query="format" type="string" default="csv" allowedValues="csv,xlsx">
+Choose `csv` (default) or `xlsx` for Excel-compatible exports.
+</ParamField>
+
+<ParamField query="startDate" type="string">
+ISO timestamp to include calls from. Useful for incremental exports.
+</ParamField>
+
+<ParamField query="endDate" type="string">
+ISO timestamp limiting the export range.
+</ParamField>
+
+<ParamField query="callStatus" type="string">
+Comma-separated list of statuses to include, for example `completed,missed`.
+</ParamField>
+
+<ParamField query="columns" type="string">
+JSON array of column keys to include. Leave blank to export all columns.
+</ParamField>
+
+<ParamField query="filter" type="string">
+Advanced JSON filter supporting nested conditions (status arrays, date ranges, etc.).
+</ParamField>
+
+<RequestExample>
+```bash cURL
+curl --location --request GET '{{baseUrl}}/api/call/export/csv' \
+  --header 'x-api-key: YOUR_API_KEY' \
+  --get --data-urlencode 'batchId=68cbb7e097b4a5dd9037565c' \
+  --data-urlencode 'format=csv' \
+  --data-urlencode 'columns=["phoneNumber","recordingUrl"]' \
+  --data-urlencode 'filter={"call_status":["completed","missed"]}' \
+  --output batch-export.csv
+```
+</RequestExample>
+
+## Response
+<ResponseExample>
+```text 200 OK
+phoneNumber,recordingUrl,call_status,call_duration
++15551234567,https://media.plivo.com/....wav,completed,105.6
+```
+</ResponseExample>
+
+## Error Handling
+- **400 Bad Request** – Missing `batchId` or malformed filters/columns JSON.
+- **403 Forbidden** – Invalid or inactive API key.
+- **404 Not Found** – Batch does not exist or is not eligible for export.
+- **500 Internal Server Error** – Export failed; retry after a short delay and report persistent issues.
+
+<Tip>
+The export response streams directly. Use `--output` (as shown above) or stream to cloud storage to avoid memory spikes.
+</Tip>

@@ -1,0 +1,51 @@
+---
+title: "List Pending Users"
+description: "Retrieve every signup that still requires super-admin approval."
+openapi: "GET /api/super-admin/pending-users"
+---
+
+## Overview
+This endpoint powers the admin approval queue. It returns every workspace signup whose status is `pending` so super admins can review and approve or reject them.
+
+## Request
+<ParamField header="Authorization" type="string" required>
+Bearer token for a super admin or administrator.
+</ParamField>
+
+<RequestExample>
+```bash cURL
+curl --location '{{baseUrl}}/api/super-admin/pending-users' \
+  --header 'Authorization: Bearer {{authToken}}'
+```
+</RequestExample>
+
+## Response
+<ResponseExample>
+```json 200 OK
+{
+  "users": [
+    {
+      "_id": "64e5f12345abcdef12345678",
+      "name": "John Doe",
+      "email": "john@example.com",
+      "organization": "Acme Inc",
+      "role": "user",
+      "status": "pending",
+      "createdAt": "2025-05-01T12:00:00.000Z"
+    }
+  ]
+}
+```
+</ResponseExample>
+
+<ResponseField name="users" type="array" required>
+List of pending user records. Password hashes and tokens are omitted for security.
+</ResponseField>
+
+## Error Handling
+- **401 Unauthorized / 403 Forbidden** – Missing or insufficient privileges.
+- **500 Internal Server Error** – Nexus could not load pending users.
+
+<Note>
+Filter or sort the response client-side if you need advanced pagination; the API currently returns the full pending set.
+</Note>

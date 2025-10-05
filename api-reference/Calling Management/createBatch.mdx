@@ -1,0 +1,68 @@
+---
+title: "Create Call Batch"
+description: "Create a named outbound batch and assign the phone numbers that will originate the campaign."
+openapi: "POST /api/call/createBatch"
+---
+
+## Overview
+Create a batch whenever you want to stage a new outbound campaign. The batch groups a friendly `batchName` with one or more provisioned calling numbers so you can add contacts and start dialing later. The response returns the `batchId`, which is required by every follow-up batch operation.
+
+## Prerequisites
+- You generated an API key with Calling Management scope.
+- At least one outbound phone number is active on the workspace.
+- The calling numbers you pass belong to the same workspace as the API key.
+
+## Request
+<ParamField header="x-api-key" type="string" required>
+Workspace API key. Find it under **Settings → API access**.
+</ParamField>
+
+<ParamField body="batchName" type="string" required>
+Human readable campaign name shown in the Nexus dashboard.
+</ParamField>
+
+<ParamField body="callingNumbers" type="array[string]" required>
+Array of phone IDs that the dialer can rotate through while placing calls from this batch.
+</ParamField>
+
+<RequestExample>
+```bash cURL
+curl --location '{{baseUrl}}/api/call/createBatch' \
+  --header 'x-api-key: YOUR_API_KEY' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "batchName": "API Campaign May 2025",
+    "callingNumbers": ["64e5f12345abcdef87654321"]
+  }'
+```
+</RequestExample>
+
+## Response
+<ResponseExample>
+```json 201 Created
+{
+  "success": true,
+  "batchId": "64e5f12345abcdef98765432",
+  "message": "Batch created successfully"
+}
+```
+</ResponseExample>
+
+<ResponseField name="success" type="boolean" required>
+Indicates whether the batch record was stored.
+</ResponseField>
+<ResponseField name="batchId" type="string" required>
+Identifier to use when adding calls, starting the dialer, or updating batch metadata.
+</ResponseField>
+<ResponseField name="message" type="string">
+Human readable confirmation message.
+</ResponseField>
+
+## Error Handling
+- **400 Bad Request** – Missing `batchName`, missing or empty `callingNumbers`, or malformed JSON.
+- **403 Forbidden** – The `x-api-key` is missing, revoked, or belongs to a different workspace.
+- **500 Internal Server Error** – Nexus could not persist the batch; retry or contact support with the request ID.
+
+<Check>
+Use `GET /api/call/batches/{userId}` right after creation to verify that the new batch appears with the expected metadata.
+</Check>

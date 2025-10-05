@@ -1,0 +1,67 @@
+---
+title: "Approve or Reject User"
+description: "Approve a pending workspace user or mark the request as rejected."
+openapi: "PUT /api/super-admin/approve/{userId}"
+---
+
+## Overview
+Super admins can promote a pending signup request to an approved account or explicitly reject it. The user status is updated immediately and downstream provisioning (credits, seat limits) should react to the new status.
+
+## Request
+<ParamField path="userId" type="string" required>
+Identifier of the pending user you are updating. Use the value returned by `GET /api/super-admin/pending-users`.
+</ParamField>
+
+<ParamField header="Authorization" type="string" required>
+Bearer token for a super admin or administrator.
+</ParamField>
+
+<ParamField header="Content-Type" type="string" required default="application/json">
+Payload format.
+</ParamField>
+
+<ParamField body="status" type="string" required allowedValues="approved,rejected">
+New state for the user request. Only `approved` or `rejected` are accepted.
+</ParamField>
+
+<RequestExample>
+```bash cURL
+curl --location --request PUT '{{baseUrl}}/api/super-admin/approve/64e5f12345abcdef12345678' \
+  --header 'Authorization: Bearer {{authToken}}' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "status": "approved"
+  }'
+```
+</RequestExample>
+
+## Response
+<ResponseExample>
+```json 200 OK
+{
+  "message": "User has been approved",
+  "user": {
+    "_id": "64e5f12345abcdef12345678",
+    "email": "jane@example.com",
+    "status": "approved"
+  }
+}
+```
+</ResponseExample>
+
+<ResponseField name="message" type="string" required>
+Human readable confirmation.
+</ResponseField>
+<ResponseField name="user" type="object" required>
+Updated user record reflecting the new `status`.
+</ResponseField>
+
+## Error Handling
+- **400 Bad Request** – Status was not provided or used an unsupported value.
+- **401 Unauthorized / 403 Forbidden** – Caller lacks the required privileges.
+- **404 Not Found** – No pending request matches the supplied `userId`.
+- **500 Internal Server Error** – Request could not be processed; retry or contact support.
+
+<Tip>
+Pair this endpoint with audit logging so you can trace who approved or rejected each workspace request.
+</Tip>

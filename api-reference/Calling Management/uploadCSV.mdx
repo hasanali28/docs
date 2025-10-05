@@ -1,0 +1,77 @@
+---
+title: "Upload Batch CSV"
+description: "Create a batch and populate it by uploading a CSV file of contacts."
+openapi: "POST /api/call/upload"
+---
+
+## Overview
+The CSV upload endpoint lets you bootstrap a campaign directly from a spreadsheet. Nexus validates the file, creates a batch, normalises the columns based on the agent’s variable schema, and inserts the calls in a single transaction.
+
+## Prerequisites
+- Bearer token for the workspace admin who owns the contacts.
+- CSV file containing the columns required by the agent.
+- At least one provisioned phone number to associate with the batch.
+
+## Request
+<ParamField header="Authorization" type="string" required>
+Bearer token for the workspace admin.
+</ParamField>
+
+<ParamField formData="file" type="file" required>
+CSV file to import. Use UTF-8 encoding and include headers.
+</ParamField>
+
+<ParamField formData="userId" type="string" required>
+Workspace user who should own the batch.
+</ParamField>
+
+<ParamField formData="batchName" type="string" required>
+Display name for the new batch.
+</ParamField>
+
+<ParamField formData="callingNumbers" type="array[string]" required>
+Phone IDs that the dialer will use when calling.
+</ParamField>
+
+<RequestExample>
+```bash cURL
+curl --location '{{baseUrl}}/api/call/upload' \
+  --header 'Authorization: Bearer {{authToken}}' \
+  --form 'file=@"/path/to/contacts.csv"' \
+  --form 'userId="64e5f12345abcdef12345678"' \
+  --form 'batchName="Marketing Campaign May 2025"' \
+  --form 'callingNumbers[]=64e5f12345abcdef87654321'
+```
+</RequestExample>
+
+<Tip>
+Match CSV headers to the agent variable keys (for example `phoneNumber`, `name`, `loan_amount`). Extra columns are stored and forwarded to the agent state machine.
+</Tip>
+
+## Response
+<ResponseExample>
+```json 200 OK
+{
+  "success": true,
+  "batch": {
+    "_id": "64e5f12345abcdef98765432",
+    "batchName": "Marketing Campaign May 2025",
+    "callingNumbers": ["64e5f12345abcdef87654321"],
+    "totalCalls": 100
+  }
+}
+```
+</ResponseExample>
+
+<ResponseField name="batch" type="object" required>
+Summary of the created batch, including totals and calling numbers.
+</ResponseField>
+
+## Error Handling
+- **400 Bad Request** – File missing, empty CSV, or required form fields not supplied.
+- **404 Not Found** – `userId` or one of the calling numbers is not registered.
+- **500 Internal Server Error** – Upload failed after validation; retry once before escalating.
+
+<Check>
+Follow up with `GET /api/call/batch-details/{batchId}` to confirm the imported rows match the expected total.
+</Check>

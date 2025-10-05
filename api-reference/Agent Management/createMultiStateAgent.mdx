@@ -1,0 +1,107 @@
+---
+title: "Create Multi-State Agent"
+description: "Provision an agent that uses a state machine to drive multi-step conversations."
+openapi: "POST /api/agents"
+---
+
+## Overview
+Multi-state agents let you orchestrate complex conversations by defining discrete states, transition intents, and shared instructions. This endpoint is identical to `POST /api/agents` but highlights the payload fields required to enable the `multi_prompt` experience.
+
+## Prerequisites
+- Workspace bearer token with permission to manage agents.
+- At least one voice profile ID to associate with the agent.
+- A fully specified `systemMessage.states` schema describing each step in the conversation.
+
+## Request Essentials
+<ParamField header="Authorization" type="string" required>
+Bearer token for the workspace admin.
+</ParamField>
+<ParamField body="agent_name" type="string" required>
+Unique agent name within the workspace.
+</ParamField>
+<ParamField body="conversationType" type="string" required>
+Set to `multi_prompt` to enable multi-state routing.
+</ParamField>
+<ParamField body="systemMessage" type="object" required>
+State machine definition containing `common` instructions plus a `states` map. Each state needs a `goal`, optional `intents`, and transitions.
+</ParamField>
+<ParamField body="callSetting.voiceSpeed" type="number">
+Voice speed multiplier applied during calls.
+</ParamField>
+<ParamField body="tags" type="array[string]">
+Optional labels used for search and reporting.
+</ParamField>
+
+<RequestExample>
+```bash cURL
+curl --location '{{baseUrl}}/api/agents' \
+  --header 'Authorization: Bearer {{authToken}}' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "agent_name": "Multi-State Support Agent",
+    "gender": "Male",
+    "type": "premium",
+    "capability": "Advanced Support",
+    "voice": "60a7b1c2d3e4f5a6b7c8d9e0",
+    "conversationType": "multi_prompt",
+    "systemMessage": {
+      "common": {
+        "agent_information": "You are a customer support specialist for Acme Inc.",
+        "communication_styles": "Friendly and solution-oriented",
+        "tools": [
+          { "name": "searchKnowledgeBase", "description": "Look up policy articles" }
+        ]
+      },
+      "states": {
+        "START": {
+          "goal": "Greet the caller and qualify their request",
+          "intents": [
+            { "condition": "Customer asks about order status", "transition": "ORDER_STATUS" },
+            { "condition": "Technical troubleshooting", "transition": "TROUBLESHOOTING" }
+          ],
+          "default_transition": "GENERAL_INQUIRY"
+        },
+        "TROUBLESHOOTING": {
+          "goal": "Diagnose and resolve the technical issue",
+          "intents": [
+            { "condition": "Issue resolved", "transition": "CLOSING" }
+          ]
+        },
+        "CLOSING": {
+          "goal": "Wrap up the call and thank the customer",
+          "default_transition": "END"
+        }
+      }
+    }
+  }'
+```
+</RequestExample>
+
+## Response
+<ResponseExample>
+```json 201 Created
+{
+  "message": "Agent created successfully",
+  "agent": {
+    "_id": "66336007e90c3d12f8c83dc9",
+    "agent_name": "Multi-State Support Agent",
+    "conversationType": "multi_prompt",
+    "status": "ready"
+  }
+}
+```
+</ResponseExample>
+
+## Validation Tips
+- Provide either `systemMessage` (recommended) or `backendSchema` so Nexus can compile the state machine.
+- Every state should include a `goal` plus either `intents` with explicit transitions or a `default_transition` fallback.
+- Xstate-like recursion is supported: transitions can point to any state, including `END`.
+
+## Error Handling
+- **400 Bad Request** – `conversationType` not set to `multi_prompt`, state definitions missing goals, or invalid `websocketUrl`.
+- **409 Conflict** – Another agent already uses the same `agent_name`.
+- **500 Internal Server Error** – Agent failed to save; retry and contact support with the payload hash if the error persists.
+
+<Check>
+Use `POST /api/agents/test-agent-chat` after creation to simulate the conversational flow before going live.
+</Check>

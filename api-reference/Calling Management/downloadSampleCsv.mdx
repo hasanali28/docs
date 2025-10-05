@@ -1,0 +1,29 @@
+---
+title: "Download Sample CSV"
+description: "Grab the canonical CSV template to ensure your upload columns match Nexus expectations."
+openapi: "GET /api/call/export/sample"
+---
+
+## Overview
+Download the sample CSV to understand the column order and header naming conventions required by `POST /api/call/upload`. Start every campaign by cloning this template so validation passes on the first try.
+
+## Request
+No authentication is required; the sample is publicly accessible.
+
+<RequestExample>
+```bash cURL
+curl --location '{{baseUrl}}/api/call/export/sample' --output nexus-batch-template.csv
+```
+</RequestExample>
+
+## Response
+<ResponseExample>
+```text 200 OK
+phoneNumber,name,loan_amount,loan_tenure
++15559876543,John Doe,10000,12 days
+```
+</ResponseExample>
+
+<Info>
+Keep the header row intact. You can add extra columns—the upload service will forward them to the agent as metadata—but required fields must stay in place.
+</Info>

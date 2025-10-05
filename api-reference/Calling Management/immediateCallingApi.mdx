@@ -1,0 +1,62 @@
+---
+title: "Trigger Immediate Call"
+description: "Fire a single call immediately without waiting for batch scheduling."
+openapi: "POST /api/call/trigger/calling"
+---
+
+## Overview
+Use the immediate calling API when you need to connect an agent to a contact right away—for example, escalations triggered from a CRM or live dashboard action. The endpoint shortcuts the batch scheduler and passes the call directly to the telephony provider.
+
+## Prerequisites
+- Bearer token for an administrator.
+- The call record already exists and has a valid `callId`.
+- The target agent is active and ready to take calls.
+
+## Request
+<ParamField header="Authorization" type="string" required>
+Bearer token authorised for calling operations.
+</ParamField>
+
+<ParamField body="callId" type="string" required>
+Identifier of the call you want to trigger instantly.
+</ParamField>
+
+<ParamField body="agentId" type="string" required>
+Agent that should receive the call.
+</ParamField>
+
+<RequestExample>
+```bash cURL
+curl --location '{{baseUrl}}/api/call/trigger/calling' \
+  --header 'Authorization: Bearer {{authToken}}' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "callId": "6842897f0070aeb8d07390fe",
+    "agentId": "684135442bc2d87ddfe0697f"
+  }'
+```
+</RequestExample>
+
+## Response
+<ResponseExample>
+```json 200 OK
+{
+  "success": true,
+  "message": "Call triggered"
+}
+```
+</ResponseExample>
+
+<ResponseField name="message" type="string">
+Human readable confirmation that the call is en route to the agent.
+</ResponseField>
+
+## Error Handling
+- **400 Bad Request** – Payload missing `callId` or `agentId`.
+- **401 Unauthorized** – Bearer token missing or expired.
+- **404 Not Found** – Call record or agent not found.
+- **500 Internal Server Error** – Provider connection failed; retry once or send the call through a batch.
+
+<Warning>
+This API bypasses batch-level throttling. Use sparingly to avoid exceeding your concurrency limits.
+</Warning>

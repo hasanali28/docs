@@ -1,0 +1,78 @@
+---
+title: "Get Batch Details"
+description: "Inspect batch metadata and page through associated calls."
+openapi: "GET /api/call/batch-details/{batchId}"
+---
+
+## Overview
+Fetch detailed information for a single batch, including campaign metadata, status, and a paginated list of call records. Use this endpoint while monitoring execution from the dashboard or building custom analytics.
+
+## Prerequisites
+- Valid bearer token with permission to view the batch.
+- The `batchId` you obtained during creation.
+
+## Request
+<ParamField path="batchId" type="string" required>
+Batch identifier you want to inspect.
+</ParamField>
+
+<ParamField query="page" type="integer" default="1">
+Page number for paginated calls.
+</ParamField>
+
+<ParamField query="limit" type="integer" default="100">
+Maximum call records to return per page.
+</ParamField>
+
+<ParamField header="Authorization" type="string" required>
+Bearer token for the workspace admin.
+</ParamField>
+
+<RequestExample>
+```bash cURL
+curl --location '{{baseUrl}}/api/call/batch-details/67def9053495307c718d9dfb' \
+  --header 'Authorization: Bearer {{authToken}}' \
+  --get --data-urlencode 'page=1' --data-urlencode 'limit=100'
+```
+</RequestExample>
+
+## Response
+<ResponseExample>
+```json 200 OK
+{
+  "success": true,
+  "batch": {
+    "_id": "67def9053495307c718d9dfb",
+    "batchName": "New Test Batch",
+    "status": "active",
+    "callingNumbers": ["67d52be3f91fe7017efdb6f1"],
+    "calls": [],
+    "createdAt": "2025-03-22T17:53:09.477Z"
+  },
+  "pagination": {
+    "page": 1,
+    "limit": 100,
+    "totalCalls": 0
+  }
+}
+```
+</ResponseExample>
+
+<ResponseField name="batch" type="object" required>
+Contains batch metadata plus the current page of call records.
+</ResponseField>
+<ResponseField name="batch.calls" type="array">
+List of calls with enriched analytics, recording URLs, and transcripts when available.
+</ResponseField>
+<ResponseField name="pagination" type="object" required>
+Provides the active page, configured limit, and total call count for the batch.
+</ResponseField>
+
+## Error Handling
+- **400 Bad Request** – `batchId` failed validation or query parameters are out of range.
+- **404 Not Found** – Batch no longer exists or is not visible to the workspace.
+- **500 Internal Server Error** – Nexus could not aggregate batch data; retry or escalate to support.
+
+<Tip>
+Use this endpoint together with `GET /api/call/batch/{batchId}/all` when you need both paginated monitoring in the UI and full exports for reports.
+</Tip>

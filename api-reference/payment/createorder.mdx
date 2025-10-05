@@ -1,0 +1,72 @@
+---
+title: "Create Payment Order"
+description: "Generate a payment gateway order so the customer can complete checkout."
+openapi: "POST /api/payments/create-order"
+---
+
+## Overview
+Use this endpoint before redirecting the customer to the payment provider. It creates an order with the gateway (for example Razorpay) and returns the `orderId` you must pass to the client SDK for payment authorisation.
+
+## Request
+<ParamField header="Authorization" type="string" required>
+Bearer token for the authenticated workspace account that is purchasing credits.
+</ParamField>
+
+<ParamField header="Content-Type" type="string" required default="application/json">
+Payload format.
+</ParamField>
+
+<ParamField body="amount" type="integer" required>
+Charge amount in the smallest currency unit (for INR this is paise).
+</ParamField>
+
+<ParamField body="userId" type="string" required>
+Identifier of the paying user. Used to link the order to the account.
+</ParamField>
+
+<ParamField body="email" type="string" required>
+Receipt email address.
+</ParamField>
+
+<RequestExample>
+```bash cURL
+curl --location '{{baseUrl}}/api/payments/create-order' \
+  --header 'Authorization: Bearer {{authToken}}' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "amount": 5000,
+    "userId": "64e5f12345abcdef12345678",
+    "email": "customer@company.com"
+  }'
+```
+</RequestExample>
+
+## Response
+<ResponseExample>
+```json 200 OK
+{
+  "orderId": "order_LMN1234567890",
+  "amount": 5000,
+  "email": "customer@company.com"
+}
+```
+</ResponseExample>
+
+<ResponseField name="orderId" type="string" required>
+Gateway-generated order identifier needed by the frontend SDK.
+</ResponseField>
+<ResponseField name="amount" type="integer" required>
+Amount that will be charged once the payment succeeds.
+</ResponseField>
+<ResponseField name="email" type="string" required>
+Echo of the email address associated with the order.
+</ResponseField>
+
+## Error Handling
+- **400 Bad Request** – Missing `amount`, `userId`, or `email`.
+- **401 Unauthorized** – Bearer token missing or expired.
+- **500 Internal Server Error** – Payment gateway request failed; retry once and escalate if it persists.
+
+<Tip>
+Store the returned `orderId` alongside your invoice data so you can reconcile webhook confirmations later.
+</Tip>

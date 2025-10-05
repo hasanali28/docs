@@ -1,0 +1,77 @@
+---
+title: "Start Batch Dialing"
+description: "Push a prepared batch into the outbound dialer queue."
+openapi: "POST /api/call/start-calling"
+---
+
+## Overview
+Use this endpoint to kick off automated dialing for a batch once all data checks pass. The call processing runs asynchronously—responses confirm that the batch moved to the queue while individual call events continue to arrive through webhooks and batch polling.
+
+## Prerequisites
+- Batch already exists and contains the final contact list.
+- The authenticated user has Calling Management permissions.
+- Plivo webhooks are configured if you need real-time updates.
+
+## Request
+<ParamField header="Authorization" type="string" required>
+Bearer token for an approved workspace administrator.
+</ParamField>
+
+<ParamField body="batchId" type="string" required>
+Identifier of the batch to start dialing.
+</ParamField>
+
+<ParamField body="callingNumbers" type="array[string]" required>
+Phone IDs the dialer should rotate through during the campaign.
+</ParamField>
+
+<ParamField body="callData" type="array[object]" required>
+Finalised call records. Provide the same payload you validated earlier so the service can rebuild the dial queue.
+</ParamField>
+
+<RequestExample>
+```bash cURL
+curl --location '{{baseUrl}}/api/call/start-calling' \
+  --header 'Authorization: Bearer {{authToken}}' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "batchId": "6806382f98da85ec32fac955",
+    "callingNumbers": ["67d52be3f91fe7017efdb6f1"],
+    "callData": [
+      {
+        "phoneNumber": "+917289836486",
+        "customer_name": "Bhavya Mittal",
+        "loan_amount": "10000",
+        "loan_tenure": "12 days"
+      }
+    ]
+  }'
+```
+</RequestExample>
+
+## Response
+<ResponseExample>
+```json 200 OK
+{
+  "success": true,
+  "message": "Batch queued for dialing"
+}
+```
+</ResponseExample>
+
+<ResponseField name="success" type="boolean" required>
+Indicates whether the batch entered the dialer queue.
+</ResponseField>
+<ResponseField name="message" type="string">
+Human readable action summary.
+</ResponseField>
+
+## Error Handling
+- **400 Bad Request** – Missing batch, empty `callData`, or mismatched calling numbers.
+- **401 Unauthorized** – Bearer token absent or expired.
+- **404 Not Found** – Batch or phone pool no longer exists.
+- **500 Internal Server Error** – Dialer bootstrap failed; monitor retry logs and contact support if it persists.
+
+<Note>
+After a successful start, monitor `GET /api/call/batch-details/{batchId}` for progress and subscribe to the Plivo webhook for live status changes.
+</Note>

@@ -1,0 +1,68 @@
+---
+title: "Fetch Batch Data"
+description: "Fetch real-time batch data, including refreshed call metrics, by batch ID."
+openapi: "GET /api/call/get-batch/{batchId}"
+---
+
+## Overview
+`GET /api/call/get-batch/{batchId}` returns the latest snapshot of a batch, similar to the paginated detail endpoint but optimised for quick refreshes in dashboards. Use it to poll status while a campaign is running.
+
+## Prerequisites
+- Bearer token with Calling Management privileges.
+- The `batchId` you want to monitor.
+
+## Request
+<ParamField path="batchId" type="string" required>
+Identifier of the batch to fetch.
+</ParamField>
+<ParamField header="Authorization" type="string" required>
+Bearer token that owns the batch.
+</ParamField>
+
+<RequestExample>
+```bash cURL
+curl --location '{{baseUrl}}/api/call/get-batch/6881d0057f3984aafeebeb78' \
+  --header 'Authorization: Bearer {{authToken}}'
+```
+</RequestExample>
+
+## Response
+<ResponseExample>
+```json 200 OK
+{
+  "success": true,
+  "batch": {
+    "_id": "6881d0057f3984aafeebeb78",
+    "batchName": "Customer Follow-up Batch",
+    "status": "active",
+    "totalCalls": 320,
+    "callsPicked": 240,
+    "callsCompleted": 215,
+    "callingNumbers": ["64fd21b7e83f9d2c8a3e11b0"],
+    "calls": [
+      {
+        "_id": "680b465749a5db1758677ab2",
+        "phoneNumber": "+15551234567",
+        "call_status": "completed",
+        "call_cost": 16
+      }
+    ]
+  },
+  "pagination": {
+    "page": 1,
+    "limit": 100,
+    "totalCalls": 320
+  }
+}
+```
+</ResponseExample>
+
+## Error Handling
+- **400 Bad Request** – `batchId` is missing or malformed.
+- **401 Unauthorized** – Bearer token not provided.
+- **404 Not Found** – Batch unavailable or belongs to another workspace.
+- **500 Internal Server Error** – Fetch failed; retry with backoff.
+
+<Tip>
+Use this endpoint for lightweight status refreshes and reserve `GET /api/call/batch/{batchId}/all` for full exports.
+</Tip>

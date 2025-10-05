@@ -1,0 +1,72 @@
+---
+title: "Add Calls to Batch"
+description: "Queue one or more contacts in an existing batch before launching the dialer."
+openapi: "POST /api/call/addCallsToBatch"
+---
+
+## Overview
+After creating a batch you can enqueue contact records that the dialer should process. Each record can include any custom fields your agent definition expects. Validation runs against the agent’s variable schema so you catch missing data before the dialer starts.
+
+## Prerequisites
+- You created the batch and captured its `batchId`.
+- All required agent variables are present in every contact.
+- The API key you use owns the batch.
+
+## Request
+<ParamField header="x-api-key" type="string" required>
+Workspace API key. Must match the owner of the target batch.
+</ParamField>
+
+<ParamField body="batchId" type="string" required>
+Identifier returned by `POST /api/call/createBatch`.
+</ParamField>
+
+<ParamField body="callData" type="array[object]" required>
+Each object represents one dial attempt. Include at least `phoneNumber` and any fields referenced in the agent’s script.
+</ParamField>
+
+<RequestExample>
+```bash cURL
+curl --location '{{baseUrl}}/api/call/addCallsToBatch' \
+  --header 'x-api-key: YOUR_API_KEY' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "batchId": "64e5f12345abcdef98765432",
+    "callData": [
+      {
+        "phoneNumber": "+15551234567",
+        "name": "John Doe",
+        "company": "Acme Inc."
+      }
+    ]
+  }'
+```
+</RequestExample>
+
+## Response
+<ResponseExample>
+```json 200 OK
+{
+  "success": true,
+  "added": 1,
+  "message": "Calls enqueued"
+}
+```
+</ResponseExample>
+
+<ResponseField name="added" type="integer" required>
+Number of call records accepted into the batch.
+</ResponseField>
+<ResponseField name="message" type="string">
+High-level status. Review it for partial validation warnings.
+</ResponseField>
+
+## Error Handling
+- **400 Bad Request** – `batchId` missing, `callData` empty, or contacts fail schema validation.
+- **403 Forbidden** – API key not recognised for this workspace.
+- **404 Not Found** – Batch or mapped agent is missing; double-check ids.
+- **500 Internal Server Error** – Bulk insertion failed; retry with exponential backoff.
+
+<Tip>
+Large uploads are chunked automatically. You can safely enqueue thousands of contacts in one request as long as the payload stays under your gateway limits.
+</Tip>
