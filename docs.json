@@ -1,42 +1,28 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "Mint Starter Kit",
+  "name": "weya AI docs",
   "colors": {
-    "primary": "#16A34A",
-    "light": "#07C983",
-    "dark": "#15803D"
+    "primary": "#ff4d00",
+    "light": "#ff4d00",
+    "dark": "#ff4d00"
   },
-  "favicon": "/favicon.svg",
+  "favicon": "/favicon.ico",
+  "customCss": "/custom.css",
   "navigation": {
     "tabs": [
       {
         "tab": "Guides",
         "groups": [
+        
           {
-            "group": "Getting started",
-            "pages": ["index", "quickstart", "development"]
+            "group": "Introduction",
+            "pages": ["index"]
+            
           },
-          {
-            "group": "Customization",
-            "pages": ["essentials/settings", "essentials/navigation"]
-          },
-          {
-            "group": "Writing content",
-            "pages": [
-              "essentials/markdown",
-              "essentials/code",
-              "essentials/images",
-              "essentials/reusable-snippets"
-            ]
-          },
-          {
-            "group": "AI tools",
-            "pages": [
-              "ai-tools/cursor",
-              "ai-tools/claude-code",
-              "ai-tools/windsurf"
-            ]
+           {
+            "group": "Get Started",
+            "pages": ["essentials/settings"]
           }
         ]
       },
@@ -44,11 +30,7 @@
         "tab": "API reference",
         "groups": [
           {
-            "group": "API documentation",
-            "pages": ["api-reference/introduction"]
-          },
-          {
-            "group": "Authentication APIs",
+            "group": "Authentication",
             "pages": [
               "api-reference/Authentication/signup",
               "api-reference/Authentication/login",
@@ -62,7 +44,7 @@
             ]
           },
           {
-            "group": "Agent Management APIs",
+            "group": "Agent Management",
             "pages": [
               "api-reference/Agent Management/addKnowledgeBase",
               "api-reference/Agent Management/ambientNoise",
@@ -85,7 +67,7 @@
             ]
           },
           {
-            "group": "Knowledge Base APIs",
+            "group": "Knowledge Base",
             "pages": [
               "api-reference/Knowledge Base/createKB",
               "api-reference/Knowledge Base/getKB",
@@ -93,7 +75,7 @@
             ]
           },
           {
-            "group": "Voice Management APIs",
+            "group": "Voice Management",
             "pages": [
               "api-reference/Voice Management/createVoice",
               "api-reference/Voice Management/deleteVoice",
@@ -103,11 +85,11 @@
             ]
           },
           {
-            "group": "Use Cases APIs",
+            "group": "Use Cases",
             "pages": ["api-reference/Use Cases/createUseCase"]
           },
           {
-            "group": "Calling Management APIs",
+            "group": "Calling Management",
             "pages": [
               "api-reference/Calling Management/addCallsToBatch",
               "api-reference/Calling Management/addPhone",
@@ -137,37 +119,40 @@
       "anchors": [
         {
           "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
+          "href": "http://localhost:3000/",
           "icon": "book-open-cover"
         },
         {
-          "anchor": "Community",
-          "href": "https://mintlify.com/community",
-          "icon": "slack"
+          "anchor": "Blog",
+          "href": "https://weya.ai/blog",
+          "icon": "newspaper"
         },
         {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
+          "anchor": "Enterprise inquiries",
+          "href": "https://calendly.com/himanshu-weya/30min?month=2025-08",
+          "icon": "dialpad"
         }
       ]
     }
   },
   "logo": {
-    "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
+    "light": "/logo/light1.png",
+    "dark": "/logo/dark1.png"
   },
   "navbar": {
     "links": [
       {
+        "label": "Homepage",
+        "href": "https://weya.ai/"
+      }, {
         "label": "Support",
-        "href": "mailto:hi@mintlify.com"
+        "href": "mailto:info@weya.ai"
       }
     ],
     "primary": {
       "type": "button",
       "label": "Dashboard",
-      "href": "https://dashboard.mintlify.com"
+      "href": "https://nexus.weya.ai/signup"
     }
   },
   "api": {
@@ -188,9 +173,9 @@
   },
   "footer": {
     "socials": {
-      "x": "https://x.com/mintlify",
-      "github": "https://github.com/mintlify",
-      "linkedin": "https://linkedin.com/company/mintlify"
+      "instagram": "https://www.instagram.com/weya.ai/",
+      "linkedin": "https://www.linkedin.com/company/100928983/admin/dashboard/",
+      "x": "https://x.com/weyaAI"
     }
   }
 }

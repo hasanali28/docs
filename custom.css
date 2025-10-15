@@ -1,0 +1,33 @@
+/* Top-right circular gradient blob for light mode */
+@media (prefers-color-scheme: light) {
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0px;
+    right: -20px;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, #ff4d00, #ffffff, transparent 70%);
+    border-radius: 50%;
+    z-index: -1;
+    filter: blur(100px);
+    pointer-events: none;
+  }
+}
+
+/* Top-right circular gradient blob for dark mode */
+@media (prefers-color-scheme: dark) {
+  body::before {
+    content: "";
+    position: fixed;
+    top: -200px;
+    right: -150px;
+    width: 1000px;
+    height: 1000px;
+    background: radial-gradient(circle, #ff4d0030, transparent 70%);
+    border-radius: 50%;
+    z-index: -1;
+    filter: blur(100px);
+    pointer-events: none;
+  }
+}
