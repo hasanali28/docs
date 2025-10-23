@@ -1,5 +1,5 @@
-/* Top-right circular gradient blob for light mode */
-@media (prefers-color-scheme: light) {
+Top-right circular gradient blob for light mode
+/* @media (prefers-color-scheme: light) {
   body::before {
     content: "";
     position: fixed;
@@ -13,10 +13,10 @@
     filter: blur(100px);
     pointer-events: none;
   }
-}
+} */
 
 /* Top-right circular gradient blob for dark mode */
-@media (prefers-color-scheme: dark) {
+/* @media (prefers-color-scheme: dark) {
   body::before {
     content: "";
     position: fixed;
@@ -30,4 +30,4 @@
     filter: blur(100px);
     pointer-events: none;
   }
-}
+} */
