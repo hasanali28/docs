@@ -16,54 +16,100 @@
         "groups": [
         
           {
-            "group": "Introduction",
+            "group": " ",
             "pages": ["index"]
             
           },
            {
             "group": "Get Started",
             "pages": ["essentials/settings"]
+            
+          },
+        {
+  "group": "Build",
+  "pages": [
+    {
+      "group": "Build AI Agent",
+      "pages": [
+        "single-prompt/step1",
+        "single-prompt/step2",
+        "single-prompt/step3",
+        "single-prompt/step4"
+      ]
+    }
+  ]
+},
+   {
+            "group": "Phone Numbers",
+            "pages": ["phonenumbers/addphonenumber"]
+            
+          },
+           {
+            "group": "Knowledge Bases",
+            "pages": ["knowledgebase/knowledgebase"]
+            
+          },
+          {
+  "group": "Tools & Integrations",
+  "pages": [
+    {
+      "group": "Tools",
+      "pages": [
+        "Post call whatsapp notifier",
+        "call transfer"
+      ]
+    },
+    {
+      "group": "Integrations",
+      "pages": [
+        "custom tool",
+        "hubspot",
+        "zoho"
+      ]
+    }
+  ]
+},
+
+{
+            "group": "Campaign",
+            "pages": ["knowledgebase/knowledgebase"]
+            
           }
+
         ]
       },
       {
         "tab": "API reference",
         "groups": [
           {
-            "group": "Authentication",
+            "group": "Agent",
             "pages": [
-              "api-reference/Authentication/signup",
-              "api-reference/Authentication/login",
-              "api-reference/Authentication/googleLogin",
-              "api-reference/Authentication/sendOtpRequest",
-              "api-reference/Authentication/requestPasswordReset",
-              "api-reference/Authentication/resetPassword",
-              "api-reference/Authentication/getStatus",
-              "api-reference/Authentication/getProfile",
-              "api-reference/Authentication/updateProfile"
+              "api-reference/Agent Management/createAgent",
+              "api-reference/Agent Management/getAgentById",
+              "api-reference/Agent Management/deleteAgent",
+              "api-reference/Agent Management/updateAgent"
             ]
           },
           {
-            "group": "Agent Management",
+            "group": "Phone Numbers",
             "pages": [
-              "api-reference/Agent Management/addKnowledgeBase",
-              "api-reference/Agent Management/ambientNoise",
-              "api-reference/Agent Management/conversationTemplates",
-              "api-reference/Agent Management/createAgent",
-              "api-reference/Agent Management/createCallsForTestAgent",
-              "api-reference/Agent Management/createMultiStateAgent",
-              "api-reference/Agent Management/deleteAgent",
-              "api-reference/Agent Management/getAgentById",
-              "api-reference/Agent Management/getAgentIdFromPhoneId",
-              "api-reference/Agent Management/getAgents",
-              "api-reference/Agent Management/getAgentTestingResult",
-              "api-reference/Agent Management/getAgentVariablesByPhoneIds",
-              "api-reference/Agent Management/linkAgentPhone",
-              "api-reference/Agent Management/testAgentByChat",
-              "api-reference/Agent Management/unlinkAgent",
-              "api-reference/Agent Management/updateAgent",
-              "api-reference/Agent Management/updateAmbientNoise",
-              "api-reference/Agent Management/validateConversation"
+              "api-reference/Calling Management/addPhone",
+               "api-reference/Calling Management/updatePhone",
+                 "api-reference/Calling Management/getPhone",
+                  "api-reference/Calling Management/deletePhone"
+            ]
+          },
+          {
+            "group": "Campaign",
+            "pages": [
+              "api-reference/Calling Management/createBatch",
+              "api-reference/Calling Management/deleteBatch"
+            ]
+          },
+          {
+            "group": "Voice Management",
+            "pages": [              
+              "api-reference/Voice Management/getVoices"
             ]
           },
           {
@@ -72,44 +118,6 @@
               "api-reference/Knowledge Base/createKB",
               "api-reference/Knowledge Base/getKB",
               "api-reference/Knowledge Base/getKBById"
-            ]
-          },
-          {
-            "group": "Voice Management",
-            "pages": [
-              "api-reference/Voice Management/createVoice",
-              "api-reference/Voice Management/deleteVoice",
-              "api-reference/Voice Management/getVoices",
-              "api-reference/Voice Management/getVoicesById",
-              "api-reference/Voice Management/updateVoice"
-            ]
-          },
-          {
-            "group": "Use Cases",
-            "pages": ["api-reference/Use Cases/createUseCase"]
-          },
-          {
-            "group": "Calling Management",
-            "pages": [
-              "api-reference/Calling Management/addCallsToBatch",
-              "api-reference/Calling Management/addPhone",
-              "api-reference/Calling Management/createBatch",
-              "api-reference/Calling Management/deleteBatch",
-              "api-reference/Calling Management/deletePhone",
-              "api-reference/Calling Management/downloadSampleCsv",
-              "api-reference/Calling Management/exportCsvCallData",
-              "api-reference/Calling Management/fetchBatchDataByID",
-              "api-reference/Calling Management/getAllCallsInBatches",
-              "api-reference/Calling Management/getBatch",
-              "api-reference/Calling Management/getBatchById",
-              "api-reference/Calling Management/getPhone",
-              "api-reference/Calling Management/immediateCallingApi",
-              "api-reference/Calling Management/plivoutbondwebhook",
-              "api-reference/Calling Management/startCalling",
-              "api-reference/Calling Management/stopCalling",
-              "api-reference/Calling Management/updateBatch",
-              "api-reference/Calling Management/updatePhone",
-              "api-reference/Calling Management/uploadCSV"
             ]
           }
         ]

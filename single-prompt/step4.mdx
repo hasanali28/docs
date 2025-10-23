@@ -1,0 +1,44 @@
+---
+title: "Step 4: Post Call Metrics"
+description: "Detailed guide to configure and track post call performance metrics for your AI Agent."
+---
+
+![Call Metrics](/images/call-m.png)
+
+
+## How to Set Up a Post Call Metric
+Step-by-step guide:
+
+### **Metric Name**  
+Enter a unique, descriptive metric name (e.g., "Customer Satisfaction", "Order Status", "Follow-up Required").  
+This helps you quickly identify what data you're tracking for each call.
+
+### **Data Type**  
+Choose from several data types to fit your tracking needs:  
+
+- **Text** – Free-form summaries or notes from the call.  
+- **Single Extract** – Extract one specific item of information (like the customer's answer or score).  
+- **Boolean (Yes/No)** – Track simple outcomes: was the order placed? Did the issue get resolved?  
+- **Timestamp** – Store the exact time something happened on the call.  
+- **Date** – Save calendar-based dates, such as appointment dates.  
+- **Numeric** – Store quantities, ratings, codes (for example, feedback scores).  
+- **Multi Extract** – Collect multiple pieces of data from the same call for richer reporting.
+
+### **Description**  
+Document what each metric tracks and how it’s calculated.  
+Clearly explain how the agent should use or interpret this field.
+
+### Example: Custom Post Call Metric
+```
+Suppose you want to track how satisfied customers are after a call.
+
+- Metric Name: Customer Satisfaction Score  
+- Data Type: Numeric  
+- Description: "Extract a rating from 0 to 10 based on how satisfied the customer sounds during the call. If the customer directly provides a rating, use that value. Otherwise, estimate based on conversation sentiment."
+```
+
+### 💡Tip
+- Use meaningful metric names so everyone on your team understands what’s being tracked.  
+- Pick the most suitable data type to make reporting and analysis easy.  
+- Clearly describe each metric for consistent agent use and accurate data.
+
