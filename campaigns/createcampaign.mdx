@@ -1,0 +1,105 @@
+---
+title: "Create a Calling Campaign"
+description: "Step-by-step guide to configuring and launching an outbound calling campaign using the Campaign Management module."
+---
+
+![Create Calling Campaign Interface](/images/tab.png)
+
+### Overview
+
+The **Campaign Management** section allows you to create, configure, and manage outbound calling campaigns. Each campaign can have its own schedule, retry logic, CRM integration, and call data imported via CSV.
+
+---
+
+### Steps to Create a Campaign
+
+1. **Navigate to Campaigns**
+   - From the sidebar menu, click **Campaigns**.
+   - Press the **Create Batch** button at the top right.
+
+2. **Fill in Campaign Details**
+![Create Calling Campaign Interface](/images/modal.png)
+   - In the popup window titled **Create Calling Campaign**, enter a **Batch Name** — for example, "Cristiano".
+   - Under **Calling Numbers**, add one or more phone numbers. These are the numbers your system will use for outbound calls.
+   - You can search and select previously configured numbers from the list.
+
+---
+
+### Configure the Calling Schedule
+
+1. **Select Calling Days**
+   - Choose the days of the week your campaign should run. You can click individual days (e.g., M, T, W, T, F) or select all.
+
+2. **Timezone Setting**
+   - Choose your operating timezone. 
+   ```
+    Example: **(GMT+5:30) Chennai, Kolkata, Mumbai, New Delhi**.```
+
+3. **Set Start and End Time**
+   - Define the time window for outbound calls.
+   - Default Example: **Start Time** → 09:00, **End Time** → 17:00.
+   - Calls will be initiated only during this window.
+
+---
+
+### Retry Settings
+
+These settings determine how the system handles retries for unanswered calls.
+
+- **Max Attempts per Contact:** Set how many times the same contact number can be retried.  
+  ```
+  Example: 3 attempts.
+  ```
+- **Delay Between Attempts (minutes):** Set how long the system should wait between retries.  
+  ```
+   Example: 5 minutes.
+  ```
+
+---
+
+### CRM Options
+
+Select whether this campaign should interact with your CRM system.
+
+- **Outgoing CRM:** Choose this for outbound lead follow-ups.
+
+---
+
+### Inbound Call Settings
+
+- Toggle **Allow inbound calls on selected phone numbers** to enable or disable inbound capabilities on the configured numbers.
+
+---
+
+### CSV Upload and Country Validation
+
+Upload your CSV file containing the contact list for outbound calls.
+
+1. **Country Code for CSV Number Validation**
+   - Select the appropriate country code prefix.  
+     Example: **+91** for India.
+
+2. **Mandatory Template Variables for CSV Upload**
+   - Add custom or predefined **template variables** if required for dynamic calling scripts or CRM updates.
+
+3. **Upload CSV File**
+   - Click the upload area or drag your contact file.  
+   - Format: `.csv` with columns for phone numbers and optional variables.  
+   - **Maximum file size:** 50 MB.
+
+---
+
+### Finalization
+
+Once all details are filled in:
+
+- Review your configuration settings.  
+- Click **Create Campaign** at the bottom right to finalize.
+
+Your campaign will now appear under **Campaign Management** with call statistics and status indicators.
+
+---
+
+💡 **Tip**
+- Always verify phone numbers before uploading CSVs to prevent validation errors.
+

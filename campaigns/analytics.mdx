@@ -1,0 +1,109 @@
+---
+title: "Campaign Analytics & Monitoring"
+
+description: "Understand how to monitor campaign performance, call statistics, and track call-level details in real time."
+---
+
+![Campaign Analytics Dashboard](/images/analytics.png)
+
+### Overview
+
+The **Campaign Analytics** dashboard allows users to measure and monitor the performance of call campaigns. It provides a detailed view of campaign performance, including call success rate, duration, and status updates all in real time.
+
+---
+
+### Campaign List View
+
+In the main campaign list, each campaign displays the following:
+
+- **Campaign Name** – The name of the campaign (e.g., “mm”).
+- **Call Statistics** – A quick summary showing:
+  - **Total Calls:** The total number of attempted calls under the campaign.
+  - **Picked:** Calls that were successfully answered.
+  - **Completed:** Calls that finished execution successfully.
+- **Status:** Indicates the current progress, such as *Completed*, *Pending*, or *Unknown*.
+- **Created:** Displays when the campaign was created.
+- **Actions:** Options to view analytics, delete, or manage the campaign.
+```
+Example:
+A campaign named Testing Campaign might show:
+- Total: 200 
+- Picked: 150  
+- Completed: 75  
+- Status: Unknown  
+```
+Older campaigns may appear as *Completed* once all calls finish.
+
+---
+
+### Call Details View
+
+Each campaign includes a **Call Details** section where detailed call-level data can be viewed.
+
+#### Columns Explained
+
+- **Phone Number:** The number dialed during the campaign.
+- **Call Cost:** The cost of the call (if applicable).
+- **Status:** Displays the current state of the call (e.g., *Pending*, *Completed*).
+- **Duration:** Shows the length of each call after completion.
+- **Start Time:** Indicates when the call began.
+- **Created At:** Timestamp for when the call record was generated.
+- **Retry Count:** Shows how many times the call was attempted.
+- **Actions:** Provides options to view logs, retry calls, or analyze call data.
+
+*Pending calls* will show “N/A” for duration and start time until they are processed.
+
+---
+
+### Batch Analytics View
+
+When you click on a specific campaign, the **Batch Analytics** section appears with deeper insights.
+
+### Campaign Details
+
+- **Campaign Name:** Displayed at the top (e.g., “Testing Campaign”).
+- **Created At:** Timestamp when the batch was created.
+- **Status:** Real-time status (e.g., *Pending* when in progress, *Completed* after finalization).
+
+---
+
+### Call Success Rate
+
+A **Donut Chart** visually represents the proportion of calls across various categories:
+- **Completed** – Successfully finished calls.
+- **Pending** – Calls still in progress.
+- **Busy / Failed / No Answer / Queued** – Indicate specific failure or waiting states.
+
+Hovering over the chart provides exact counts in each category to quickly assess campaign performance health.
+
+---
+
+### Call Duration Distribution
+
+This graph displays the number of calls across different time duration intervals:
+- Ranges: *0–30s*, *31–60s*, *1–2m*, *2–5m*, etc.
+- Helps analyze average conversation lengths and agent interaction quality.
+- Empty bars indicate no completed calls yet.
+
+---
+
+### Managing Campaigns
+
+Each campaign includes administrative actions:
+- **Edit:** Modify campaign name or scheduling parameters.
+- **Delete:** Permanently remove the campaign and all its associated call records.
+- **Pause:** Temporarily suspend an active campaign.
+- **Export:** Download analytics data for external reporting or documentation.
+
+---
+
+### Insights and Recommendations
+
+- **Pending Calls:** If all calls remain pending, confirm that your telephony integration is running properly.
+- **Low Success Rate:** Indicates failed or unanswered calls; verify numbers and call routing.
+- **Duration Analysis:** Short durations often mean disconnected or unanswered calls, while longer durations reflect successful engagement.
+
+---
+
+💡 **Tip:**  
+Regularly monitor both *Call Success Rate* and *Call Duration Distribution* to identify technical issues or optimize staff efficiency. Export reports after each campaign for performance tracking and compliance audits.

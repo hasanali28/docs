@@ -54,8 +54,8 @@
     {
       "group": "Tools",
       "pages": [
-        "Post call whatsapp notifier",
-        "call transfer"
+        "tools/postcallwhatsapp",
+        "tools/calltransfer"
       ]
     },
     {
@@ -68,13 +68,18 @@
     }
   ]
 },
-
-{
-            "group": "Campaign",
-            "pages": ["campaign"]
-            
-          }
-
+ {
+  "group": "Campaign",
+  "pages": [
+    {
+      "group": "Campaign  Management ",
+      "pages": [
+        "campaigns/createcampaign",
+        "campaigns/analytics"
+      ]
+    }
+  ]
+}
         ]
       },
       {
@@ -125,9 +130,9 @@
     "global": {
       "anchors": [
         {
-          "anchor": "Documentation",
+          "anchor": "Community",
           "href": "https://weya-f85e708b.mintlify.app/",
-          "icon": "book-open-cover"
+          "icon": "discord"
         },
         {
           "anchor": "Blog",
