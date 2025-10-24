@@ -1,0 +1,108 @@
+---
+title: "CRM Integration Guide"
+description: "Step-by-step process to integrate, monitor, and configure data mapping for HubSpot and Zoho CRMs in Weya AI."
+---
+
+![CRM Integration Overview](/images/crm-integration-main.png)
+
+### Overview
+
+Integrate and monitor **HubSpot** or **Zoho CRM** within Weya AI to automate call tracking, sales synchronization, and customer relationship workflows.  
+Both CRMs follow the same stepwise flow, where **you first integrate and monitor** the connection, and **mapping is configured later** by clicking **Configure**.
+
+---
+
+### 1. Access Integrations
+
+1. Navigate to the **Integrations** tab from the sidebar.  
+2. Under **Available Integrations**, choose **HubSpot** or **Zoho CRM**.  
+3. Click **Connect** to begin the setup.
+
+---
+
+### 2. Authenticate CRM Connection
+
+![CRM Authorization](/images/crm-auth.png)
+
+When you click **Connect**, you’re redirected to the CRM authentication page.
+
+- **HubSpot:** Log into your HubSpot account and approve access for Weya AI.  
+- **Zoho:** Sign in to Zoho CRM and authorize Weya AI API permissions.  
+
+Once authentication succeeds, the connection is securely established.
+
+---
+
+### 3. Configure Credentials
+
+![CRM Configuration](/images/crm-config.png)
+
+Next, configure your CRM details inside Weya AI:
+
+- **Choose CRM:** HubSpot or Zoho  
+- **Region:** Choose (e.g., Asia or Europe)  
+- **Client ID** & **Client Secret:** Obtained from your CRM developer console  
+- **Redirect URL:** Auto-filled by Weya AI  
+- **Access Token / Refresh Token:** Paste generated tokens  
+- **Token Type:** Bearer  
+- **Expires In** (3600 seconds) and **Expires At** (expiry date)
+
+Once all details are filled, click **Save** to finalize the integration.
+
+---
+
+### 4. Monitor CRM Integration (Before Mapping)
+
+![Active Integration](/images/crm-active.png)
+
+After saving credentials, go to **My Integrations** — your CRM will appear as **Active** if connected successfully.
+
+From here, you can :
+
+- Monitor integration health and token validity  
+- View active CRM connections  
+- Confirm real-time status (e.g., Active / Processing)
+
+This monitoring step ensures your integration is live before moving to mapping.
+
+---
+
+### 5. Click Configure to Map Data
+
+![CRM Mapping](/images/crm-mapping.png)
+
+Once your CRM shows **Active**, click **Configure** to set up mapping for synced data.
+
+#### Configuration Setup
+- **Module Name:** Select what to sync — e.g., Contacts or Leads.  
+- **Unique Key:** Choose fields identifying unique records (Email, First Name).  
+- **Required Fields:** Define mandatory data points (Email, DOB).
+
+#### Mapping Call Data
+- Assign specific **Agents** to CRM modules.  
+- Choose which call details to sync:
+  - Call Duration  
+  - Call Cost  
+  - Call Transcription  
+  - Call Recording
+
+#### Sync Frequency
+- Select how often data syncs between CRM and Weya AI:
+  - **Realtime Sync**
+  - **Every 3 hours**
+  - **Once a day**
+
+When mapping is complete, click **Save** to activate it.
+
+---
+
+### 💡 Tips
+
+- This flow is identical for both **HubSpot** and **Zoho CRM**.  
+- Always verify the CRM authorization before configuring mapping.  
+- Refresh expired tokens regularly to ensure continuous sync.  
+- You may reconfigure mapping anytime via the **Configure** button in **My Integrations**.
+
+---
+
+Once setup and mapping are done, Weya AI automatically synchronizes CRM data, logging call metrics, agent performance, and real-time updates across both CRMs.

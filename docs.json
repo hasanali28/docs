@@ -61,9 +61,7 @@
     {
       "group": "Integrations",
       "pages": [
-        "custom tool",
-        "hubspot",
-        "zoho"
+        "/integration/crmintegration"
       ]
     }
   ]
