@@ -1,18 +1,23 @@
 ---
 title: "Get Batch Details"
-description: "Inspect batch metadata and page through associated calls."
-openapi: "GET /api/call/batch-details/{batchId}"
+description: "Inspect batch metadata and page through associated calls with filtering and sorting."
+openapi: "GET /api/call/batch-details/{id}"
 ---
 
 ## Overview
-Fetch detailed information for a single batch, including campaign metadata, status, and a paginated list of call records. Use this endpoint while monitoring execution from the dashboard or building custom analytics.
+Fetch detailed information for a single batch, including campaign metadata, status, and a paginated list of call records. This endpoint supports advanced filtering, sorting, and searching to help you analyze call data. Use it for monitoring execution from the dashboard or building custom analytics.
 
 ## Prerequisites
-- Valid bearer token with permission to view the batch.
-- The `batchId` you obtained during creation.
+- Bearer token for an authenticated user who owns the batch.
+- The batch `id` you obtained during creation.
 
 ## Request
-<ParamField path="batchId" type="string" required>
+
+<ParamField header="Authorization" type="string" required>
+Bearer token for the authenticated user.
+</ParamField>
+
+<ParamField path="id" type="string" required>
 Batch identifier you want to inspect.
 </ParamField>
 
@@ -20,59 +25,124 @@ Batch identifier you want to inspect.
 Page number for paginated calls.
 </ParamField>
 
-<ParamField query="limit" type="integer" default="100">
-Maximum call records to return per page.
+<ParamField query="limit" type="integer" default="10">
+Maximum call records to return per page (default: 10).
 </ParamField>
 
-<ParamField header="Authorization" type="string" required>
-Bearer token for the workspace admin.
+<ParamField query="filter" type="string">
+JSON stringified filter object to filter calls by specific fields. Example: `{"callStatus":"completed"}`.
+</ParamField>
+
+<ParamField query="sortBy" type="string">
+Field to sort by (e.g., "createdAt").
+</ParamField>
+
+<ParamField query="sortOrder" type="string" allowedValues="asc,desc" default="asc">
+Sort order: "asc" for ascending or "desc" for descending.
+</ParamField>
+
+<ParamField query="search" type="string">
+Search term to filter calls across dynamic fields (e.g., customer name, phone number).
 </ParamField>
 
 <RequestExample>
 ```bash cURL
-curl --location '{{baseUrl}}/api/call/batch-details/67def9053495307c718d9dfb' \
-  --header 'Authorization: Bearer {{authToken}}' \
-  --get --data-urlencode 'page=1' --data-urlencode 'limit=100'
+curl --location '{{baseUrl}}/api/call/batch-details/67def9053495307c718d9dfb?page=1&limit=10&sortBy=createdAt&sortOrder=desc' \
+  --header 'Authorization: Bearer {{authToken}}'
 ```
 </RequestExample>
 
 ## Response
+
 <ResponseExample>
 ```json 200 OK
 {
-  "success": true,
-  "batch": {
-    "_id": "67def9053495307c718d9dfb",
-    "batchName": "New Test Batch",
-    "status": "active",
-    "callingNumbers": ["67d52be3f91fe7017efdb6f1"],
-    "calls": [],
-    "createdAt": "2025-03-22T17:53:09.477Z"
-  },
-  "pagination": {
+  "message": "Calls fetched successfully",
+  "status": true,
+  "code": 200,
+  "errorMessage": "",
+  "data": {
+    "batchId": "67def9053495307c718d9dfb",
+    "batchName": "Marketing Campaign May 2025",
+    "batchStatus": "active",
     "page": 1,
-    "limit": 100,
-    "totalCalls": 0
+    "limit": 10,
+    "total": 150,
+    "totalPages": 15,
+    "data": [
+      {
+        "_id": "64e5f12345abcdef11111111",
+        "phoneNumber": "+1234567890",
+        "customer_name": "John Doe",
+        "loan_amount": 50000,
+        "phoneLogs": [
+          {
+            "callStatus": "completed",
+            "callDuration": 120,
+            "recordingUrl": "https://example.com/recording.mp3",
+            "transcript": "Call transcript here...",
+            "createdAt": "2025-05-15T14:30:00.000Z"
+          }
+        ],
+        "createdAt": "2025-05-15T14:00:00.000Z"
+      }
+    ]
   }
 }
 ```
 </ResponseExample>
 
-<ResponseField name="batch" type="object" required>
-Contains batch metadata plus the current page of call records.
+<ResponseField name="data" type="object" required>
+Contains batch metadata and paginated call records.
 </ResponseField>
-<ResponseField name="batch.calls" type="array">
-List of calls with enriched analytics, recording URLs, and transcripts when available.
+
+<ResponseField name="data.batchId" type="string" required>
+The batch identifier.
 </ResponseField>
-<ResponseField name="pagination" type="object" required>
-Provides the active page, configured limit, and total call count for the batch.
+
+<ResponseField name="data.batchName" type="string" required>
+The name of the batch.
+</ResponseField>
+
+<ResponseField name="data.batchStatus" type="string" required>
+Current status of the batch (e.g., "active", "completed", "paused").
+</ResponseField>
+
+<ResponseField name="data.page" type="integer" required>
+Current page number.
+</ResponseField>
+
+<ResponseField name="data.limit" type="integer" required>
+Number of records per page.
+</ResponseField>
+
+<ResponseField name="data.total" type="integer" required>
+Total number of calls in the batch matching the filter criteria.
+</ResponseField>
+
+<ResponseField name="data.totalPages" type="integer" required>
+Total number of pages available.
+</ResponseField>
+
+<ResponseField name="data.data" type="array[object]" required>
+Array of call records with enriched data including phone logs, recording URLs, and transcripts when available.
 </ResponseField>
 
 ## Error Handling
-- **400 Bad Request** – `batchId` failed validation or query parameters are out of range.
-- **404 Not Found** – Batch no longer exists or is not visible to the workspace.
-- **500 Internal Server Error** – Nexus could not aggregate batch data; retry or escalate to support.
+
+- **400 Bad Request** – Invalid batch ID format, invalid filter JSON, or query parameters out of range.
+- **404 Not Found** – Batch not found or does not belong to the authenticated user.
+- **500 Internal Server Error** – Failed to aggregate batch data; retry or contact support.
+
+<Note>
+**Advanced Features:**
+
+- **Filtering:** Use the `filter` parameter with JSON to filter calls by specific fields from the phone logs
+- **Sorting:** Sort by any field using `sortBy` and control order with `sortOrder`
+- **Searching:** The `search` parameter performs a regex search across all dynamic string fields in call records
+- Phone logs are automatically included with each call record when available
+</Note>
 
 <Tip>
-Use this endpoint together with `GET /api/call/batch/{batchId}/all` when you need both paginated monitoring in the UI and full exports for reports.
+For real-time monitoring, combine this endpoint with webhooks to track batch progress. Use filtering and sorting to identify specific call outcomes or issues.
 </Tip>

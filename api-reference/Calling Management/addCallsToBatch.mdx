@@ -21,8 +21,8 @@ Workspace API key. Must match the owner of the target batch.
 Identifier returned by `POST /api/call/createBatch`.
 </ParamField>
 
-<ParamField body="callData" type="array[object]" required>
-Each object represents one dial attempt. Include at least `phoneNumber` and any fields referenced in the agent’s script.
+<ParamField body="call_data" type="array[object]" required>
+Array of call records to be added to the batch. Each object must include `phoneNumber` and any custom variables required by the agent. The system automatically chunks large arrays (1000 records per chunk) for efficient processing.
 </ParamField>
 
 <RequestExample>
@@ -32,11 +32,15 @@ curl --location '{{baseUrl}}/api/call/addCallsToBatch' \
   --header 'Content-Type: application/json' \
   --data '{
     "batchId": "64e5f12345abcdef98765432",
-    "callData": [
+    "call_data": [
       {
-        "phoneNumber": "+15551234567",
-        "name": "John Doe",
-        "company": "Acme Inc."
+        "phoneNumber": "919876543210",
+        "customer_name": "Praveen",
+        "loan_amount": 30000,
+        "loan_tenure": 40,
+        "lead_id": "1094436",
+        "completedStage": "lead_eligibility_pass",
+        "upcomingStage": "lead_loan_offer"
       }
     ]
   }'
@@ -44,29 +48,73 @@ curl --location '{{baseUrl}}/api/call/addCallsToBatch' \
 </RequestExample>
 
 ## Response
+
 <ResponseExample>
 ```json 200 OK
 {
   "success": true,
-  "added": 1,
-  "message": "Calls enqueued"
+  "added": 1000,
+  "callIds": ["64e5f12345abcdef11111111", "64e5f12345abcdef22222222"]
 }
 ```
 </ResponseExample>
 
-<ResponseField name="added" type="integer" required>
-Number of call records accepted into the batch.
+<ResponseExample>
+```json 207 Partial Content
+{
+  "success": false,
+  "partial": true,
+  "added": 500,
+  "callIds": ["64e5f12345abcdef11111111"],
+  "failedChunks": [
+    {
+      "chunkNum": 2,
+      "error": "Database connection error"
+    }
+  ]
+}
+```
+</ResponseExample>
+
+<ResponseField name="success" type="boolean" required>
+Indicates whether all chunks were processed successfully. `false` with `partial: true` means some chunks succeeded.
 </ResponseField>
-<ResponseField name="message" type="string">
-High-level status. Review it for partial validation warnings.
+
+<ResponseField name="added" type="integer" required>
+Total number of call records successfully added to the batch across all chunks.
+</ResponseField>
+
+<ResponseField name="callIds" type="array[string]" required>
+Array of call record IDs that were inserted or updated.
+</ResponseField>
+
+<ResponseField name="partial" type="boolean">
+Present when `success` is `false`, indicating that some chunks succeeded while others failed.
+</ResponseField>
+
+<ResponseField name="failedChunks" type="array[object]">
+Array of chunk processing failures, each containing `chunkNum` and `error` message.
 </ResponseField>
 
 ## Error Handling
-- **400 Bad Request** – `batchId` missing, `callData` empty, or contacts fail schema validation.
-- **403 Forbidden** – API key not recognised for this workspace.
-- **404 Not Found** – Batch or mapped agent is missing; double-check ids.
-- **500 Internal Server Error** – Bulk insertion failed; retry with exponential backoff.
+
+- **400 Bad Request** – Missing `batchId`, empty `call_data` array, or validation failure.
+- **403 Forbidden** – Invalid or missing API key, or API key doesn't own the batch.
+- **404 Not Found** – Batch not found, or no agent found for the batch's calling numbers.
+- **207 Partial Content** – Some chunks processed successfully while others failed. Check `failedChunks` for details.
+- **500 Internal Server Error** – Server error during processing; retry with exponential backoff.
+
+<Note>
+**Processing Details:**
+
+- Large arrays are automatically chunked into batches of 1000 records for efficient processing
+- Each call record is validated against the agent's required variables
+- Existing calls with the same phone number are updated if they have a "pending" status
+- Completed calls create new phone log entries
+- The system automatically starts the calling service after successful insertion
+- Timezone information is applied to each call record if not provided
+</Note>
 
 <Tip>
-Large uploads are chunked automatically. You can safely enqueue thousands of contacts in one request as long as the payload stays under your gateway limits.
+You can safely enqueue thousands of contacts in a single request. The system handles chunking automatically. Monitor the response for `partial: true` to identify any failed chunks that may need retry.
 </Tip>

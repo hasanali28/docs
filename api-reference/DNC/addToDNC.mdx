@@ -1,0 +1,89 @@
+---
+title: "Add to DNC List"
+description: "Add a phone number to the Do Not Call (DNC) list for your organization."
+openapi: "POST /api/dnc/add"
+---
+
+## Overview
+Add a phone number to your organization's Do Not Call (DNC) list. Once added, this number will be excluded from future outbound calling campaigns. The system automatically sends a notification email to the organization admin when a number is added to the DNC list.
+
+## Prerequisites
+- Bearer token for authenticated workspace access
+- Valid `batchId` that exists in your workspace
+- Valid `requestUUID` from a call record in the specified batch
+
+## Request
+
+<ParamField header="Authorization" type="string" required>
+Bearer token for the authenticated workspace account.
+</ParamField>
+
+<ParamField body="phoneNumber" type="string" required>
+Phone number to add to the DNC list. Format: E.164 format (e.g., "+1234567890").
+</ParamField>
+
+<ParamField body="batchId" type="string" required>
+ID of the batch associated with the call that triggered this DNC request.
+</ParamField>
+
+<ParamField body="requestUUID" type="string" required>
+Unique identifier (UUID) of the specific call record from the batch's phone logs.
+</ParamField>
+
+<ParamField body="type" type="string">
+Optional classification for the DNC entry (e.g., "customer_request", "complaint", etc.).
+</ParamField>
+
+<RequestExample>
+```bash cURL
+curl --location '{{baseUrl}}/api/dnc/add' \
+  --header 'Authorization: Bearer {{authToken}}' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "phoneNumber": "+1234567890",
+    "batchId": "64e5f12345abcdef98765432",
+    "requestUUID": "550e8400-e29b-41d4-a716-446655440000",
+    "type": "customer_request"
+  }'
+```
+</RequestExample>
+
+## Response
+
+<ResponseExample>
+```json 200 OK
+{
+  "message": "Phone number added to DNC successfully",
+  "status": true,
+  "code": 200,
+  "errorMessage": ""
+}
+```
+</ResponseExample>
+
+<ResponseField name="message" type="string" required>
+Success message confirming the phone number was added to the DNC list.
+</ResponseField>
+
+<ResponseField name="status" type="boolean" required>
+Indicates whether the operation was successful.
+</ResponseField>
+
+<ResponseField name="code" type="integer" required>
+HTTP status code (200 for success).
+</ResponseField>
+
+## Error Handling
+
+- **400 Bad Request** – Missing required fields (`phoneNumber`, `batchId`, or `requestUUID`), or phone number already exists in DNC for this organization.
+- **404 Not Found** – Batch not found, user not found for the batch, or call record not found for the given `batchId` and `requestUUID`.
+- **500 Internal Server Error** – Server error while processing the request.
+
+<Note>
+When a phone number is added to the DNC list, the system automatically:
+- Links the DNC entry to your organization
+- Associates it with the batch and call record
+- Stores call recording and transcription data (if available)
+- Sends an email notification to your organization's admin
+</Note>
+

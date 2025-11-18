@@ -1,0 +1,140 @@
+---
+title: "Get DNC List"
+description: "Retrieve a paginated list of phone numbers in your organization's Do Not Call (DNC) list."
+openapi: "GET /api/dnc/list"
+---
+
+## Overview
+Fetch all phone numbers that have been added to your organization's Do Not Call list. Results are paginated and can be filtered by search term. The list is automatically scoped to your organization based on your authentication token.
+
+## Prerequisites
+- Bearer token for authenticated workspace access
+- Organization membership (automatically determined from your user account)
+
+## Request
+
+<ParamField header="Authorization" type="string" required>
+Bearer token for the authenticated workspace account.
+</ParamField>
+
+<ParamField query="page" type="integer" default="1">
+Page number for pagination. Minimum value is 1.
+</ParamField>
+
+<ParamField query="limit" type="integer" default="10">
+Number of DNC entries to return per page. Default is 10.
+</ParamField>
+
+<ParamField query="search" type="string">
+Optional search term to filter results. Searches across phone number, type, and requestUUID fields (case-insensitive).
+</ParamField>
+
+<RequestExample>
+```bash cURL
+curl --location '{{baseUrl}}/api/dnc/list?page=1&limit=10&search=123' \
+  --header 'Authorization: Bearer {{authToken}}'
+```
+</RequestExample>
+
+## Response
+
+<ResponseExample>
+```json 200 OK
+{
+  "message": "DNC list fetched successfully",
+  "status": true,
+  "code": 200,
+  "errorMessage": "",
+  "data": {
+    "dncList": [
+      {
+        "_id": "64e5f12345abcdef98765432",
+        "phoneNumber": "+1234567890",
+        "type": "customer_request",
+        "orgId": "64e5f12345abcdef12345678",
+        "batchId": "64e5f12345abcdef87654321",
+        "requestUUID": "550e8400-e29b-41d4-a716-446655440000",
+        "callRecording": "https://example.com/recording.mp3",
+        "transcription": "Customer requested to be removed from calling list",
+        "createdAt": "2025-05-15T10:30:00.000Z"
+      }
+    ],
+    "pagination": {
+      "total": 42,
+      "page": 1,
+      "limit": 10,
+      "totalPages": 5
+    }
+  }
+}
+```
+</ResponseExample>
+
+<ResponseField name="dncList" type="array" required>
+Array of DNC entries matching the query parameters.
+</ResponseField>
+
+<ResponseField name="dncList[]._id" type="string" required>
+Unique identifier for the DNC record.
+</ResponseField>
+
+<ResponseField name="dncList[].phoneNumber" type="string" required>
+Phone number in the DNC list (E.164 format).
+</ResponseField>
+
+<ResponseField name="dncList[].type" type="string">
+Optional classification type for the DNC entry.
+</ResponseField>
+
+<ResponseField name="dncList[].orgId" type="string" required>
+Organization ID that owns this DNC entry.
+</ResponseField>
+
+<ResponseField name="dncList[].batchId" type="string" required>
+Batch ID associated with the call that triggered the DNC entry.
+</ResponseField>
+
+<ResponseField name="dncList[].requestUUID" type="string" required>
+UUID of the specific call record from the batch.
+</ResponseField>
+
+<ResponseField name="dncList[].callRecording" type="string">
+URL to the call recording (if available).
+</ResponseField>
+
+<ResponseField name="dncList[].transcription" type="string">
+Call transcription text (if available).
+</ResponseField>
+
+<ResponseField name="dncList[].createdAt" type="string" required>
+ISO 8601 timestamp when the DNC entry was created.
+</ResponseField>
+
+<ResponseField name="pagination" type="object" required>
+Pagination metadata for the current query.
+</ResponseField>
+
+<ResponseField name="pagination.total" type="integer" required>
+Total number of DNC entries matching the search criteria.
+</ResponseField>
+
+<ResponseField name="pagination.page" type="integer" required>
+Current page number.
+</ResponseField>
+
+<ResponseField name="pagination.limit" type="integer" required>
+Number of entries per page.
+</ResponseField>
+
+<ResponseField name="pagination.totalPages" type="integer" required>
+Total number of pages available.
+</ResponseField>
+
+## Error Handling
+
+- **500 Internal Server Error** – Server error while fetching the DNC list.
+
+<Tip>
+Use the `search` parameter to quickly find specific phone numbers or filter by type. The search is case-insensitive and matches partial strings.
+</Tip>
+

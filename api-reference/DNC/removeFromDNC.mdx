@@ -1,0 +1,66 @@
+---
+title: "Remove from DNC List"
+description: "Remove a phone number from your organization's Do Not Call (DNC) list."
+openapi: "DELETE /api/dnc/delete/{id}"
+---
+
+## Overview
+Permanently remove a phone number from your organization's Do Not Call list. Once removed, the number can be called again in future campaigns. You can only delete DNC entries that belong to your organization.
+
+## Prerequisites
+- Bearer token for authenticated workspace access
+- Valid DNC record ID that belongs to your organization
+
+## Request
+
+<ParamField header="Authorization" type="string" required>
+Bearer token for the authenticated workspace account.
+</ParamField>
+
+<ParamField path="id" type="string" required>
+Unique identifier of the DNC record to delete. This is the `_id` field from the DNC list response.
+</ParamField>
+
+<RequestExample>
+```bash cURL
+curl --location --request DELETE '{{baseUrl}}/api/dnc/delete/64e5f12345abcdef98765432' \
+  --header 'Authorization: Bearer {{authToken}}'
+```
+</RequestExample>
+
+## Response
+
+<ResponseExample>
+```json 200 OK
+{
+  "message": "DNC record deleted successfully",
+  "status": true,
+  "code": 200,
+  "errorMessage": ""
+}
+```
+</ResponseExample>
+
+<ResponseField name="message" type="string" required>
+Success message confirming the DNC record was deleted.
+</ResponseField>
+
+<ResponseField name="status" type="boolean" required>
+Indicates whether the operation was successful.
+</ResponseField>
+
+<ResponseField name="code" type="integer" required>
+HTTP status code (200 for success).
+</ResponseField>
+
+## Error Handling
+
+- **400 Bad Request** – Missing or invalid DNC ID parameter.
+- **403 Forbidden** – You are not authorized to delete this DNC record (it belongs to a different organization).
+- **404 Not Found** – DNC record not found with the provided ID.
+- **500 Internal Server Error** – Server error while processing the deletion.
+
+<Warning>
+This action is permanent. Once a DNC record is deleted, the phone number can be called again in future campaigns. Make sure you have the correct DNC record ID before deleting.
+</Warning>
+

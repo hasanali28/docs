@@ -1,33 +1,91 @@
 ---
-title: 'Introduction'
-description: 'Example section for showcasing API endpoints'
+title: 'API Reference Introduction'
+description: 'Welcome to the Weya AI API documentation'
 ---
-
-<Note>
-  If you're not looking to build API reference documentation, you can delete
-  this section by removing the api-reference folder.
-</Note>
 
 ## Welcome
 
-There are two ways to build API documentation: [OpenAPI](https://mintlify.com/docs/api-playground/openapi/setup) and [MDX components](https://mintlify.com/docs/api-playground/mdx/configuration). For the starter kit, we are using the following OpenAPI specification.
+Welcome to the Weya AI API documentation. This documentation covers the public APIs available for integrating with the Weya AI platform. The APIs are organized into two main categories:
 
-<Card
-  title="Plant Store Endpoints"
-  icon="leaf"
-  href="https://github.com/mintlify/starter/blob/main/api-reference/openapi.json"
->
-  View the OpenAPI specification file
-</Card>
+- **Call Management APIs** - Manage phone numbers, batches, and outbound calling campaigns
+- **DNC (Do Not Call) APIs** - Manage your organization's Do Not Call list
+
+## Base URL
+
+All API requests should be made to:
+
+```
+https://nexusdev-wjs-api-dev.mangoforest-291de162.swedencentral.azurecontainerapps.io
+```
+
+The base URL is automatically used in all code examples throughout this documentation via the `{{baseUrl}}` variable.
 
 ## Authentication
 
-All API endpoints are authenticated using Bearer tokens and picked up from the specification file.
+API endpoints support two authentication methods:
+
+### Bearer Token Authentication
+
+Most endpoints require a Bearer token in the `Authorization` header:
+
+```bash
+Authorization: Bearer YOUR_TOKEN_HERE
+```
+
+### API Key Authentication
+
+Some endpoints (like batch creation) also support API key authentication via the `x-api-key` header:
+
+```bash
+x-api-key: YOUR_API_KEY_HERE
+```
+
+You can find your API key in your workspace settings under **Settings → API access**.
+
+<Note>
+When both authentication methods are available for an endpoint, the API key takes precedence if both are provided. Check individual endpoint documentation for specific authentication requirements.
+</Note>
+
+## Response Format
+
+All API responses follow a consistent format:
 
 ```json
-"security": [
-  {
-    "bearerAuth": []
-  }
-]
+{
+  "message": "Success message",
+  "status": true,
+  "code": 200,
+  "errorMessage": "",
+  "data": { ... }
+}
 ```
+
+- `message` - Human-readable message describing the result
+- `status` - Boolean indicating success (`true`) or failure (`false`)
+- `code` - HTTP status code
+- `errorMessage` - Error message (empty string on success)
+- `data` - Response payload (varies by endpoint)
+
+## Error Handling
+
+API errors are returned with appropriate HTTP status codes:
+
+- **400 Bad Request** - Invalid request parameters or missing required fields
+- **401 Unauthorized** - Missing or invalid authentication token
+- **403 Forbidden** - Insufficient permissions or invalid API key
+- **404 Not Found** - Resource not found
+- **422 Unprocessable Entity** - Validation errors (e.g., invalid CSV rows)
+- **500 Internal Server Error** - Server error; retry or contact support
+
+## Rate Limiting
+
+API requests are subject to rate limiting to ensure fair usage. If you exceed the rate limit, you'll receive a `429 Too Many Requests` response. Please implement exponential backoff when retrying requests.
+
+## Getting Started
+
+1. **Obtain Authentication Credentials** - Get your Bearer token or API key from your workspace settings
+2. **Review API Endpoints** - Explore the available endpoints in the navigation menu
+3. **Test with Examples** - Use the provided cURL examples to test API calls
+4. **Integrate** - Implement the APIs in your application
+
+For questions or support, contact us at [info@weya.ai](mailto:info@weya.ai).

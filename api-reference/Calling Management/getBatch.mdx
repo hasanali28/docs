@@ -1,86 +1,163 @@
 ---
-title: "List Batches"
-description: "Retrieve batches for a user and optionally soft delete or restore them."
+title: "Get All Batches"
+description: "Retrieve a paginated list of all batches for an authenticated user with search capabilities."
 openapi: "GET /api/call/batches/{userId}"
 ---
 
 ## Overview
-This endpoint lists every batch created by a specific user. You can filter out archived batches, soft delete a batch, or restore one by combining the `action` and `batchId` query parameters in the same call.
+This endpoint lists every batch created by the authenticated user with pagination and search support. Only non-deleted batches are returned by default. Use this to monitor active campaigns, view batch summaries, and track campaign statistics.
 
 ## Prerequisites
-- Bearer token for the workspace that owns the batches.
-- The `userId` path parameter corresponds to the user scope you want to inspect.
+- Bearer token for an authenticated user.
+- The user must own the batches being retrieved.
 
 ## Request
-<ParamField path="userId" type="string" required>
-Workspace user identifier. Only batches owned by this user are returned.
-</ParamField>
-
-<ParamField query="includeDeleted" type="boolean" default="true">
-Set to `false` to hide batches that were soft deleted within the last 90 days.
-</ParamField>
-
-<ParamField query="action" type="string" allowedValues="delete,restore">
-Optional action to perform before fetching the list. Pair with `batchId`.
-</ParamField>
-
-<ParamField query="batchId" type="string">
-Target batch for the action supplied in `action`.
-</ParamField>
 
 <ParamField header="Authorization" type="string" required>
-Bearer token issued to the workspace administrator.
+Bearer token for the authenticated user.
+</ParamField>
+
+<ParamField path="userId" type="string" required>
+User identifier. The authenticated user must match this ID.
+</ParamField>
+
+<ParamField query="page" type="integer" default="1">
+Page number for pagination.
+</ParamField>
+
+<ParamField query="limit" type="integer" default="10">
+Number of batches to return per page (default: 10).
+</ParamField>
+
+<ParamField query="search" type="string">
+Search term to filter batches by `batchName` or `queue_status`.
 </ParamField>
 
 <RequestExample>
 ```bash cURL
-curl --location '{{baseUrl}}/api/call/batches/64e5f12345abcdef12345678' \
-  --header 'Authorization: Bearer {{authToken}}' \
-  --data ''
+curl --location '{{baseUrl}}/api/call/batches/64e5f12345abcdef12345678?page=1&limit=10&search=Marketing' \
+  --header 'Authorization: Bearer {{authToken}}'
 ```
 </RequestExample>
 
 ## Response
+
 <ResponseExample>
 ```json 200 OK
 {
-  "success": true,
-  "batches": [
-    {
-      "_id": "64e5f12345abcdef98765432",
-      "batchName": "Marketing Campaign May 2025",
-      "callingNumbers": ["64e5f12345abcdef87654321"],
-      "totalCalls": 100,
-      "callsPicked": 80,
-      "callsCompleted": 70,
-      "totalCost": 42.5,
-      "status": "active",
-      "isDeleted": false,
-      "createdAt": "2025-05-01T12:00:00Z"
+  "message": "Batches fetched successfully",
+  "status": true,
+  "code": 200,
+  "errorMessage": "",
+  "data": {
+    "batches": [
+      {
+        "_id": "64e5f12345abcdef98765432",
+        "batchName": "Marketing Campaign May 2025",
+        "totalCalls": 150,
+        "callsPicked": 120,
+        "callsCompleted": 100,
+        "queue_status": "active",
+        "createdAt": "2025-05-01T12:00:00.000Z",
+        "updatedAt": "2025-05-15T14:30:00.000Z"
+      },
+      {
+        "_id": "64e5f12345abcdef98765433",
+        "batchName": "Sales Outreach June 2025",
+        "totalCalls": 200,
+        "callsPicked": 150,
+        "callsCompleted": 120,
+        "queue_status": "paused",
+        "createdAt": "2025-06-01T09:00:00.000Z",
+        "updatedAt": "2025-06-10T16:45:00.000Z"
+      }
+    ],
+    "pagination": {
+      "total": 25,
+      "page": 1,
+      "limit": 10,
+      "totalPages": 3
     }
-  ]
+  }
 }
 ```
 </ResponseExample>
 
-<ResponseField name="batches" type="array" required>
-Each entry summarises a batch with totals, soft-delete status, and owner metadata.
-</ResponseField>
-<ResponseField name="batches[].remainingDays" type="integer">
-Shows how many days remain before a soft-deleted batch is purged.
+<ResponseField name="data" type="object" required>
+Contains the batches array and pagination metadata.
 </ResponseField>
 
-## Soft Delete & Restore
-<Steps>
-<Step title="Soft delete a batch">
-Call the endpoint with `action=delete&batchId=BATCH_ID`. The batch remains recoverable for 90 days.
-</Step>
-<Step title="Restore a batch">
-Repeat the call with `action=restore&batchId=BATCH_ID` to reactivate it.
-</Step>
-</Steps>
+<ResponseField name="data.batches" type="array[object]" required>
+Array of batch records with summary statistics.
+</ResponseField>
+
+<ResponseField name="data.batches[]._id" type="string" required>
+Unique identifier for the batch.
+</ResponseField>
+
+<ResponseField name="data.batches[].batchName" type="string" required>
+Display name for the batch.
+</ResponseField>
+
+<ResponseField name="data.batches[].totalCalls" type="integer" required>
+Total number of calls in the batch.
+</ResponseField>
+
+<ResponseField name="data.batches[].callsPicked" type="integer" required>
+Number of calls that were picked up/answered.
+</ResponseField>
+
+<ResponseField name="data.batches[].callsCompleted" type="integer" required>
+Number of calls that completed successfully.
+</ResponseField>
+
+<ResponseField name="data.batches[].queue_status" type="string" required>
+Current status of the batch queue (e.g., "active", "paused", "completed").
+</ResponseField>
+
+<ResponseField name="data.batches[].createdAt" type="string" required>
+Timestamp when the batch was created (ISO 8601 format).
+</ResponseField>
+
+<ResponseField name="data.batches[].updatedAt" type="string" required>
+Timestamp when the batch was last updated (ISO 8601 format).
+</ResponseField>
+
+<ResponseField name="data.pagination" type="object" required>
+Pagination metadata.
+</ResponseField>
+
+<ResponseField name="data.pagination.total" type="integer" required>
+Total number of batches matching the search criteria.
+</ResponseField>
+
+<ResponseField name="data.pagination.page" type="integer" required>
+Current page number.
+</ResponseField>
+
+<ResponseField name="data.pagination.limit" type="integer" required>
+Number of records per page.
+</ResponseField>
+
+<ResponseField name="data.pagination.totalPages" type="integer" required>
+Total number of pages available.
+</ResponseField>
 
 ## Error Handling
-- **400 Bad Request** – Invalid `userId`, invalid `batchId`, or `action` provided without `batchId`.
-- **404 Not Found** – No batches exist for the given user or the batch cannot be located.
-- **500 Internal Server Error** – Service could not fetch batch metadata.
+
+- **400 Bad Request** – Invalid `userId` format or invalid query parameters.
+- **404 Not Found** – No batches found for the authenticated user.
+- **500 Internal Server Error** – Failed to fetch batch data; retry or contact support.
+
+<Note>
+**Filtering Behavior:**
+
+- Only non-deleted batches are returned (`isDeleted: false`)
+- Use the `search` parameter to filter by batch name or queue status
+- Results are sorted by creation date in descending order (newest first)
+- Pagination helps manage large lists of batches efficiently
+</Note>
+
+<Tip>
+Combine this endpoint with `GET /api/call/batch-details/{id}` to first get an overview of all batches, then drill down into specific batch details.
+</Tip>

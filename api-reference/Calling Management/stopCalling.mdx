@@ -37,28 +37,50 @@ curl --location '{{baseUrl}}/api/call/stop-calling' \
 </RequestExample>
 
 ## Response
+
 <ResponseExample>
 ```json 200 OK
 {
-  "success": true,
-  "message": "Batch marked as stopped"
+  "message": "",
+  "status": true,
+  "code": 200,
+  "errorMessage": "",
+  "data": {
+    "batchId": "64e5f12345abcdef98765432",
+    "status": "stopped"
+  }
 }
 ```
 </ResponseExample>
 
-<ResponseField name="success" type="boolean" required>
-Confirms that no new calls will be created for the batch.
+<ResponseField name="status" type="boolean" required>
+Indicates whether the batch was successfully stopped.
 </ResponseField>
-<ResponseField name="message" type="string">
-Provides additional context such as whether calls were still in progress.
+
+<ResponseField name="code" type="integer" required>
+HTTP status code (200 for success).
+</ResponseField>
+
+<ResponseField name="data" type="object">
+Additional information about the stopped batch.
 </ResponseField>
 
 ## Error Handling
-- **400 Bad Request** – Request body missing `batchId` or `userId`, or payload failed validation.
-- **401 Unauthorized** – Bearer token missing or invalid.
-- **404 Not Found** – Batch does not exist or is already archived.
-- **500 Internal Server Error** – Pausing failed due to a service issue; retry then escalate to support.
+
+- **400 Bad Request** – Missing required parameters (`batchId` or `userId`).
+- **401 Unauthorized** – Bearer token missing or expired.
+- **404 Not Found** – Batch not found or user not found.
+- **500 Internal Server Error** – Failed to stop calling service or call queue; retry or contact support.
+
+<Note>
+**Stopping Behavior:**
+
+- Prevents new calls from being initiated for the batch
+- In-flight calls are allowed to complete naturally
+- The call queue is stopped to prevent new call processing
+- Batch status is updated to reflect the stopped state
+</Note>
 
 <Check>
-Use `GET /api/call/batches/{userId}` afterwards and confirm the batch status is `stopped`.
+After stopping, verify the batch status using `GET /api/call/batches/{userId}` to confirm it shows as stopped.
 </Check>

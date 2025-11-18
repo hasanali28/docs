@@ -1,4 +1,110 @@
 ---
-title: "Add Phone"
+title: "Add Phone Number"
+description: "Add a new phone number to your workspace for outbound or inbound calling."
 openapi: "POST /api/call/add-phone"
 ---
+
+## Overview
+Add a phone number to your workspace that can be used for outbound calling campaigns or inbound call handling. The system supports multiple integrations including Plivo, Twilio, and Telnyx. Credentials are validated before the number is saved, and webhooks are automatically configured for the selected integration.
+
+## Prerequisites
+- Bearer token for authenticated workspace access
+- Valid phone number credentials for your chosen integration provider
+- Phone number must be owned by your integration account
+
+## Request
+
+<ParamField header="Authorization" type="string" required>
+Bearer token for the authenticated workspace account.
+</ParamField>
+
+<ParamField body="userId" type="string" required>
+ID of the user who will own this phone number.
+</ParamField>
+
+<ParamField body="phoneNumber" type="string" required>
+Phone number in E.164 format (e.g., "+1234567890"). Must be owned by your integration account.
+</ParamField>
+
+<ParamField body="integration" type="string" required allowedValues="plivo,twilio,telnyx">
+Integration provider for this phone number. Choose one of: `plivo`, `twilio`, or `telnyx`.
+</ParamField>
+
+<ParamField body="authToken" type="string" required>
+Authentication token for your integration provider account. For Plivo, this is the Auth Token. For Twilio, this is the Auth Token. For Telnyx, this is the API Key.
+</ParamField>
+
+<ParamField body="accSId" type="string" required>
+Account identifier for your integration provider. For Plivo, this is the Auth ID. For Twilio, this is the Account SID. For Telnyx, this is the App ID (automatically configured).
+</ParamField>
+
+<RequestExample>
+```bash cURL
+curl --location '{{baseUrl}}/api/call/add-phone' \
+  --header 'Authorization: Bearer {{authToken}}' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "userId": "64e5f12345abcdef12345678",
+    "phoneNumber": "+1234567890",
+    "integration": "twilio",
+    "authToken": "your_auth_token",
+    "accSId": "your_account_sid"
+  }'
+```
+</RequestExample>
+
+## Response
+
+<ResponseExample>
+```json 201 Created
+{
+  "message": "Phone number added successfully",
+  "status": true,
+  "code": 201,
+  "errorMessage": "",
+  "data": {
+    "_id": "64e5f12345abcdef87654321",
+    "userId": "64e5f12345abcdef12345678",
+    "phoneNumber": "+1234567890",
+    "integration": "twilio",
+    "createdAt": "2025-05-15T10:30:00.000Z"
+  }
+}
+```
+</ResponseExample>
+
+<ResponseField name="data" type="object" required>
+Phone number record that was created.
+</ResponseField>
+
+<ResponseField name="data._id" type="string" required>
+Unique identifier for the phone number record.
+</ResponseField>
+
+<ResponseField name="data.phoneNumber" type="string" required>
+Phone number that was added (E.164 format).
+</ResponseField>
+
+<ResponseField name="data.integration" type="string" required>
+Integration provider used for this number.
+</ResponseField>
+
+## Error Handling
+
+- **400 Bad Request** – Invalid User ID format, phone number already exists for this user, or invalid credentials for the integration provider.
+- **404 Not Found** – User not found with the provided `userId`.
+- **500 Internal Server Error** – Failed to set up integration webhooks or other server errors.
+
+<Note>
+**Integration-Specific Behavior:**
+
+- **Plivo:** Validates Auth ID and Auth Token, then creates or reuses a Plivo application for webhook configuration.
+- **Twilio:** Validates Account SID, Auth Token, and phone number ownership, then configures webhooks for the number.
+- **Telnyx:** Validates API Key and phone number, then automatically configures webhooks.
+
+All integrations automatically set up webhook endpoints to receive call status updates and recordings.
+</Note>
+
+<Warning>
+Phone numbers must be unique per user. If you attempt to add a number that already exists for the user, the request will fail with a 400 error.
+</Warning>

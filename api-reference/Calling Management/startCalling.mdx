@@ -21,12 +21,20 @@ Bearer token for an approved workspace administrator.
 Identifier of the batch to start dialing.
 </ParamField>
 
-<ParamField body="callingNumbers" type="array[string]" required>
-Phone IDs the dialer should rotate through during the campaign.
+<ParamField body="userId" type="string" required>
+ID of the user who owns the batch.
 </ParamField>
 
-<ParamField body="callData" type="array[object]" required>
-Finalised call records. Provide the same payload you validated earlier so the service can rebuild the dial queue.
+<ParamField body="callingNumbers" type="array[string]">
+Phone IDs the dialer should rotate through. Optional if batch already has calling numbers configured.
+</ParamField>
+
+<ParamField body="callData" type="array[object]">
+Call records to process. Optional if batch already contains calls. If provided, these calls will be processed instead of existing batch calls.
+</ParamField>
+
+<ParamField body="uuid" type="string">
+Optional UUID for tracking this calling session.
 </ParamField>
 
 <RequestExample>
@@ -36,42 +44,53 @@ curl --location '{{baseUrl}}/api/call/start-calling' \
   --header 'Content-Type: application/json' \
   --data '{
     "batchId": "6806382f98da85ec32fac955",
-    "callingNumbers": ["67d52be3f91fe7017efdb6f1"],
-    "callData": [
-      {
-        "phoneNumber": "+917289836486",
-        "customer_name": "Bhavya Mittal",
-        "loan_amount": "10000",
-        "loan_tenure": "12 days"
-      }
-    ]
+    "userId": "64e5f12345abcdef12345678"
   }'
 ```
 </RequestExample>
 
 ## Response
+
 <ResponseExample>
 ```json 200 OK
 {
-  "success": true,
-  "message": "Batch queued for dialing"
+  "message": "",
+  "status": true,
+  "code": 200,
+  "errorMessage": "",
+  "data": {
+    "batchId": "6806382f98da85ec32fac955",
+    "status": "started"
+  }
 }
 ```
 </ResponseExample>
 
-<ResponseField name="success" type="boolean" required>
-Indicates whether the batch entered the dialer queue.
+<ResponseField name="status" type="boolean" required>
+Indicates whether the batch was successfully queued for dialing.
 </ResponseField>
-<ResponseField name="message" type="string">
-Human readable action summary.
+
+<ResponseField name="code" type="integer" required>
+HTTP status code (200 for success).
+</ResponseField>
+
+<ResponseField name="data" type="object">
+Additional information about the started batch.
 </ResponseField>
 
 ## Error Handling
-- **400 Bad Request** – Missing batch, empty `callData`, or mismatched calling numbers.
-- **401 Unauthorized** – Bearer token absent or expired.
-- **404 Not Found** – Batch or phone pool no longer exists.
-- **500 Internal Server Error** – Dialer bootstrap failed; monitor retry logs and contact support if it persists.
+
+- **400 Bad Request** – Missing required parameters (`batchId` or `userId`).
+- **401 Unauthorized** – Bearer token missing or expired.
+- **404 Not Found** – Batch not found or user not found.
+- **500 Internal Server Error** – Failed to start calling service; retry or contact support.
 
 <Note>
-After a successful start, monitor `GET /api/call/batch-details/{batchId}` for progress and subscribe to the Plivo webhook for live status changes.
+**Calling Behavior:**
+
+- If `callData` is provided, those calls will be processed (useful for immediate calling)
+- If `callData` is not provided, the system uses existing calls in the batch
+- The calling service runs asynchronously
+- Calls are queued and processed based on batch configuration (calling hours, allowed days, etc.)
+- Monitor progress using `GET /api/call/batch-details/{batchId}` or webhook callbacks
 </Note>

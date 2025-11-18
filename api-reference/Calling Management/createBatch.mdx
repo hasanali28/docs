@@ -8,13 +8,18 @@ openapi: "POST /api/call/createBatch"
 Create a batch whenever you want to stage a new outbound campaign. The batch groups a friendly `batchName` with one or more provisioned calling numbers so you can add contacts and start dialing later. The response returns the `batchId`, which is required by every follow-up batch operation.
 
 ## Prerequisites
-- You generated an API key with Calling Management scope.
-- At least one outbound phone number is active on the workspace.
-- The calling numbers you pass belong to the same workspace as the API key.
+- API key with Calling Management scope, OR Bearer token for authenticated workspace access
+- At least one outbound phone number is active on the workspace
+- The calling numbers you pass belong to the same workspace
 
 ## Request
-<ParamField header="x-api-key" type="string" required>
-Workspace API key. Find it under **Settings → API access**.
+
+<ParamField header="x-api-key" type="string">
+Workspace API key. Find it under **Settings → API access**. Either `x-api-key` or `Authorization` header is required.
+</ParamField>
+
+<ParamField header="Authorization" type="string">
+Bearer token for authenticated workspace access. Either `x-api-key` or `Authorization` header is required.
 </ParamField>
 
 <ParamField body="batchName" type="string" required>
@@ -25,10 +30,47 @@ Human readable campaign name shown in the Nexus dashboard.
 Array of phone IDs that the dialer can rotate through while placing calls from this batch.
 </ParamField>
 
+<ParamField body="retry" type="number">
+Number of retry attempts for failed calls.
+</ParamField>
+
+<ParamField body="delay" type="number">
+Delay in seconds between retry attempts.
+</ParamField>
+
+<ParamField body="timezone" type="string">
+Timezone for the batch (e.g., "America/New_York", "Asia/Kolkata"). Used for scheduling calls.
+</ParamField>
+
+<ParamField body="callingHour" type="object">
+Object defining calling hours. Example: `{"start": "09:00", "end": "17:00"}`.
+</ParamField>
+
+<ParamField body="allowedDays" type="array[number]">
+Array of allowed days for calling (0=Sunday, 1=Monday, ..., 6=Saturday). Example: `[1,2,3,4,5]` for weekdays.
+</ParamField>
+
 <RequestExample>
 ```bash cURL
+# Using API Key
 curl --location '{{baseUrl}}/api/call/createBatch' \
   --header 'x-api-key: YOUR_API_KEY' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "batchName": "API Campaign May 2025",
+    "callingNumbers": ["64e5f12345abcdef87654321"],
+    "retry": 3,
+    "delay": 60,
+    "timezone": "America/New_York",
+    "callingHour": {"start": "09:00", "end": "17:00"},
+    "allowedDays": [1,2,3,4,5]
+  }'
+```
+
+```bash cURL
+# Using Bearer Token
+curl --location '{{baseUrl}}/api/call/createBatch' \
+  --header 'Authorization: Bearer {{authToken}}' \
   --header 'Content-Type: application/json' \
   --data '{
     "batchName": "API Campaign May 2025",
@@ -38,30 +80,50 @@ curl --location '{{baseUrl}}/api/call/createBatch' \
 </RequestExample>
 
 ## Response
+
 <ResponseExample>
 ```json 201 Created
 {
-  "success": true,
-  "batchId": "64e5f12345abcdef98765432",
-  "message": "Batch created successfully"
+  "message": "Batch created successfully",
+  "status": true,
+  "code": 201,
+  "errorMessage": "",
+  "data": "64e5f12345abcdef98765432"
 }
 ```
 </ResponseExample>
 
-<ResponseField name="success" type="boolean" required>
-Indicates whether the batch record was stored.
+<ResponseField name="status" type="boolean" required>
+Indicates whether the batch record was stored successfully.
 </ResponseField>
-<ResponseField name="batchId" type="string" required>
-Identifier to use when adding calls, starting the dialer, or updating batch metadata.
+
+<ResponseField name="code" type="integer" required>
+HTTP status code (201 for successful creation).
 </ResponseField>
-<ResponseField name="message" type="string">
+
+<ResponseField name="data" type="string" required>
+Batch ID (string) to use when adding calls, starting the dialer, or updating batch metadata.
+</ResponseField>
+
+<ResponseField name="message" type="string" required>
 Human readable confirmation message.
 </ResponseField>
 
 ## Error Handling
-- **400 Bad Request** – Missing `batchName`, missing or empty `callingNumbers`, or malformed JSON.
-- **403 Forbidden** – The `x-api-key` is missing, revoked, or belongs to a different workspace.
-- **500 Internal Server Error** – Nexus could not persist the batch; retry or contact support with the request ID.
+
+- **400 Bad Request** – Missing `batchName`, missing or empty `callingNumbers` array, or invalid input format.
+- **403 Forbidden** – Invalid or missing API key, API key doesn't match workspace, or no user found (when using Bearer token).
+- **500 Internal Server Error** – Failed to create batch in database; retry or contact support with the request ID.
+
+<Note>
+**Authentication Options:**
+
+You can authenticate using either:
+- **API Key:** Pass `x-api-key` header with your workspace API key
+- **Bearer Token:** Pass `Authorization: Bearer <token>` header
+
+The system automatically determines the user from either authentication method. If both are provided, the API key takes precedence.
+</Note>
 
 <Check>
 Use `GET /api/call/batches/{userId}` right after creation to verify that the new batch appears with the expected metadata.
