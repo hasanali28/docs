@@ -23,7 +23,7 @@ ID of the user who will own this phone number.
 </ParamField>
 
 <ParamField body="phoneNumber" type="string" required>
-Phone number in E.164 format (e.g., "+1234567890"). Must be owned by your integration account.
+Phone number with country code (e.g., "12125551234"). The `+` prefix is optional. Must be owned by your integration account.
 </ParamField>
 
 <ParamField body="integration" type="string" required allowedValues="plivo,twilio,telnyx">
@@ -45,7 +45,7 @@ curl --location '{{baseUrl}}/api/call/add-phone' \
   --header 'Content-Type: application/json' \
   --data '{
     "userId": "64e5f12345abcdef12345678",
-    "phoneNumber": "+1234567890",
+    "phoneNumber": "12125551234",
     "integration": "twilio",
     "authToken": "your_auth_token",
     "accSId": "your_account_sid"
@@ -65,7 +65,7 @@ curl --location '{{baseUrl}}/api/call/add-phone' \
   "data": {
     "_id": "64e5f12345abcdef87654321",
     "userId": "64e5f12345abcdef12345678",
-    "phoneNumber": "+1234567890",
+    "phoneNumber": "12125551234",
     "integration": "twilio",
     "createdAt": "2025-05-15T10:30:00.000Z"
   }
@@ -82,7 +82,7 @@ Unique identifier for the phone number record.
 </ResponseField>
 
 <ResponseField name="data.phoneNumber" type="string" required>
-Phone number that was added (E.164 format).
+Phone number that was added (with country code).
 </ResponseField>
 
 <ResponseField name="data.integration" type="string" required>

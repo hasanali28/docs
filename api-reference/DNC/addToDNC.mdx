@@ -19,7 +19,7 @@ Bearer token for the authenticated workspace account.
 </ParamField>
 
 <ParamField body="phoneNumber" type="string" required>
-Phone number to add to the DNC list. Format: E.164 format (e.g., "+1234567890").
+Phone number to add to the DNC list with country code (e.g., "12125551234"). The `+` prefix is optional.
 </ParamField>
 
 <ParamField body="batchId" type="string" required>
@@ -40,7 +40,7 @@ curl --location '{{baseUrl}}/api/dnc/add' \
   --header 'Authorization: Bearer {{authToken}}' \
   --header 'Content-Type: application/json' \
   --data '{
-    "phoneNumber": "+1234567890",
+    "phoneNumber": "12125551234",
     "batchId": "64e5f12345abcdef98765432",
     "requestUUID": "550e8400-e29b-41d4-a716-446655440000",
     "type": "customer_request"

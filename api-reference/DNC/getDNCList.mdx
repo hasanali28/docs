@@ -49,7 +49,7 @@ curl --location '{{baseUrl}}/api/dnc/list?page=1&limit=10&search=123' \
     "dncList": [
       {
         "_id": "64e5f12345abcdef98765432",
-        "phoneNumber": "+1234567890",
+        "phoneNumber": "12125551234",
         "type": "customer_request",
         "orgId": "64e5f12345abcdef12345678",
         "batchId": "64e5f12345abcdef87654321",
@@ -79,7 +79,7 @@ Unique identifier for the DNC record.
 </ResponseField>
 
 <ResponseField name="dncList[].phoneNumber" type="string" required>
-Phone number in the DNC list (E.164 format).
+Phone number in the DNC list (with country code).
 </ResponseField>
 
 <ResponseField name="dncList[].type" type="string">

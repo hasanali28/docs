@@ -20,6 +20,22 @@ https://nexusdev-wjs-api-dev.mangoforest-291de162.swedencentral.azurecontainerap
 
 The base URL is automatically used in all code examples throughout this documentation via the `{{baseUrl}}` variable.
 
+## Phone Number Format
+
+All phone numbers in API requests must include the country code. The `+` prefix is optional and will be automatically stripped if provided.
+
+**Required Format:** `[country_code][area_code][number]`
+
+**Examples:**
+- ✅ **US:** `12125551234` (country code: 1, area code: 212)
+- ✅ **UK:** `442071234567` (country code: 44)
+- ✅ **Also works:** `+12125551234` (+ is automatically stripped)
+- ❌ **Incorrect:** `2125551234` (missing country code)
+
+<Note>
+The country code is required for all phone numbers. You may include or omit the `+` prefix - both formats are accepted.
+</Note>
+
 ## Authentication
 
 API endpoints support two authentication methods:

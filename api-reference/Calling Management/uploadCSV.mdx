@@ -88,7 +88,8 @@ curl --location '{{baseUrl}}/api/call/upload' \
 - Must include a header row
 - Must include `phoneNumber` column (required)
 - Must include all mandatory variables defined by the agent
-- CSV headers should match agent variable keys (e.g., `phoneNumber`, `customer_name`, `loan_amount`)
+- CSV headers should match agent variable keys (e.g., `phoneNumber`, `name`, `account_id`, `custom_field_1`)
+- The `phoneNumber` column is required; all other columns are flexible based on your agent's needs
 - Extra columns are stored and forwarded to the agent state machine
 - File encoding should be UTF-8
 - Empty files or files with no valid rows will be rejected

@@ -34,7 +34,7 @@
                 "type": "object",
                 "required": ["phoneNumber", "batchId", "requestUUID"],
                 "properties": {
-                  "phoneNumber": {"type": "string", "example": "+1234567890"},
+                  "phoneNumber": {"type": "string", "example": "12125551234"},
                   "type": {"type": "string", "example": "manual"},
                   "batchId": {"type": "string", "example": "64e5f12345abcdef98765432"},
                   "requestUUID": {"type": "string", "example": "some-unique-uuid"}
@@ -129,7 +129,7 @@
                 "required": ["userId", "phoneNumber", "integration", "authToken", "accSId"],
                 "properties": {
                   "userId": {"type": "string", "example": "64e5f12345abcdef12345678"},
-                  "phoneNumber": {"type": "string", "example": "+1234567890"},
+                  "phoneNumber": {"type": "string", "example": "12125551234"},
                   "integration": {"type": "string", "enum": ["plivo", "twilio", "telnyx"], "example": "twilio"},
                   "authToken": {"type": "string", "example": "your_auth_token"},
                   "accSId": {"type": "string", "example": "your_account_sid"}
@@ -360,17 +360,19 @@
                   "batchId": {"type": "string", "example": "64e5f12345abcdef98765432"},
                   "call_data": {
                     "type": "array",
+                    "description": "Array of call records. Each object MUST include phoneNumber. All other fields are flexible and determined by your agent configuration.",
                     "items": {
                       "type": "object",
+                      "required": ["phoneNumber"],
                       "properties": {
-                        "phoneNumber": {"type": "string", "example": "919876543210"},
-                        "customer_name": {"type": "string", "example": "Praveen"},
-                        "loan_amount": {"type": "number", "example": 30000},
-                        "loan_tenure": {"type": "number", "example": 40},
-                        "lead_id": {"type": "string", "example": "1094436"},
-                        "completedStage": {"type": "string", "example": "lead_eligibility_pass"},
-                        "upcomingStage": {"type": "string", "example": "lead_loan_offer"}
-                      }
+                        "phoneNumber": {"type": "string", "example": "12125551001", "description": "Phone number with country code (required)"},
+                        "name": {"type": "string", "example": "Sarah Johnson", "description": "Customer name"},
+                        "account_id": {"type": "string", "example": "ACC-1001", "description": "Account identifier"},
+                        "custom_field_1": {"type": "string", "example": "value1", "description": "Any custom field your agent needs"},
+                        "priority": {"type": "string", "example": "high", "description": "Priority level"},
+                        "category": {"type": "string", "example": "support", "description": "Category or type"}
+                      },
+                      "additionalProperties": true
                     }
                   }
                 }
