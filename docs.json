@@ -3,9 +3,9 @@
   "theme": "mint",
   "name": "weya AI docs",
   "colors": {
-    "primary": "#ff4d00",
-    "light": "#ff4d00",
-    "dark": "#ff4d00"
+    "primary": "#4F1AD6",
+    "light": "#4F1AD6",
+    "dark": "#4F1AD6"
   },
   "favicon": "/favicon1.avif",
   "navigation": {
@@ -131,8 +131,8 @@
     }
   },
   "logo": {
-    "light": "/logo/light1.png",
-    "dark": "/logo/dark1.png"
+    "light": "/logo/light.png",
+    "dark": "/logo/dark.png"
   },
   "navbar": {
     "links": [
