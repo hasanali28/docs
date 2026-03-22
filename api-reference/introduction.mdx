@@ -1,0 +1,107 @@
+---
+title: 'API Reference Introduction'
+description: 'Welcome to the Weya AI API documentation'
+---
+
+## Welcome
+
+Welcome to the Weya AI API documentation. This documentation covers the public APIs available for integrating with the Weya AI platform. The APIs are organized into two main categories:
+
+- **Call Management APIs** - Manage phone numbers, batches, and outbound calling campaigns
+- **DNC (Do Not Call) APIs** - Manage your organization's Do Not Call list
+
+## Base URL
+
+All API requests should be made to:
+
+```
+https://nexusdev-wjs-api-dev.mangoforest-291de162.swedencentral.azurecontainerapps.io
+```
+
+The base URL is automatically used in all code examples throughout this documentation via the `{{baseUrl}}` variable.
+
+## Phone Number Format
+
+All phone numbers in API requests must include the country code. The `+` prefix is optional and will be automatically stripped if provided.
+
+**Required Format:** `[country_code][area_code][number]`
+
+**Examples:**
+- ✅ **US:** `12125551234` (country code: 1, area code: 212)
+- ✅ **UK:** `442071234567` (country code: 44)
+- ✅ **Also works:** `+12125551234` (+ is automatically stripped)
+- ❌ **Incorrect:** `2125551234` (missing country code)
+
+<Note>
+The country code is required for all phone numbers. You may include or omit the `+` prefix - both formats are accepted.
+</Note>
+
+## Authentication
+
+API endpoints support two authentication methods:
+
+### Bearer Token Authentication
+
+Most endpoints require a Bearer token in the `Authorization` header:
+
+```bash
+Authorization: Bearer YOUR_TOKEN_HERE
+```
+
+### API Key Authentication
+
+Some endpoints (like batch creation) also support API key authentication via the `x-api-key` header:
+
+```bash
+x-api-key: YOUR_API_KEY_HERE
+```
+
+You can find your API key in your workspace settings under **Settings → API access**.
+
+<Note>
+When both authentication methods are available for an endpoint, the API key takes precedence if both are provided. Check individual endpoint documentation for specific authentication requirements.
+</Note>
+
+## Response Format
+
+All API responses follow a consistent format:
+
+```json
+{
+  "message": "Success message",
+  "status": true,
+  "code": 200,
+  "errorMessage": "",
+  "data": { ... }
+}
+```
+
+- `message` - Human-readable message describing the result
+- `status` - Boolean indicating success (`true`) or failure (`false`)
+- `code` - HTTP status code
+- `errorMessage` - Error message (empty string on success)
+- `data` - Response payload (varies by endpoint)
+
+## Error Handling
+
+API errors are returned with appropriate HTTP status codes:
+
+- **400 Bad Request** - Invalid request parameters or missing required fields
+- **401 Unauthorized** - Missing or invalid authentication token
+- **403 Forbidden** - Insufficient permissions or invalid API key
+- **404 Not Found** - Resource not found
+- **422 Unprocessable Entity** - Validation errors (e.g., invalid CSV rows)
+- **500 Internal Server Error** - Server error; retry or contact support
+
+## Rate Limiting
+
+API requests are subject to rate limiting to ensure fair usage. If you exceed the rate limit, you'll receive a `429 Too Many Requests` response. Please implement exponential backoff when retrying requests.
+
+## Getting Started
+
+1. **Obtain Authentication Credentials** - Get your Bearer token or API key from your workspace settings
+2. **Review API Endpoints** - Explore the available endpoints in the navigation menu
+3. **Test with Examples** - Use the provided cURL examples to test API calls
+4. **Integrate** - Implement the APIs in your application
+
+For questions or support, contact us at [info@weya.ai](mailto:info@weya.ai).

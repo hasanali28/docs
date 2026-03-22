@@ -1,0 +1,59 @@
+---
+title: "Get Knowledge Base"
+description: "Retrieve complete details for a specific Knowledge Base."
+openapi: "GET /api/knowledgeBase/{knowledgeBaseId}"
+---
+
+## Overview
+Call this endpoint to fetch the full details and configuration of a specific Knowledge Base by its unique identifier.
+
+## Request
+<ParamField header="Authorization" type="string" required>
+Bearer token for an authenticated workspace user.
+</ParamField>
+
+<ParamField path="knowledgeBaseId" type="string" required>
+The unique identifier of the Knowledge Base.
+</ParamField>
+
+<RequestExample>
+```bash cURL
+curl --location '{{baseUrl}}/api/knowledgeBase/64f8bca93a0b8d3e4e2c95a7' \
+  --header 'Authorization: Bearer {{authToken}}'
+```
+</RequestExample>
+
+## Response
+
+<ResponseExample>
+```json 200 OK
+{
+  "message": "KnowledgeBase retrieved successfully",
+  "status": true,
+  "code": 200,
+  "errorMessage": "",
+  "data": {
+    "_id": "64f8bca93a0b8d3e4e2c95a7",
+    "knowledgeBaseName": "Customer Support KB",
+    "description": "Knowledge base for customer support.",
+    "status": "active",
+    "vectorDbCollection": "customer_support_vectors",
+    "createdAt": "2025-10-29T12:45:30.000Z"
+  }
+}
+```
+</ResponseExample>
+
+<ResponseField name="status" type="boolean" required>
+Indicates whether the Knowledge Base was successfully retrieved.
+</ResponseField>
+
+<ResponseField name="data" type="object">
+The complete Knowledge Base object.
+</ResponseField>
+
+## Error Handling
+
+- **401 Unauthorized** – Bearer token missing, expired, or user unauthorized.
+- **404 Not Found** – Knowledge Base not found or access denied.
+- **500 Internal Server Error** – Failed to fetch the Knowledge Base.

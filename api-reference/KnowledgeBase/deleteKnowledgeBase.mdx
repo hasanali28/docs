@@ -1,0 +1,52 @@
+---
+title: "Delete Knowledge Base"
+description: "Permanently delete a Knowledge Base and its source documents."
+openapi: "DELETE /api/knowledgeBase/{knowledgeBaseId}"
+---
+
+## Overview
+Call this endpoint to entirely delete a Knowledge Base from the organization. This action will also remove the associated vector database collections and uploaded source files, rendering it unavailable for RAG. This action is irreversible.
+
+## Request
+<ParamField header="Authorization" type="string" required>
+Bearer token for an authenticated workspace user.
+</ParamField>
+
+<ParamField path="knowledgeBaseId" type="string" required>
+The unique identifier of the Knowledge Base to delete.
+</ParamField>
+
+<RequestExample>
+```bash cURL
+curl --location --request DELETE '{{baseUrl}}/api/knowledgeBase/64f8bca93a0b8d3e4e2c95a7' \
+  --header 'Authorization: Bearer {{authToken}}'
+```
+</RequestExample>
+
+## Response
+
+<ResponseExample>
+```json 200 OK
+{
+  "message": "Knowledge Base deleted successfully",
+  "status": true,
+  "code": 200,
+  "errorMessage": "",
+  "data": null
+}
+```
+</ResponseExample>
+
+<ResponseField name="status" type="boolean" required>
+Indicates whether the Knowledge Base was successfully deleted.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+Success message confirming the deletion.
+</ResponseField>
+
+## Error Handling
+
+- **401 Unauthorized** – Bearer token missing, expired, or user not associated with an organization.
+- **404 Not Found** – Knowledge Base not found or access denied.
+- **500 Internal Server Error** – Failed to delete the Knowledge Base due to database or system error.

@@ -1,0 +1,428 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Weya AI Public API",
+    "description": "Public API documentation for Weya AI platform - Call Management and DNC (Do Not Call) APIs",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://nexusdev-wjs-api-dev.mangoforest-291de162.swedencentral.azurecontainerapps.io",
+      "description": "Development server"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    },
+    {
+      "apiKeyAuth": []
+    }
+  ],
+  "paths": {
+    "/api/dnc/add": {
+      "post": {
+        "summary": "Add to DNC list",
+        "description": "Add a phone number to your organization's Do Not Call (DNC) list",
+        "tags": ["DNC (Do Not Call)"],
+        "security": [{"bearerAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["phoneNumber", "batchId", "requestUUID"],
+                "properties": {
+                  "phoneNumber": {"type": "string", "example": "12125551234"},
+                  "type": {"type": "string", "example": "manual"},
+                  "batchId": {"type": "string", "example": "64e5f12345abcdef98765432"},
+                  "requestUUID": {"type": "string", "example": "some-unique-uuid"}
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {"description": "Phone number added to DNC successfully"},
+          "400": {"description": "Missing required fields or phone number already exists"},
+          "404": {"description": "Batch or Call record not found"},
+          "500": {"description": "Internal Server Error"}
+        }
+      }
+    },
+    "/api/dnc/list": {
+      "get": {
+        "summary": "Get DNC list",
+        "description": "Retrieve the Do Not Call (DNC) list for your organization",
+        "tags": ["DNC (Do Not Call)"],
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {"in": "query", "name": "page", "schema": {"type": "integer", "default": 1}},
+          {"in": "query", "name": "limit", "schema": {"type": "integer", "default": 10}},
+          {"in": "query", "name": "search", "schema": {"type": "string"}}
+        ],
+        "responses": {
+          "200": {"description": "DNC list fetched successfully"},
+          "500": {"description": "Internal Server Error"}
+        }
+      }
+    },
+    "/api/dnc/delete/{id}": {
+      "delete": {
+        "summary": "Remove from DNC list",
+        "description": "Remove a phone number from your organization's DNC list",
+        "tags": ["DNC (Do Not Call)"],
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {"in": "path", "name": "id", "required": true, "schema": {"type": "string"}}
+        ],
+        "responses": {
+          "200": {"description": "DNC record deleted successfully"},
+          "400": {"description": "DNC ID is required"},
+          "403": {"description": "Not authorized to delete this DNC record"},
+          "404": {"description": "DNC record not found"},
+          "500": {"description": "Internal Server Error"}
+        }
+      }
+    },
+    "/api/dnc/enable-disable": {
+      "post": {
+        "summary": "Enable/disable DNC",
+        "description": "Enable or disable the Do Not Call (DNC) feature for your organization",
+        "tags": ["DNC (Do Not Call)"],
+        "security": [{"bearerAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["enable"],
+                "properties": {
+                  "enable": {"type": "boolean", "example": true}
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {"description": "DNC setting updated successfully"},
+          "400": {"description": "Enable field must be a boolean"},
+          "404": {"description": "No users found for this organization"},
+          "500": {"description": "Internal Server Error"}
+        }
+      }
+    },
+    "/api/call/add-phone": {
+      "post": {
+        "summary": "Add Phone Number",
+        "description": "Add a new phone number to your workspace for outbound or inbound calling",
+        "tags": ["Call Management"],
+        "security": [{"bearerAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["userId", "phoneNumber", "integration", "authToken", "accSId"],
+                "properties": {
+                  "userId": {"type": "string", "example": "64e5f12345abcdef12345678"},
+                  "phoneNumber": {"type": "string", "example": "12125551234"},
+                  "integration": {"type": "string", "enum": ["plivo", "twilio", "telnyx"], "example": "twilio"},
+                  "authToken": {"type": "string", "example": "your_auth_token"},
+                  "accSId": {"type": "string", "example": "your_account_sid"}
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {"description": "Phone number added successfully"},
+          "400": {"description": "Invalid User ID, phone number exists, or invalid credentials"},
+          "404": {"description": "User not found"},
+          "500": {"description": "Internal Server Error"}
+        }
+      }
+    },
+    "/api/call/delete-phone/{phoneId}": {
+      "delete": {
+        "summary": "Delete Phone Number",
+        "description": "Remove an outbound phone number and detach it from future campaigns",
+        "tags": ["Call Management"],
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {"in": "path", "name": "phoneId", "required": true, "schema": {"type": "string"}}
+        ],
+        "responses": {
+          "200": {"description": "Phone deleted successfully"},
+          "400": {"description": "Invalid Phone ID"},
+          "404": {"description": "Phone not found"},
+          "500": {"description": "Internal Server Error"}
+        }
+      }
+    },
+    "/api/call/upload": {
+      "post": {
+        "summary": "Upload CSV for batch",
+        "description": "Create a batch and populate it by uploading a CSV or Excel file of contacts",
+        "tags": ["Call Management"],
+        "security": [{"bearerAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": ["file", "userId", "batchName", "callingNumbers", "batchType"],
+                "properties": {
+                  "file": {"type": "string", "format": "binary"},
+                  "userId": {"type": "string", "example": "64e5f12345abcdef12345678"},
+                  "batchName": {"type": "string", "example": "Marketing Campaign May 2025"},
+                  "callingNumbers": {"type": "string", "example": "[\"64e5f12345abcdef87654321\"]"},
+                  "batchType": {"type": "string", "enum": ["outbound", "mixed"], "example": "outbound"},
+                  "enableDNC": {"type": "string", "example": "true"},
+                  "type": {"type": "string", "example": "false"},
+                  "retry": {"type": "number", "example": 3},
+                  "delay": {"type": "number", "example": 60},
+                  "timezone": {"type": "string", "example": "America/New_York"},
+                  "callingHour": {"type": "string", "example": "{\"start\":\"09:00\",\"end\":\"17:00\"}"},
+                  "allowedDays": {"type": "string", "example": "[1,2,3,4,5]"}
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {"description": "CSV uploaded successfully"},
+          "400": {"description": "Missing file, empty CSV, invalid input"},
+          "404": {"description": "User, organization, or agent not found"},
+          "422": {"description": "Invalid rows in CSV"},
+          "500": {"description": "Internal Server Error"}
+        }
+      }
+    },
+    "/api/call/start-calling": {
+      "post": {
+        "summary": "Start calling batch",
+        "description": "Push a prepared batch into the outbound dialer queue",
+        "tags": ["Call Management"],
+        "security": [{"bearerAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["batchId", "userId"],
+                "properties": {
+                  "batchId": {"type": "string", "example": "6806382f98da85ec32fac955"},
+                  "userId": {"type": "string", "example": "64e5f12345abcdef12345678"},
+                  "callingNumbers": {"type": "array", "items": {"type": "string"}, "example": ["67d52be3f91fe7017efdb6f1"]},
+                  "callData": {"type": "array", "items": {"type": "object"}},
+                  "uuid": {"type": "string", "example": "some-unique-uuid"}
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {"description": "Calling service started successfully"},
+          "400": {"description": "Missing required parameters"},
+          "401": {"description": "Unauthorized"},
+          "404": {"description": "Batch or user not found"},
+          "500": {"description": "Internal Server Error"}
+        }
+      }
+    },
+    "/api/call/stop-calling": {
+      "post": {
+        "summary": "Stop calling batch",
+        "description": "Stop new outbound calls from starting while allowing in-flight calls to finish gracefully",
+        "tags": ["Call Management"],
+        "security": [{"bearerAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["batchId", "userId"],
+                "properties": {
+                  "batchId": {"type": "string", "example": "64e5f12345abcdef98765432"},
+                  "userId": {"type": "string", "example": "64e5f12345abcdef12345678"}
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {"description": "Calling service stopped"},
+          "400": {"description": "Missing required parameters"},
+          "401": {"description": "Unauthorized"},
+          "404": {"description": "Batch or user not found"},
+          "500": {"description": "Internal Server Error"}
+        }
+      }
+    },
+    "/api/call/batches/{userId}": {
+      "get": {
+        "summary": "Get all batches for user",
+        "description": "Retrieve a paginated list of all batches for an authenticated user with search capabilities",
+        "tags": ["Call Management"],
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {"in": "path", "name": "userId", "required": true, "schema": {"type": "string"}},
+          {"in": "query", "name": "page", "schema": {"type": "integer", "default": 1}},
+          {"in": "query", "name": "limit", "schema": {"type": "integer", "default": 10}},
+          {"in": "query", "name": "search", "schema": {"type": "string"}}
+        ],
+        "responses": {
+          "200": {"description": "Batches fetched successfully"},
+          "400": {"description": "Invalid userId"},
+          "404": {"description": "No batches found"},
+          "500": {"description": "Internal Server Error"}
+        }
+      }
+    },
+    "/api/call/batch-details/{id}": {
+      "get": {
+        "summary": "Get batch details by ID",
+        "description": "Inspect batch metadata and page through associated calls with filtering and sorting",
+        "tags": ["Call Management"],
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {"in": "path", "name": "id", "required": true, "schema": {"type": "string"}},
+          {"in": "query", "name": "page", "schema": {"type": "integer", "default": 1}},
+          {"in": "query", "name": "limit", "schema": {"type": "integer", "default": 10}},
+          {"in": "query", "name": "filter", "schema": {"type": "string"}},
+          {"in": "query", "name": "sortBy", "schema": {"type": "string"}},
+          {"in": "query", "name": "sortOrder", "schema": {"type": "string", "enum": ["asc", "desc"], "default": "asc"}},
+          {"in": "query", "name": "search", "schema": {"type": "string"}}
+        ],
+        "responses": {
+          "200": {"description": "Batch details fetched successfully"},
+          "400": {"description": "Invalid batchId"},
+          "404": {"description": "Batch not found"},
+          "500": {"description": "Internal Server Error"}
+        }
+      }
+    },
+    "/api/call/createBatch": {
+      "post": {
+        "summary": "Create batch",
+        "description": "Create a named outbound batch and assign the phone numbers that will originate the campaign",
+        "tags": ["Call Management"],
+        "security": [{"bearerAuth": []}, {"apiKeyAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["batchName", "callingNumbers"],
+                "properties": {
+                  "batchName": {"type": "string", "example": "API Campaign May 2025"},
+                  "callingNumbers": {"type": "array", "items": {"type": "string"}, "example": ["64e5f12345abcdef87654321"]},
+                  "retry": {"type": "number", "example": 3},
+                  "delay": {"type": "number", "example": 60},
+                  "timezone": {"type": "string", "example": "America/New_York"},
+                  "callingHour": {"type": "object", "properties": {"start": {"type": "string"}, "end": {"type": "string"}}, "example": {"start": "09:00", "end": "17:00"}},
+                  "allowedDays": {"type": "array", "items": {"type": "number"}, "example": [1, 2, 3, 4, 5]}
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {"description": "Batch created successfully"},
+          "400": {"description": "Missing required fields"},
+          "403": {"description": "Unauthorized"},
+          "500": {"description": "Internal Server Error"}
+        }
+      }
+    },
+    "/api/call/addCallsToBatch": {
+      "post": {
+        "summary": "Add calls to batch",
+        "description": "Queue one or more contacts in an existing batch before launching the dialer",
+        "tags": ["Call Management"],
+        "security": [{"bearerAuth": []}, {"apiKeyAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["batchId", "call_data"],
+                "properties": {
+                  "batchId": {"type": "string", "example": "64e5f12345abcdef98765432"},
+                  "call_data": {
+                    "type": "array",
+                    "description": "Array of call records. Each object MUST include phoneNumber. All other fields are flexible and determined by your agent configuration.",
+                    "items": {
+                      "type": "object",
+                      "required": ["phoneNumber"],
+                      "properties": {
+                        "phoneNumber": {"type": "string", "example": "12125551001", "description": "Phone number with country code (required)"},
+                        "name": {"type": "string", "example": "Sarah Johnson", "description": "Customer name"},
+                        "account_id": {"type": "string", "example": "ACC-1001", "description": "Account identifier"},
+                        "custom_field_1": {"type": "string", "example": "value1", "description": "Any custom field your agent needs"},
+                        "priority": {"type": "string", "example": "high", "description": "Priority level"},
+                        "category": {"type": "string", "example": "support", "description": "Category or type"}
+                      },
+                      "additionalProperties": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {"description": "Calls enqueued"},
+          "207": {"description": "Partial content, some chunks failed"},
+          "400": {"description": "Missing required fields or validation failure"},
+          "403": {"description": "Invalid API key"},
+          "404": {"description": "Batch or agent not found"},
+          "500": {"description": "Internal Server Error"}
+        }
+      }
+    },
+    "/api/call/delete-batch/{batchId}": {
+      "delete": {
+        "summary": "Delete batch",
+        "description": "Permanently remove a batch after exporting its data",
+        "tags": ["Call Management"],
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {"in": "path", "name": "batchId", "required": true, "schema": {"type": "string"}}
+        ],
+        "responses": {
+          "200": {"description": "Batch deleted"},
+          "400": {"description": "Invalid batchId"},
+          "401": {"description": "Unauthorized"},
+          "404": {"description": "Batch not found"},
+          "500": {"description": "Internal Server Error"}
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Bearer token authentication for workspace access"
+      },
+      "apiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-api-key",
+        "description": "API key used for programmatic calling integrations. Find it under Settings → API access in your workspace."
+      }
+    }
+  }
+}

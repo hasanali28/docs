@@ -1,0 +1,316 @@
+---
+title: "Campaign Management"
+description: "Create and manage calling campaigns with CRM integration"
+icon: "phone"
+---
+
+Campaigns allow you to automate outbound and inbound calling workflows, manage leads, and sync results with your CRM.
+
+---
+
+## Campaign List
+
+![Campaign List](/images/campaign/campaigns_list.png)
+
+The **Campaign Management** page displays all your created campaigns.
+
+### What You Can See
+
+Each campaign row includes:
+
+- **Campaign Name**
+- **Call Statistics**
+  - Leads
+  - Attempted
+  - Connected
+- **Created Date**
+- **Status**
+  - Completed
+  - Pending
+  - Failed
+  - Paused
+- **Last Run**
+- **Actions**
+  - View analytics  
+  - Delete campaign  
+
+---
+
+## Create Campaign
+
+To create a new campaign, click **+ Create Campaign**.
+
+This opens the campaign configuration dialog.
+
+---
+
+## Step 1: Campaign Details
+### Fields
+
+#### Campaign Name
+- Name of your campaign  
+- Example: `Q3 Sales Campaign`
+
+#### Calling Numbers
+- Select phone numbers used for making calls  
+
+#### Allow User to Callback
+- Enables users to call back using the same number  
+
+#### Enable DNC for Batch
+- Prevents calling numbers marked as **Do Not Call**
+
+---
+
+## Step 2: Schedule Settings
+
+![Schedule Settings](/images/campaign/cc1.png)
+
+### Fields
+
+#### Calling Days
+- Select days when calls should be made  
+- Example: Monday to Friday  
+
+#### Timezone
+- Set campaign timezone  
+
+#### Start Time / End Time
+- Define calling window  
+
+#### Max Attempt
+- Number of retry attempts (Min: 1, Max: 10)
+
+#### Time Gap Between Calls
+- Delay between consecutive calls (in minutes)
+
+#### Schedule for Later
+- Enable to schedule campaign for future execution  
+
+---
+
+## Step 3: Add Data
+
+![Add Data](/images/campaign/cc2.png)
+
+Choose how you want to add leads:
+
+### 1. Upload CSV
+- Upload a CSV file containing leads  
+
+**Fields:**
+- Country Code (e.g., +91)  
+- Mandatory Variables  
+- Upload CSV file (Max size: 50MB)  
+
+**Extras:**
+- Download sample CSV template  
+
+---
+
+### 2. API
+- Fetch data dynamically using APIs  
+
+---
+
+### 3. CRM Integration
+- Pull leads directly from connected CRM (HubSpot / Custom CRM)
+
+---
+
+## Step 4: CRM Integration (Save Call Results)
+
+![CRM Integration](/images/campaign/cc3.png)
+
+Enable **Track Call Outcomes** to sync results back to CRM.
+
+### Fields
+
+#### CRM Type
+- **Standard (HubSpot/Zoho)**  
+- **Custom CRM**
+
+#### Connection
+- Select an active CRM integration  
+
+#### Add Another CRM
+- Attach multiple CRMs if needed  
+
+---
+
+## How CRM Works in Campaign
+
+### 1. Fetch Leads
+- Use CRM Integration in **Add Data** section  
+- Pull leads directly from CRM  
+
+### 2. Process Calls
+- Campaign executes calls based on schedule  
+
+### 3. Save Results
+- Call outcomes (connected, failed, etc.) are pushed back to CRM  
+
+---
+
+## Final Actions
+
+- **Cancel** → Discard campaign  
+- **Create Campaign** → Save and start campaign  
+
+---
+
+
+## Notes
+
+- Campaigns can run in real-time or scheduled mode  
+- CRM integration must be configured before use  
+- Proper CSV formatting is required for uploads  
+- Multiple CRMs can be attached to a single campaign  
+
+---
+
+## When to Use What?
+
+| Use Case | Recommended Method |
+|----------|------------------|
+| Bulk leads from file | CSV Upload |
+| Real-time dynamic leads | API |
+| Sync with CRM data | CRM Integration |
+| Save call outcomes | Enable CRM tracking |
+
+---
+
+## Best Practices
+
+- Always validate phone numbers before uploading  
+- Use DNC to avoid restricted contacts  
+- Keep retry attempts optimal (avoid spam behavior)  
+- Test campaign with small data before scaling  
+
+---
+---
+
+## Campaign Details & Analytics
+
+![Campaign Details](/images/campaign/cl.png)
+
+After creating a campaign, you can view detailed logs and analytics by clicking on a campaign from the list.
+
+This page provides insights into call activity, outcomes, and performance.
+
+---
+
+## Campaign Overview
+
+At the top of the page, you can see:
+
+- **Campaign Name** (e.g., `test call`)  
+- **Status** (Completed / Running / Failed)  
+- **Created Date & Time**  
+- **Start Time / End Time**  
+- **Calling Days**  
+- **Timezone**  
+
+---
+
+## Tabs
+
+### 1. Campaign Logs
+
+Displays detailed logs for each call attempt.
+
+### What You Can See
+
+Each row includes:
+
+- **Phone Number**
+- **Last Call Status** (e.g., busy, completed)
+- **Call Duration**
+- **Attempted Time**
+- **Created At**
+- **Attempt Count** (e.g., 1/1)
+- **Next Attempt After**
+- **Hangup Source**
+- **Hangup Reason**
+- **Call Outcome**
+- **Actions (View Logs)**
+
+---
+
+### Filters & Actions
+
+- **Search** → Search across all columns  
+- **Outcome Filter** → Filter by call result  
+- **Status Filter** → Filter by call status  
+- **Duration Filter** → Filter by call duration  
+- **Select Columns** → Customize visible fields  
+- **Export** → Download logs  
+
+---
+
+## Detailed Call Logs
+
+Click **View Logs** to open detailed insights for a specific call.
+
+![Detailed Logs](/images/campaign/clogd.png)
+
+---
+
+### Call Attempt Details
+
+- **Call Status** (Completed / Busy / Failed)  
+- **Attempt Number**  
+- **Timestamp**  
+- **Call Outcome**  
+- **Call Ended By**  
+- **Reason for Disconnection**  
+
+---
+
+### CRM Sync Status
+
+Shows whether call data was successfully synced to CRM:
+
+- ✅ HubSpot CRM: Success  
+- ✅ Custom CRM: Success  
+
+---
+
+### Call Playback
+
+- Play recorded call audio  
+- Control playback speed  
+
+---
+
+### Tabs Inside Detailed Logs
+
+#### 1. Overview
+- Summary of the call  
+- Call outcome  
+- Disconnection reason  
+
+#### 2. Post Call Metrics
+- Performance metrics after call completion  
+
+#### 3. Transcription
+- Call transcript (if enabled)  
+
+---
+
+## How It Helps
+
+- Track call performance per lead  
+- Debug failed or busy calls  
+- Verify CRM sync status  
+- Analyze agent performance  
+- Review call recordings and transcripts  
+
+---
+
+## Notes
+
+- Only completed calls show full insights  
+- Failed or busy calls may have limited data  
+- CRM sync status helps ensure data consistency  
+- Logs can be exported for external analysis  

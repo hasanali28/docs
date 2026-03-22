@@ -1,0 +1,52 @@
+---
+title: "Delete Batch"
+description: "Permanently remove a batch after exporting its data."
+openapi: "DELETE /api/call/delete-batch/{batchId}"
+---
+
+## Overview
+Once you have exported or archived call outcomes, delete the batch to keep your workspace tidy and prevent accidental reactivation. Deleting is irreversible and removes the batch record from analytics views.
+
+## Prerequisites
+- Bearer token for an administrator.
+- Confirm no audits or dispute processes require the batch history.
+
+## Request
+<ParamField path="batchId" type="string" required>
+Identifier of the batch to delete.
+</ParamField>
+
+<ParamField header="Authorization" type="string" required>
+Bearer token authorised for Calling Management.
+</ParamField>
+
+<RequestExample>
+```bash cURL
+curl --location --request DELETE '{{baseUrl}}/api/call/delete-batch/6880bac05860c9b91c53c790' \
+  --header 'Authorization: Bearer {{authToken}}'
+```
+</RequestExample>
+
+## Response
+<ResponseExample>
+```json 200 OK
+{
+  "success": true,
+  "message": "Batch deleted"
+}
+```
+</ResponseExample>
+
+<ResponseField name="message" type="string">
+Confirms the deletion. Use it to log audit trails.
+</ResponseField>
+
+## Error Handling
+- **400 Bad Request** – Invalid `batchId` supplied.
+- **401 Unauthorized** – Bearer token missing or expired.
+- **404 Not Found** – Batch already deleted or does not belong to the workspace.
+- **500 Internal Server Error** – Deletion failed; retry, then escalate with the batch id.
+
+<Warning>
+This operation cannot be undone. Export call data with `GET /api/call/export/csv` before removing the batch.
+</Warning>

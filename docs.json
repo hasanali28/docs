@@ -1,0 +1,176 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "mint",
+  "name": "weya AI docs",
+  "colors": {
+    "primary": "#4F1AD6",
+    "light": "#4F1AD6",
+    "dark": "#4F1AD6"
+  },
+  "favicon": "/favicon1.avif",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Guides",
+        "groups": [
+        
+          {
+            "group": " ",
+            "pages": ["index"]
+            
+          },
+           {
+            "group": "Get Started",
+            "pages": ["essentials/settings"]
+            
+          },
+        {
+  "group": "Build",
+  "pages": [
+    {
+      "group": "Build AI Agent",
+      "pages": [
+        "single-prompt/step1",
+        "single-prompt/step2",
+        "single-prompt/step3",
+        "single-prompt/step4"
+      ]
+    }
+  ]
+},
+   {
+            "group": "Phone Numbers",
+            "pages": ["phonenumbers/addphonenumber"]
+            
+          },
+           {
+            "group": "Knowledge Bases",
+            "pages": ["knowledgebase/knowledgebase"]
+            
+          },
+          {
+  "group": "Tools & Integrations",
+  "pages": [
+    {
+      "group": "Tools",
+      "pages": [
+        "tools/postcallwhatsapp",
+        "tools/calltransfer"
+      ]
+    },
+    {
+      "group": "Integrations",
+      "pages": [
+        "/integration/crmintegration"
+      ]
+    }
+  ]
+},
+ {
+  "group": "Campaign",
+  "pages": [
+    {
+      "group": "Campaign  Management ",
+      "pages": [
+        "campaigns/createcampaign",
+        "campaigns/analytics"
+      ]
+    }
+  ]
+}
+        ]
+      },
+      {
+        "tab": "API reference",
+        "groups": [
+          {
+            "group": "Call Management",
+            "pages": [
+              "api-reference/Calling Management/addPhone",
+              "api-reference/Calling Management/deletePhone",
+              "api-reference/Calling Management/createBatch",
+              "api-reference/Calling Management/deleteBatch",
+              "api-reference/Calling Management/addCallsToBatch",
+              "api-reference/Calling Management/uploadCSV",
+              "api-reference/Calling Management/startCalling",
+              "api-reference/Calling Management/stopCalling",
+              "api-reference/Calling Management/getBatch",
+              "api-reference/Calling Management/getBatchById"
+            ]
+          },
+          {
+            "group": "DNC (Do Not Call)",
+            "pages": [
+              "api-reference/DNC/addToDNC",
+              "api-reference/DNC/getDNCList",
+              "api-reference/DNC/removeFromDNC",
+              "api-reference/DNC/enableDisableDNC"
+            ]
+          }
+        ]
+      }
+    ],
+    "global": {
+      "anchors": [
+        {
+          "anchor": "Community",
+          "href": "https://discord.gg/F9u5SgcH",
+          "icon": "discord"
+        },
+        {
+          "anchor": "Blog",
+          "href": "https://weya.ai/blog",
+          "icon": "newspaper"
+        },
+        {
+          "anchor": "Enterprise inquiries",
+          "href": "https://calendly.com/himanshu-weya/30min?month=2025-08",
+          "icon": "dialpad"
+        }
+      ]
+    }
+  },
+  "logo": {
+    "light": "/logo/light.png",
+    "dark": "/logo/dark.png"
+  },
+  "navbar": {
+    "links": [
+      {
+        "label": "Homepage",
+        "href": "https://weya.ai/"
+      }, {
+        "label": "Support",
+        "href": "mailto:info@weya.ai"
+      }
+    ],
+    "primary": {
+      "type": "button",
+      "label": "Dashboard",
+      "href": "https://nexus.weya.ai/signup"
+    }
+  },
+  "api": {
+    "baseUrl": "https://nexusdev-wjs-api-dev.mangoforest-291de162.swedencentral.azurecontainerapps.io"
+  },
+  "openapi": "/api-reference/openapi.json",
+  "contextual": {
+    "options": [
+      "copy",
+      "view",
+      "chatgpt",
+      "claude",
+      "perplexity",
+      "mcp",
+      "cursor",
+      "vscode"
+    ]
+  },
+  "footer": {
+    "socials": {
+      "instagram": "https://www.instagram.com/weya.ai/",
+      "linkedin": "https://www.linkedin.com/company/100928983/admin/dashboard/",
+      "x": "https://x.com/weyaAI"
+    }
+  }
+}

@@ -1,0 +1,77 @@
+---
+title: "Enable/Disable DNC"
+description: "Enable or disable the Do Not Call (DNC) functionality for your organization."
+openapi: "POST /api/dnc/enable-disable"
+---
+
+## Overview
+Control whether the DNC (Do Not Call) feature is active for your organization. When enabled, the system will respect DNC entries and prevent calling numbers in the list. When disabled, DNC checks are bypassed.
+
+## Prerequisites
+- Bearer token for authenticated workspace access
+- Organization membership (automatically determined from your user account)
+
+## Request
+
+<ParamField header="Authorization" type="string" required>
+Bearer token for the authenticated workspace account.
+</ParamField>
+
+<ParamField body="enable" type="boolean" required>
+Set to `true` to enable DNC functionality, or `false` to disable it.
+</ParamField>
+
+<RequestExample>
+```bash cURL
+curl --location '{{baseUrl}}/api/dnc/enable-disable' \
+  --header 'Authorization: Bearer {{authToken}}' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "enable": true
+  }'
+```
+</RequestExample>
+
+## Response
+
+<ResponseExample>
+```json 200 OK
+{
+  "message": "DNC setting updated successfully",
+  "status": true,
+  "code": 200,
+  "errorMessage": ""
+}
+```
+</ResponseExample>
+
+<ResponseField name="message" type="string" required>
+Success message confirming the DNC setting was updated.
+</ResponseField>
+
+<ResponseField name="status" type="boolean" required>
+Indicates whether the operation was successful.
+</ResponseField>
+
+<ResponseField name="code" type="integer" required>
+HTTP status code (200 for success).
+</ResponseField>
+
+## Error Handling
+
+- **400 Bad Request** – Missing `enable` field or `enable` is not a boolean value.
+- **404 Not Found** – No users found for this organization.
+- **500 Internal Server Error** – Server error while updating the DNC setting.
+
+<Note>
+When DNC is **enabled**:
+- The system checks the DNC list before making outbound calls
+- Numbers in the DNC list will be skipped automatically
+- This helps maintain compliance and respect customer preferences
+
+When DNC is **disabled**:
+- DNC checks are bypassed
+- All numbers, including those in the DNC list, may be called
+- Use with caution to ensure compliance with regulations
+</Note>
+

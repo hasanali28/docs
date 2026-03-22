@@ -1,0 +1,86 @@
+---
+title: "Stop Batch Dialing"
+description: "Stop new outbound calls from starting while allowing in-flight calls to finish gracefully."
+openapi: "POST /api/call/stop-calling"
+---
+
+## Overview
+Call this endpoint when you want to pause or end a campaign early. The batch status switches to *stopped*, preventing the dialer from launching additional calls. Existing conversations continue until they complete or hit agent-configured thresholds.
+
+## Prerequisites
+- You know the `batchId` you want to stop.
+- The authenticated user owns or administrates the batch.
+
+## Request
+<ParamField header="Authorization" type="string" required>
+Bearer token for an authorised workspace admin.
+</ParamField>
+
+<ParamField body="batchId" type="string" required>
+Batch identifier to halt.
+</ParamField>
+
+<ParamField body="userId" type="string" required>
+Workspace user responsible for the batch. Used for auditing and scoping.
+</ParamField>
+
+<RequestExample>
+```bash cURL
+curl --location '{{baseUrl}}/api/call/stop-calling' \
+  --header 'Authorization: Bearer {{authToken}}' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "batchId": "64e5f12345abcdef98765432",
+    "userId": "64e5f12345abcdef12345678"
+  }'
+```
+</RequestExample>
+
+## Response
+
+<ResponseExample>
+```json 200 OK
+{
+  "message": "",
+  "status": true,
+  "code": 200,
+  "errorMessage": "",
+  "data": {
+    "batchId": "64e5f12345abcdef98765432",
+    "status": "stopped"
+  }
+}
+```
+</ResponseExample>
+
+<ResponseField name="status" type="boolean" required>
+Indicates whether the batch was successfully stopped.
+</ResponseField>
+
+<ResponseField name="code" type="integer" required>
+HTTP status code (200 for success).
+</ResponseField>
+
+<ResponseField name="data" type="object">
+Additional information about the stopped batch.
+</ResponseField>
+
+## Error Handling
+
+- **400 Bad Request** – Missing required parameters (`batchId` or `userId`).
+- **401 Unauthorized** – Bearer token missing or expired.
+- **404 Not Found** – Batch not found or user not found.
+- **500 Internal Server Error** – Failed to stop calling service or call queue; retry or contact support.
+
+<Note>
+**Stopping Behavior:**
+
+- Prevents new calls from being initiated for the batch
+- In-flight calls are allowed to complete naturally
+- The call queue is stopped to prevent new call processing
+- Batch status is updated to reflect the stopped state
+</Note>
+
+<Check>
+After stopping, verify the batch status using `GET /api/call/batches/{userId}` to confirm it shows as stopped.
+</Check>

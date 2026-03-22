@@ -1,0 +1,134 @@
+---
+title: "Upload Batch CSV"
+description: "Create a batch and populate it by uploading a CSV file of contacts."
+openapi: "POST /api/call/upload"
+---
+
+## Overview
+The CSV upload endpoint lets you bootstrap a campaign directly from a spreadsheet. Nexus validates the file, creates a batch, normalises the columns based on the agent’s variable schema, and inserts the calls in a single transaction.
+
+## Prerequisites
+- Bearer token for the workspace admin who owns the contacts.
+- CSV file containing the columns required by the agent.
+- At least one provisioned phone number to associate with the batch.
+
+## Request
+<ParamField header="Authorization" type="string" required>
+Bearer token for the workspace admin.
+</ParamField>
+
+<ParamField formData="file" type="file" required>
+CSV file to import. Use UTF-8 encoding and include headers.
+</ParamField>
+
+<ParamField formData="userId" type="string" required>
+Workspace user who should own the batch.
+</ParamField>
+
+<ParamField formData="batchName" type="string" required>
+Display name for the new batch.
+</ParamField>
+
+<ParamField formData="callingNumbers" type="string" required>
+JSON stringified array of phone number IDs that the dialer will use when calling. Example: `"[\"64e5f12345abcdef87654321\"]"`.
+</ParamField>
+
+<ParamField formData="batchType" type="string" required allowedValues="outbound,mixed">
+Type of batch: `outbound` for outbound-only campaigns, or `mixed` for campaigns that support both inbound and outbound.
+</ParamField>
+
+<ParamField formData="enableDNC" type="string">
+Set to `"true"` to enable DNC checking for this batch. Must match your organization's DNC setting.
+</ParamField>
+
+<ParamField formData="type" type="string">
+Set to `"true"` to force upload even if CSV contains invalid rows. Default is `"false"` which rejects invalid CSVs.
+</ParamField>
+
+<ParamField formData="retry" type="number">
+Number of retry attempts for failed calls.
+</ParamField>
+
+<ParamField formData="delay" type="number">
+Delay in seconds between retry attempts.
+</ParamField>
+
+<ParamField formData="timezone" type="string">
+Timezone for the batch (e.g., "America/New_York", "Asia/Kolkata").
+</ParamField>
+
+<ParamField formData="callingHour" type="string">
+JSON stringified object defining calling hours. Example: `"{\"start\":\"09:00\",\"end\":\"17:00\"}"`.
+</ParamField>
+
+<ParamField formData="allowedDays" type="string">
+JSON stringified array of allowed days (0=Sunday, 6=Saturday). Example: `"[1,2,3,4,5]"` for weekdays.
+</ParamField>
+
+<RequestExample>
+```bash cURL
+curl --location '{{baseUrl}}/api/call/upload' \
+  --header 'Authorization: Bearer {{authToken}}' \
+  --form 'file=@"/path/to/contacts.csv"' \
+  --form 'userId="64e5f12345abcdef12345678"' \
+  --form 'batchName="Marketing Campaign May 2025"' \
+  --form 'batchType="outbound"' \
+  --form 'callingNumbers="[\"64e5f12345abcdef87654321\"]"' \
+  --form 'enableDNC="true"' \
+  --form 'timezone="America/New_York"' \
+  --form 'callingHour="{\"start\":\"09:00\",\"end\":\"17:00\"}"' \
+  --form 'allowedDays="[1,2,3,4,5]"'
+```
+</RequestExample>
+
+<Note>
+**CSV/Excel File Requirements:**
+
+- Supported formats: CSV (.csv) or Excel (.xls, .xlsx)
+- Must include a header row
+- Must include `phoneNumber` column (required)
+- Must include all mandatory variables defined by the agent
+- CSV headers should match agent variable keys (e.g., `phoneNumber`, `name`, `account_id`, `custom_field_1`)
+- The `phoneNumber` column is required; all other columns are flexible based on your agent's needs
+- Extra columns are stored and forwarded to the agent state machine
+- File encoding should be UTF-8
+- Empty files or files with no valid rows will be rejected
+
+**File Processing:**
+
+- The system automatically detects file type by extension
+- Excel files use the first sheet
+- Invalid rows are identified and reported (unless `type="true"`)
+- Data is normalized and validated against agent requirements
+- Phone numbers are deduplicated (only the first occurrence is kept)
+</Note>
+
+## Response
+<ResponseExample>
+```json 200 OK
+{
+  "success": true,
+  "batch": {
+    "_id": "64e5f12345abcdef98765432",
+    "batchName": "Marketing Campaign May 2025",
+    "callingNumbers": ["64e5f12345abcdef87654321"],
+    "totalCalls": 100
+  }
+}
+```
+</ResponseExample>
+
+<ResponseField name="batch" type="object" required>
+Summary of the created batch, including totals and calling numbers.
+</ResponseField>
+
+## Error Handling
+
+- **400 Bad Request** – Missing file, empty CSV, invalid `batchType`, invalid User ID format, missing required fields, or unsupported file type.
+- **404 Not Found** – User not found, organization not found, no agent found for calling numbers, or no language configured for agent.
+- **422 Unprocessable Entity** – CSV contains invalid rows (when `type="false"`). Response includes details of invalid rows.
+- **500 Internal Server Error** – File parsing failed, database error, or other server errors.
+
+<Check>
+Follow up with `GET /api/call/batch-details/{batchId}` to confirm the imported rows match the expected total.
+</Check>

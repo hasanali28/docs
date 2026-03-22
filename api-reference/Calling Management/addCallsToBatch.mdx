@@ -1,0 +1,158 @@
+---
+title: "Add Calls to Batch"
+description: "Queue one or more contacts in an existing batch before launching the dialer."
+openapi: "POST /api/call/addCallsToBatch"
+---
+
+## Overview
+After creating a batch you can enqueue contact records that the dialer should process. Each record can include any custom fields your agent definition expects. Validation runs against the agent’s variable schema so you catch missing data before the dialer starts.
+
+## Prerequisites
+- You created the batch and captured its `batchId`.
+- All required agent variables are present in every contact.
+- The API key you use owns the batch.
+
+## Request
+<ParamField header="x-api-key" type="string" required>
+Workspace API key. Must match the owner of the target batch.
+</ParamField>
+
+<ParamField body="batchId" type="string" required>
+Identifier returned by `POST /api/call/createBatch`.
+</ParamField>
+
+<ParamField body="callData" type="array[object]" required>
+Array of call records to be added to the batch. Each object MUST include `phoneNumber`. All other fields are flexible and determined by your agent's configuration. The system automatically chunks large arrays (1000 records per chunk) for efficient processing.
+</ParamField>
+
+<RequestExample>
+```bash cURL
+curl --location '{{baseUrl}}/api/call/addCallsToBatch' \
+  --header 'x-api-key: YOUR_API_KEY' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "batchId": "64e5f12345abcdef98765432",
+    "callData": [
+      {
+        "phoneNumber": "12125551001",
+        "name": "Sarah Johnson",
+        "account_id": "ACC-1001",
+        "custom_field_1": "value1",
+        "priority": "high"
+      },
+      {
+        "phoneNumber": "13105552002",
+        "name": "Michael Chen",
+        "account_id": "ACC-1002",
+        "category": "support"
+      }
+    ]
+  }'
+```
+</RequestExample>
+
+## Response
+
+<ResponseExample>
+```json 200 OK
+{
+  "message": "Calls enqueued successfully",
+  "status": true,
+  "code": 200,
+  "errorMessage": "",
+  "data": {
+    "added": 2,
+    "callIds": ["64e5f12345abcdef11111111", "64e5f12345abcdef22222222"]
+  }
+}
+```
+</ResponseExample>
+
+<ResponseExample>
+```json 207 Partial Content
+{
+  "message": "Some calls failed to enqueue",
+  "status": false,
+  "code": 207,
+  "errorMessage": "Partial content, check failedChunks for details",
+  "data": {
+    "added": 1,
+    "callIds": ["64e5f12345abcdef11111111"],
+    "failedChunks": [
+      {
+        "chunkNum": 2,
+        "error": "Database connection error"
+      }
+    ]
+  }
+}
+```
+</ResponseExample>
+
+<ResponseField name="message" type="string" required>
+A human-readable message indicating the outcome.
+</ResponseField>
+
+<ResponseField name="status" type="boolean" required>
+Indicates whether the operation was entirely successful. If `false` and `code` is 207, check `data.failedChunks`.
+</ResponseField>
+
+<ResponseField name="code" type="integer" required>
+The HTTP status code (200 for full success, 207 for partial success).
+</ResponseField>
+
+<ResponseField name="errorMessage" type="string">
+Error message, if any.
+</ResponseField>
+
+<ResponseField name="data" type="object">
+Contains details about the operation.
+</ResponseField>
+
+<ResponseField name="data.added" type="integer" required>
+Total number of call records successfully added to the batch across all chunks.
+</ResponseField>
+
+<ResponseField name="data.callIds" type="array[string]" required>
+Array of call record IDs that were inserted or updated.
+</ResponseField>
+
+<ResponseField name="data.failedChunks" type="array[object]">
+Present when `status` is `false` and `code` is 207. Array of chunk processing failures, each containing `chunkNum` and `error` message.
+</ResponseField>
+
+## Error Handling
+
+- **400 Bad Request** – Missing `batchId`, empty `callData` array, or validation failure.
+- **403 Forbidden** – Invalid or missing API key, or API key doesn't own the batch.
+- **404 Not Found** – Batch not found, or no agent found for the batch's calling numbers.
+- **207 Partial Content** – Some chunks processed successfully while others failed. Check `failedChunks` for details.
+- **500 Internal Server Error** – Server error during processing; retry with exponential backoff.
+
+<Note>
+**Flexible Parameters:**
+
+The `callData` array accepts any custom key-value pairs beyond the required `phoneNumber` field. You can include any parameters your agent needs:
+
+- Customer identifiers (e.g., `account_id`, `customer_id`, `unique_id`)
+- Custom data fields (e.g., `custom_field_1`, `custom_field_2`, `priority`)
+- Business-specific data (e.g., `order_amount`, `subscription_tier`, `category`)
+- Any other data your AI agent requires for the conversation
+
+**Important:** Each object in `callData` MUST include `phoneNumber`. All other fields are flexible and determined by your agent's configuration.
+</Note>
+
+<Note>
+**Processing Details:**
+
+- Large arrays are automatically chunked into batches of 1000 records for efficient processing
+- Each call record is validated against the agent's required variables
+- Existing calls with the same phone number are updated if they have a "pending" status
+- Completed calls create new phone log entries
+- The system automatically starts the calling service after successful insertion
+- Timezone information is applied to each call record if not provided
+</Note>
+
+<Tip>
+You can safely enqueue thousands of contacts in a single request. The system handles chunking automatically. Monitor the response for `status: false` and `code: 207` to identify any failed chunks that may need retry.
+</Tip>

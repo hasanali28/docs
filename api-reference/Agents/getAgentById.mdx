@@ -1,0 +1,61 @@
+---
+title: "Get Agent by ID"
+description: "Retrieve complete details for a specific AI agent."
+openapi: "GET /api/agents/{id}"
+---
+
+## Overview
+Call this endpoint to fetch the full configuration and details of an agent by its unique identifier. The caller must be authorized for the specified workspace.
+
+## Request
+<ParamField header="Authorization" type="string" required>
+Bearer token for an authenticated workspace user.
+</ParamField>
+
+<ParamField path="id" type="string" required>
+The unique identifier of the agent.
+</ParamField>
+
+<RequestExample>
+```bash cURL
+curl --location '{{baseUrl}}/api/agents/64e5f12345abcdef12345678' \
+  --header 'Authorization: Bearer {{authToken}}'
+```
+</RequestExample>
+
+## Response
+
+<ResponseExample>
+```json 200 OK
+{
+  "message": "Fetched successfully",
+  "status": true,
+  "code": 200,
+  "errorMessage": "",
+  "data": {
+    "_id": "64e5f12345abcdef12345678",
+    "agent_name": "Support Agent",
+    "gender": "Female",
+    "conversationType": "single_prompt",
+    "systemMessage": {
+      "content": "You are a customer support agent."
+    },
+    ...
+  }
+}
+```
+</ResponseExample>
+
+<ResponseField name="status" type="boolean" required>
+Indicates whether the agent was successfully retrieved.
+</ResponseField>
+
+<ResponseField name="data" type="object">
+The complete agent object including configurations, settings, and voice parameters.
+</ResponseField>
+
+## Error Handling
+
+- **401 Unauthorized** – Bearer token missing or expired.
+- **404 Not Found** – Agent not found or access denied.
+- **500 Internal Server Error** – Failed to fetch the agent.
