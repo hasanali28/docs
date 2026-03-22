@@ -1,0 +1,52 @@
+---
+title: "Delete Agent"
+description: "Permanently delete an AI agent."
+openapi: "DELETE /api/agents/{id}"
+---
+
+## Overview
+Call this endpoint to delete an AI agent entirely from the workspace. This action is irreversible.
+
+## Request
+<ParamField header="Authorization" type="string" required>
+Bearer token for an authenticated workspace user.
+</ParamField>
+
+<ParamField path="id" type="string" required>
+The unique identifier of the agent to delete.
+</ParamField>
+
+<RequestExample>
+```bash cURL
+curl --location --request DELETE '{{baseUrl}}/api/agents/64e5f12345abcdef12345678' \
+  --header 'Authorization: Bearer {{authToken}}'
+```
+</RequestExample>
+
+## Response
+
+<ResponseExample>
+```json 200 OK
+{
+  "message": "Agent deleted successfully",
+  "status": true,
+  "code": 200,
+  "errorMessage": "",
+  "data": null
+}
+```
+</ResponseExample>
+
+<ResponseField name="status" type="boolean" required>
+Indicates whether the agent was successfully deleted.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+Success message confirming the deletion.
+</ResponseField>
+
+## Error Handling
+
+- **401 Unauthorized** – Bearer token missing or expired.
+- **404 Not Found** – Agent not found or access denied.
+- **500 Internal Server Error** – Failed to delete the agent due to system or database error.

@@ -21,7 +21,7 @@ Workspace API key. Must match the owner of the target batch.
 Identifier returned by `POST /api/call/createBatch`.
 </ParamField>
 
-<ParamField body="call_data" type="array[object]" required>
+<ParamField body="callData" type="array[object]" required>
 Array of call records to be added to the batch. Each object MUST include `phoneNumber`. All other fields are flexible and determined by your agent's configuration. The system automatically chunks large arrays (1000 records per chunk) for efficient processing.
 </ParamField>
 
@@ -32,7 +32,7 @@ curl --location '{{baseUrl}}/api/call/addCallsToBatch' \
   --header 'Content-Type: application/json' \
   --data '{
     "batchId": "64e5f12345abcdef98765432",
-    "call_data": [
+    "callData": [
       {
         "phoneNumber": "12125551001",
         "name": "Sarah Johnson",
@@ -123,7 +123,7 @@ Present when `status` is `false` and `code` is 207. Array of chunk processing fa
 
 ## Error Handling
 
-- **400 Bad Request** – Missing `batchId`, empty `call_data` array, or validation failure.
+- **400 Bad Request** – Missing `batchId`, empty `callData` array, or validation failure.
 - **403 Forbidden** – Invalid or missing API key, or API key doesn't own the batch.
 - **404 Not Found** – Batch not found, or no agent found for the batch's calling numbers.
 - **207 Partial Content** – Some chunks processed successfully while others failed. Check `failedChunks` for details.
@@ -132,14 +132,14 @@ Present when `status` is `false` and `code` is 207. Array of chunk processing fa
 <Note>
 **Flexible Parameters:**
 
-The `call_data` array accepts any custom key-value pairs beyond the required `phoneNumber` field. You can include any parameters your agent needs:
+The `callData` array accepts any custom key-value pairs beyond the required `phoneNumber` field. You can include any parameters your agent needs:
 
 - Customer identifiers (e.g., `account_id`, `customer_id`, `unique_id`)
 - Custom data fields (e.g., `custom_field_1`, `custom_field_2`, `priority`)
 - Business-specific data (e.g., `order_amount`, `subscription_tier`, `category`)
 - Any other data your AI agent requires for the conversation
 
-**Important:** Each object in `call_data` MUST include `phoneNumber`. All other fields are flexible and determined by your agent's configuration.
+**Important:** Each object in `callData` MUST include `phoneNumber`. All other fields are flexible and determined by your agent's configuration.
 </Note>
 
 <Note>

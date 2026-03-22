@@ -1,0 +1,72 @@
+---
+title: "Create Knowledge Base"
+description: "Create a new Knowledge Base and upload source documents."
+openapi: "POST /api/knowledgeBase/createKnowledgeBase"
+---
+
+## Overview
+Use this endpoint to create a new Knowledge Base by uploading files (e.g., PDFs, text documents). The documents will be processed, chunked, and embedded into a vector database for Retrieval-Augmented Generation (RAG).
+
+## Request
+<ParamField header="Authorization" type="string" required>
+Bearer token for an authenticated workspace user.
+</ParamField>
+
+<ParamField header="Content-Type" type="string" required>
+Must be `multipart/form-data` to support file uploads.
+</ParamField>
+
+<ParamField body="knowledgeBaseName" type="string" required>
+Name for the Knowledge Base.
+</ParamField>
+
+<ParamField body="description" type="string">
+A brief description of what the Knowledge Base contains.
+</ParamField>
+
+<ParamField body="files" type="file[]" required>
+One or more files to be uploaded and processed into the Knowledge Base.
+</ParamField>
+
+<RequestExample>
+```bash cURL
+curl --location '{{baseUrl}}/api/knowledgeBase/createKnowledgeBase' \
+  --header 'Authorization: Bearer {{authToken}}' \
+  --form 'knowledgeBaseName="Product FAQ"' \
+  --form 'description="Frequently asked questions about our products"' \
+  --form 'files=@"/path/to/document1.pdf"'
+```
+</RequestExample>
+
+## Response
+
+<ResponseExample>
+```json 200 OK
+{
+  "message": "Files uploaded successfully, vectorDbCollection updated",
+  "status": true,
+  "code": 200,
+  "errorMessage": "",
+  "data": {
+    "knowledgeBaseName": "Product FAQ",
+    "description": "Frequently asked questions about our products",
+    "status": "PENDING",
+    ...
+  }
+}
+```
+</ResponseExample>
+
+<ResponseField name="status" type="boolean" required>
+Indicates whether the Knowledge Base was successfully created.
+</ResponseField>
+
+<ResponseField name="data" type="object">
+Details of the created Knowledge Base.
+</ResponseField>
+
+## Error Handling
+
+- **400 Bad Request** – Missing required parameters or invalid files.
+- **401 Unauthorized** – Bearer token missing, expired, or user not associated with an organization.
+- **500 Internal Server Error** – Failed to create Knowledge Base or process files.
