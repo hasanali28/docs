@@ -54,6 +54,7 @@
     {
       "group": "Tools",
       "pages": [
+        "tools/customtool",
         "tools/postcallwhatsapp",
         "tools/calltransfer"
       ]
