@@ -1,0 +1,76 @@
+---
+title: "Update Knowledge Base"
+description: "Update the configuration or source documents of an existing Knowledge Base."
+openapi: "PUT /api/knowledgeBase/{knowledgeBaseId}"
+---
+
+## Overview
+Use this endpoint to update an existing Knowledge Base's details or add new source documents to it.
+
+## Request
+<ParamField header="Authorization" type="string" required>
+Bearer token for an authenticated workspace user.
+</ParamField>
+
+<ParamField header="Content-Type" type="string">
+Must be `multipart/form-data` if uploading new files. Otherwise, `application/json` is accepted.
+</ParamField>
+
+<ParamField path="knowledgeBaseId" type="string" required>
+The unique identifier of the Knowledge Base to update.
+</ParamField>
+
+<ParamField body="knowledgeBaseName" type="string">
+Updated name for the Knowledge Base.
+</ParamField>
+
+<ParamField body="description" type="string">
+Updated description.
+</ParamField>
+
+<ParamField body="files" type="file[]">
+Optional. New files to upload and process into this Knowledge Base.
+</ParamField>
+
+<RequestExample>
+```bash cURL
+curl --location --request PUT '{{baseUrl}}/api/knowledgeBase/64f8bca93a0b8d3e4e2c95a7' \
+  --header 'Authorization: Bearer {{authToken}}' \
+  --form 'knowledgeBaseName="Updated Support KB"' \
+  --form 'description="Updated description contents"'
+```
+</RequestExample>
+
+## Response
+
+<ResponseExample>
+```json 200 OK
+{
+  "message": "Knowledge Base updated successfully",
+  "status": true,
+  "code": 200,
+  "errorMessage": "",
+  "data": {
+    "_id": "64f8bca93a0b8d3e4e2c95a7",
+    "knowledgeBaseName": "Updated Support KB",
+    "description": "Updated description contents",
+    ...
+  }
+}
+```
+</ResponseExample>
+
+<ResponseField name="status" type="boolean" required>
+Indicates whether the Knowledge Base was successfully updated.
+</ResponseField>
+
+<ResponseField name="data" type="object">
+The updated Knowledge Base payload.
+</ResponseField>
+
+## Error Handling
+
+- **400 Bad Request** – Invalid configuration provided.
+- **401 Unauthorized** – Bearer token missing or expired.
+- **404 Not Found** – Knowledge Base not found or access denied.
+- **500 Internal Server Error** – Failed to update the Knowledge Base or process new documents.
