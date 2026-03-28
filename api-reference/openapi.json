@@ -355,10 +355,10 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["batchId", "call_data"],
+                "required": ["batchId", "callData"],
                 "properties": {
                   "batchId": {"type": "string", "example": "64e5f12345abcdef98765432"},
-                  "call_data": {
+                  "callData": {
                     "type": "array",
                     "description": "Array of call records. Each object MUST include phoneNumber. All other fields are flexible and determined by your agent configuration.",
                     "items": {
