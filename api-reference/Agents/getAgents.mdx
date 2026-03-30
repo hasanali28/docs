@@ -1,0 +1,76 @@
+---
+title: "Get Agents"
+description: "Fetch agents for the authenticated user with pagination and search support."
+openapi: "GET /api/agents"
+---
+
+## Overview
+Use this endpoint to retrieve a paginated list of AI agents belonging to the authenticated user's workspace. It allows searching by agent name, type, gender, or conversation type.
+
+## Request
+<ParamField header="Authorization" type="string" required>
+Bearer token for an authenticated workspace user.
+</ParamField>
+
+<ParamField query="page" type="integer">
+Page number for pagination (default is 1).
+</ParamField>
+
+<ParamField query="limit" type="integer">
+Number of agents to fetch per page (default is 10, max is 1000).
+</ParamField>
+
+<ParamField query="search" type="string">
+Search term to filter agents by name, type, gender, or conversation type.
+</ParamField>
+
+<RequestExample>
+```bash cURL
+curl --location '{{baseUrl}}/api/agents?page=1&limit=10&search=sales' \
+  --header 'Authorization: Bearer {{authToken}}'
+```
+</RequestExample>
+
+## Response
+
+<ResponseExample>
+```json 200 OK
+{
+  "message": "Fetched successfully",
+  "status": true,
+  "code": 200,
+  "errorMessage": "",
+  "data": {
+    "agents": [
+      {
+        "agent_name": "John Doe",
+        "gender": "Male",
+        "conversationType": "single_prompt",
+        "createdAt": "2025-10-29T12:45:30.000Z"
+      }
+    ],
+    "pagination": {
+      "total": 125,
+      "page": 1,
+      "limit": 10,
+      "totalPages": 13,
+      "hasNextPage": true,
+      "hasPrevPage": false
+    }
+  }
+}
+```
+</ResponseExample>
+
+<ResponseField name="status" type="boolean" required>
+Indicates whether the agents were successfully retrieved.
+</ResponseField>
+
+<ResponseField name="data" type="object">
+Contains the list of `agents` and `pagination` details.
+</ResponseField>
+
+## Error Handling
+
+- **401 Unauthorized** – Bearer token missing, expired, or no user found relative to token.
+- **500 Internal Server Error** – Failed to fetch agents.
