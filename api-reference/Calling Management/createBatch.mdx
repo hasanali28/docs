@@ -22,6 +22,15 @@ Workspace API key. Find it under **Settings → API access**. Either `x-api-key`
 Bearer token for authenticated workspace access. Either `x-api-key` or `Authorization` header is required.
 </ParamField>
 
+<ParamField body="channel_type" type="string">
+Supported values:
+
+- `voice` (default)
+- `video`
+
+If omitted, the API automatically creates a voice batch.
+</ParamField>
+
 <ParamField body="batchName" type="string" required>
 Human readable campaign name shown in the Nexus dashboard.
 </ParamField>
@@ -50,6 +59,10 @@ Object defining calling hours. Example: `{"start": "09:00", "end": "17:00"}`.
 Array of allowed days for calling (0=Sunday, 1=Monday, ..., 6=Saturday). Example: `[1,2,3,4,5]` for weekdays.
 </ParamField>
 
+<ParamField body="holidayListId" type="string">
+Optional holiday list ID to associate with the batch. Calls scheduled on the holidays defined in the specified holiday list will be skipped during campaign execution.
+</ParamField>
+
 <RequestExample>
 ```bash cURL
 # Using API Key
@@ -57,13 +70,15 @@ curl --location '{{baseUrl}}/api/call/createBatch' \
   --header 'x-api-key: YOUR_API_KEY' \
   --header 'Content-Type: application/json' \
   --data '{
+    "channel_type": "voice",
     "batchName": "API Campaign May 2025",
     "callingNumbers": ["64e5f12345abcdef87654321"],
     "retry": 3,
     "delay": 60,
     "timezone": "America/New_York",
     "callingHour": {"start": "09:00", "end": "17:00"},
-    "allowedDays": [1,2,3,4,5]
+    "allowedDays": [1,2,3,4,5],
+    "holidayListId": "64f12345abcdef9876543210"
   }'
 ```
 
