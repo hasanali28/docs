@@ -1,0 +1,79 @@
+---
+title: "Get All Knowledge Bases"
+description: "Fetch all Knowledge Bases for the organization."
+openapi: "GET /api/knowledgeBase"
+---
+
+## Overview
+Retrieve a paginated list of all Knowledge Bases belonging to the authenticated user's organization. Supports searching by keyword.
+
+## Request
+<ParamField header="Authorization" type="string" required>
+Bearer token for an authenticated workspace user.
+</ParamField>
+
+<ParamField query="page" type="integer">
+Page number for pagination (default is 1).
+</ParamField>
+
+<ParamField query="limit" type="integer">
+Number of Knowledge Bases to fetch per page (default is 10, max is 100).
+</ParamField>
+
+<ParamField query="search" type="string">
+Search keyword to filter Knowledge Bases by name, description, or status.
+</ParamField>
+
+<RequestExample>
+```bash cURL
+curl --location '{{baseUrl}}/api/knowledgeBase?page=1&limit=10' \
+  --header 'Authorization: Bearer {{authToken}}'
+```
+</RequestExample>
+
+## Response
+
+<ResponseExample>
+```json 200 OK
+{
+  "message": "Fetched successfully",
+  "status": true,
+  "code": 200,
+  "errorMessage": "",
+  "data": {
+    "knowledgeBases": [
+      {
+        "_id": "64f8bca93a0b8d3e4e2c95a7",
+        "knowledgeBaseName": "Customer Support KB",
+        "description": "Knowledge base for customer support.",
+        "status": "active",
+        "vectorDbCollection": "customer_support_vectors",
+        "createdAt": "2025-10-29T12:45:30.000Z"
+      }
+    ],
+    "pagination": {
+      "total": 42,
+      "page": 1,
+      "limit": 10,
+      "totalPages": 5,
+      "hasNextPage": true,
+      "hasPrevPage": false
+    }
+  }
+}
+```
+</ResponseExample>
+
+<ResponseField name="status" type="boolean" required>
+Indicates whether the request was successful.
+</ResponseField>
+
+<ResponseField name="data" type="object">
+Contains the list of `knowledgeBases` and `pagination` details.
+</ResponseField>
+
+## Error Handling
+
+- **401 Unauthorized** – Bearer token missing, expired, or user not authenticated.
+- **404 Not Found** – No Knowledge Bases found for the organization.
+- **500 Internal Server Error** – Failed to fetch Knowledge Bases.

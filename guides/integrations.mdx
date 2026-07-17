@@ -1,0 +1,359 @@
+---
+title: "Integrations"
+description: "Connect Weya AI with your CRM and other tools"
+icon: "plug"
+---
+
+Integrations allow you to sync data between Weya AI and your existing business tools.
+
+![Integrations](/images/integration/integration.png)
+
+---
+
+## Available Integrations
+
+The **Integrations → Available** tab displays all CRM integrations that are ready to be connected. This is where you can add new CRM systems to start syncing data with your platform.
+
+### Overview
+
+This page lists all supported integrations that are not yet connected. You can choose any integration and click **Connect** to set it up.
+
+Each integration card provides:
+
+- Integration name  
+- Short description  
+- A **Connect** button to start the setup  
+
+---
+
+### Available Integration Types
+
+#### 1. HubSpot (Pre-built Integration)
+
+A native CRM integration with HubSpot.
+
+Ideal for users already using HubSpot for sales and contact management.
+
+**Capabilities:**
+- Sync contacts automatically  
+- Automate sales workflows  
+- Track engagement and activity  
+
+**Action:**
+- Click **Connect** to authenticate your HubSpot account and enable syncing.
+
+---
+
+#### 2. Custom CRM (API-based Integration)
+
+Allows you to connect your own CRM system via API.
+
+Best suited for:
+
+- Internal tools  
+- Unsupported third-party CRMs  
+- Custom workflows  
+
+**Capabilities:**
+- Send data to your CRM using APIs  
+- Define custom payload structure  
+- Full control over field mapping  
+
+**Action:**
+- Click **Connect** to configure API endpoints, headers, and request structure.
+
+---
+
+### Key Action
+
+#### Connect
+
+- Starts the integration setup process  
+- After successful setup:
+  - The integration moves to the **Active** tab  
+  - Data syncing begins based on configuration  
+
+---
+
+## Active Integrations
+
+The **Integrations → Active** tab displays all CRM systems currently connected to your account. These integrations allow you to sync contact data, automate workflows, and manage forms directly from external CRMs.
+![Integrations](/images/integration/connected_int.png)
+### Overview
+
+Each card in this section represents an active CRM integration. Once connected, the system continuously syncs data between your platform and the CRM.
+
+
+---
+
+### Types of CRM Integrations
+
+#### 1. HubSpot (Pre-built Integration)
+
+The HubSpot integration is a native, pre-configured CRM connection.
+
+It enables:
+
+- Automatic contact syncing  
+- Sales and engagement tracking  
+- Workflow automation with HubSpot tools  
+
+**Details shown:**
+- Integration name (e.g., `hubspot`)  
+- Description (e.g., "Sync contacts, automate sales with HubSpot")  
+- Creation date  
+- Region  
+
+**Actions:**
+- **View Forms** → See linked forms and mappings  
+- **Disconnect** → Remove the integration  
+
+---
+---
+
+## HubSpot Forms
+
+HubSpot Forms allow you to connect your HubSpot CRM data with Weya AI campaigns. You can create, configure, and manage forms that trigger actions or sync data in real-time.
+
+![HubSpot Forms](/images/integration/hubspot_fl.png)
+
+### Overview
+
+The **HubSpot Forms** page displays all forms created under your HubSpot integration.
+
+Each form represents a configuration that connects HubSpot data with your calling or workflow system.
+
+### What You Can See
+
+Each form card includes:
+
+- Form Name (e.g., `Test`)  
+- Module (e.g., `contacts`)  
+- Creation Date  
+- Sync Type (e.g., Realtime)  
+
+### Actions
+
+- **Edit** → Modify form configuration  
+- **Delete** → Remove the form  
+
+---
+
+## Add New Form
+
+To create a new form, click **+ Add Forms**.
+
+This opens a 2-step configuration dialog.
+
+---
+
+### Step 1: Choose Data
+
+![Choose Data](/images/integration/hubspot_af.png)
+
+#### Integration Type
+
+- **Call Trigger Integration** → Triggers calls from HubSpot data  
+- **Disposition Integration** → Sends call outcomes back to HubSpot  
+
+#### Select Module
+
+Choose the HubSpot module (e.g., Contacts, Deals).
+
+#### Primary Key
+
+- Unique identifier for matching records  
+- Example: `email`, `phone`, `contactId`
+
+#### Required Fields
+
+- Fields required for successful syncing  
+
+---
+
+### Step 2: Configure Integration
+
+![Configure Integration](/images/integration/hubspot_af2.png)
+
+#### Select Agent
+
+- Choose which agent will handle calls  
+
+#### Static Fields
+
+- Add constant key-value pairs sent with every request  
+
+#### Whitelisting
+
+- Define conditions for triggering calls  
+- Example: trigger only if `lead_status = new`
+
+---
+
+### Final Actions
+
+- **Previous** → Go back  
+- **Save Configuration** → Create the form  
+
+---
+
+### Notes
+
+- Forms define how HubSpot data flows into Weya AI  
+- Multiple forms can be created  
+- Proper configuration ensures accurate syncing  
+
+#### 2. Custom CRM (API-based Integration)
+
+Custom CRM integrations (e.g., `test form`, `test form1`, `test form234`) allow you to connect your own CRM system via API.
+
+Designed for:
+
+- Internal CRM systems  
+- Third-party CRMs not natively supported  
+
+Requires API configuration during setup.
+
+**Details shown:**
+- Integration name (user-defined)  
+- Description: "Connect your own CRM system via API"  
+- Creation timestamp  
+
+**Actions:**
+- **View Forms** → Manage form mappings and payload structure  
+- **Disconnect** → Stop syncing and remove the integration  
+
+---
+
+### Key Actions
+
+#### View Forms
+
+---
+
+## Custom CRM Forms
+
+Custom CRM Forms allow you to connect your own CRM system using APIs. You can define how data is sent, transformed, and received using a flexible configuration flow.
+
+---
+
+## Add Custom CRM Form
+
+To create a Custom CRM integration, click **Connect** on Custom CRM and configure the form.
+
+This opens a **4-step configuration dialog**:
+
+1. Configuration  
+2. Headers  
+3. Parameters  
+4. Body  
+
+---
+
+## Step 1: Configuration
+
+![Custom CRM Configuration](/images/integration/c1.png)
+
+This step defines the basic setup of your integration.
+
+### Fields
+
+#### Form Name
+- A unique name for your integration  
+- Example: `Lead Sync API`
+
+#### Select Agent
+- Choose which agent will handle requests triggered by this integration  
+
+#### Description
+- Optional description for internal reference  
+
+#### Method
+- HTTP method for the API request  
+- Example: `GET`, `POST`, `PUT`  
+
+#### URL
+- The API endpoint where data will be sent  
+- Example: `https://api.example.com/leads`
+
+#### Import from cURL
+- Paste a cURL command to auto-fill configuration  
+- Useful for quickly setting headers, body, and method  
+
+---
+
+## Step 2: Headers
+
+![Custom CRM Headers](/images/integration/c2.png)
+
+Define request headers to be sent with every API call.
+
+### Examples
+
+- `Authorization: Bearer <token>`  
+- `Content-Type: application/json`  
+
+Use **+ Add** to include headers.
+
+---
+
+## Step 3: Parameters
+
+![Custom CRM Parameters](/images/integration/c3.png)
+
+Define dynamic values in the request.
+
+### Query Parameters
+- Appended to the URL  
+- Example: `?source=weya&campaign=sales`
+
+### Path Variables
+- Dynamic segments in URL  
+- Example: `/users/{id}`  
+
+Use **+ Add** to configure parameters.
+
+---
+
+## Step 4: Body
+
+![Custom CRM Body](/images/integration/c4.png)
+
+Define the request payload sent to your CRM.
+
+### Options
+
+#### Send as form-data
+- Enable if API expects multipart form data  
+
+#### Static Fields
+- Constant key-value pairs sent with every request  
+
+#### Request Body Schema
+- Define structure of request payload  
+- Map values to agent or system variables  
+
+#### Output Body Schema
+- Define expected response format  
+- Helps in processing API responses  
+
+Example:
+
+```json
+{
+  "name": "John Doe",
+  "phone": "1234567890"
+}
+
+Used to:
+- Map fields between platform and CRM  
+- Configure data sync rules  
+
+---
+
+#### Disconnect
+
+- Safely removes the integration  
+- Stops all future data syncing  
+- Does **not** delete previously synced data 
+

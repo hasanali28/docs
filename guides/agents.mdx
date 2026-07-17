@@ -1,0 +1,210 @@
+---
+title: 'Agents'
+description: 'Build and configure AI agents for different channels'
+icon: 'robot'
+---
+
+The **Agents** section is your command center for managing all AI personas. From here, you can create, edit, and organize agents for different channels.
+
+![Agent Management Dashboard](/images/agents/agent.png)
+
+### Agent Management Dashboard
+The dashboard provides a centralized view of your agents:
+- **Tabs**: Switch between **Phone Agents** and **WhatsApp Agents** lists.
+- **Search**: Quickly find agents by name.
+- **Agent List**: View key details like **Gender**, **Last Edited**, and **Created** dates.
+- **Actions**: Edit or delete agents directly from the list.
+
+### Creating a New Agent
+Click the **Create Agent** button in the top right corner to open the selection menu. You can choose from:
+1.  **Create Phone Agent**: For real-time voice conversations.
+2.  **Create WhatsApp Agent**: For text-based automation.
+3.  **Create Voice Blaster** <span class="badge">New</span>: For high-volume outbound campaigns.
+
+## 1. Phone Agent
+Phone Agents are designed for real-time voice conversations. They can handle inbound calls or make outbound calls to individuals.
+
+### Creating a Phone Agent
+1. Click the **Create Agent** button in the top right corner and select **Create Phone Agent**.
+
+![Create Agent Dropdown](/images/agents/agent_create_button.png)
+
+2. The **Create Voice Agent** dialog will appear.
+    - **Select Use Case**: Choose the category that best fits your needs (e.g., Loan Collection, Insurance, Customer Service).
+    - **Choose Persona**: Select a pre-configured template from the list.
+    - Click **Continue** to proceed to the builder.
+
+![Phone Agent Template Selection](/images/agents/select_persona.png)
+
+3. You will be redirected to the Agent Builder. Configure the agent using the following tabs:
+
+#### General Info
+- **Agent Name**: A unique identifier for your agent.
+- **Voice**: Select from our premium neural voices.
+- **System Prompt**: The core instructions that define your agent's persona and behavior.
+
+3. You will be redirected to the Agent Builder. Configure the agent starting with the **Call Flow** tab:
+
+![Phone Agent Call Flow](/images/agents/agent_call_flow.png)
+
+#### 1. Agent Name
+Located at the top left of the screen (e.g., "Loan collection India"). Click the pencil icon to edit.
+
+#### 2. Voice Agent
+Select the voice persona and language for your agent.
+- **Voice**: Choose from available neural voices (e.g., "Muskan").
+- **Language**: Set the primary language and dialect (e.g., "English (India)", "Hindi").
+
+#### 3. Welcome Message
+This is the first sentence your agent will speak when the call connects.
+- **Example**: "Hi, this is [AGENT_NAME] calling from [AGENCY_NAME]..."
+- You can use variables like `{customer_name}` which will be dynamically populated.
+
+#### 4. System Message
+This is the "brain" of your agent. It defines the role, context, and rules of engagement.
+- **Role**: Define who the agent is (e.g., "You are a professional collection agent...").
+- **About**: Provide context about your company or the purpose of the call.
+- **Language Guidelines**: Instruct the agent on how to speak (e.g., "Keep sentences short", "Use light fillers").
+- **Sections**: You can organize the prompt into sections using the **+ Add Section** button for better clarity.
+
+#### Knowledge Base & Tools
+Enhance your agent with external capabilities and documents.
+
+![Phone Agent Knowledge Base](/images/agents/knowlwdgebase_and_tools.png)
+
+**1. Tools & Integrations**
+Enable specific functions for your agent:
+- **WhatsApp**: Connect messaging capabilities to send follow-ups.
+- **Google Calendar**: Allow the agent to check availability and book appointments (Sync schedules).
+- **Call Transfer**: Automatically route calls to a human agent or another department based on the conversation.
+- **Custom Tools**: Configure your own API tools for specific business logic.
+
+#### Configuring Custom Tools
+Custom Tools allow your agent to interact with **any external API** during a call (e.g., fetching customer data, updating a CRM, checking inventory).
+
+1. Click **Custom Tools** -> **New Tool**.
+2. Configure the tool details:
+
+![Custom Tool Configuration](/images/agents/custom_tool.png)
+
+**General Settings**
+- **Tool Name**: Unique name (e.g., `get_weather_data`).
+- **Description**: Explain what the tool does (e.g., "Fetches the forecast for a given city"). *This is critical as the AI uses this description to decide when to use the tool.*
+- **Method & URL**: Select GET/POST/PUT/DELETE and enter the endpoint URL.
+
+**cURL Import (Recommended)**
+Paste a cURL command into the **Import from cURL** box and click **Import**. This will automatically populate the Headers, Parameters, and Body fields for you.
+
+**Advanced Configuration Tabs**
+- **Headers**: Add authentication tokens (e.g., `Authorization: Bearer <token>`) or content types.
+- **Parameters**: Define query parameters (e.g., `?city=London`).
+- **Body**: For POST/PUT requests, define the JSON payload.
+- **Variables**: Dynamic values that the AI should extract from the conversation and pass to the API (e.g., `customer_name`, `appointment_date`). The system will automatically detect potential variables from your URL and Body.
+
+**2. Knowledge Base**
+Select a Knowledge Base (RAG) to give your agent access to your documents. This allows the agent to answer questions based on your specific business data.
+- If no knowledge base is available, you will see a prompt to create one.
+
+#### Call Settings
+Fine-tune how your agent speaks and listens.
+
+![Phone Agent Call Settings](/images/agents/call_setting.png)
+
+**1. General Behaviors**
+- **Auto Detect Language**: Automatically adapts to the caller's language. Useful for multilingual regions.
+- **Retry on Voicemail**: If the system detects a voicemail beep, it will hang up and retry the call later (configurable in campaign settings).
+- **Ambient Noise**: Adds background audio (e.g., "Office", "Cafe") to make the call sound more natural and less robotic. You can adjust the noise volume.
+
+**2. Vocabulary**
+Add specific words, proper nouns, or brand names that the speech-to-text engine might struggle with. This improves transcription accuracy.
+- *Example*: "Weya", "SaaS", "EBITDA".
+
+**3. Timing & Speech**
+- **Max Timeout**: The maximum duration of the call before the system automatically hangs up (default: 30 mins).
+- **Voice Speed**: Adjusts the rate of speech (0.5x to 1.2x). Lower speed is better for clarity, while normal speed typically sounds more natural.
+
+#### Call Metrics
+Define specific data points the agent should extract from the conversation. This structures the unstructured voice data for analysis.
+
+![Call Metrics](/images/agents/call_matrix.png)
+
+1. **Metric Name**: A descriptive identifier (e.g., `Customer Satisfaction`, `Call Outcome`).
+2. **Data Type**: Select the format of the extracted data:
+    - **Text**: Free-form text.
+    - **Single Extract**: Pick one value from a predefined list (Enum).
+    - **Boolean (Yes/No)**: True/False flag.
+    - **Timestamp / Date**: Captures specific times or dates mentioned.
+    - **Numeric**: Extracts numbers (e.g., age, loan amount).
+    - **Multi Extract**: Pick multiple values from a list.
+3. **Description**: *Crucial Step*. Explain logically **how** the AI should determine this value.
+    - *Example for Call Outcome*: "Extract 'Interested' if the user asks for pricing, 'Not Interested' if they hang up or say no, and 'Callback' if they ask to be called later."
+
+## 2. WhatsApp Agent
+WhatsApp Agents allow you to automate text-based conversations on WhatsApp using official Business API templates.
+
+### Creating a WhatsApp Agent
+1. Click **Create Agent** and select **Create WhatsApp Agent**.
+2. **Select Template**: You must start with a pre-approved WhatsApp template. This defines the initial message structure.
+    - *Note*: Templates are synced from your Meta Business Account.
+
+
+
+3. **Select Phone Number**: Choose the WhatsApp-enabled phone number that this agent will use to send messages.
+4. Click **Continue** to enter the builder.
+
+### Configuring the Agent
+You will see a tabbed interface similar to the Phone Agent, but optimized for text:
+
+- **System Flow**:
+    - **System Message**: Define the agent's persona. You can use `{Variable_Name}` syntax here to create dynamic placeholders.
+    - **Variable Detection**: The system automatically detects variables in your prompt and asks you to map them.
+- **Template Variables**: Map the placeholders in your selected WhatsApp template to actual values or agent variables.
+- **Knowledge Base**: Enable RAG for the agent to answer queries based on your documents.
+- **Custom Metrics**: Define what data to extract from the chat (e.g., `OrderConfirmed`, `CustomerSentiment`).
+
+
+
+> [!NOTE]
+> **Documentation for advanced WhatsApp features is coming soon.**
+> We are currently updating our guides for advanced flows like media handling and catalog integration.
+
+## 3. Voice Blaster
+Voice Blasters are specialized agents for high-volume outbound campaigns where the goal is to deliver a message or qualify leads quickly.
+
+### Creating a Voice Blaster
+
+1. From the **Agent Management** dashboard, click **Create Agent**.
+2. Select **Create Voice Blaster** from the dropdown menu.
+![Voice Blaster create](/images/agents/voice_blaster.png)
+
+3. You will be prompted to choose the broadcast type:
+2. Choose the type:
+    - **Static**: Delivers a pre-recorded or identical message to everyone.
+    - **Dynamic**: Uses variables to personalize the message for each contact (e.g., "Hi {name}, we have an offer for you...").
+    ![Voice Blaster create](/images/agents/vb_option.png)
+3. Configure the **Message**:
+    - For **Dynamic** blasters, use `{variable}` syntax to insert personal details.
+4. Set the **Voice Speed** and **Language**.
+
+
+
+## Testing Your Agent
+
+Once you have configured your agent, you can verify its behavior directly within the platform before deploying it.
+
+### 1. Initiate Test
+Click the **Test Agent** button located in the top right corner of the Agent Builder.
+
+![Test Agent Button](/images/agents/test_agent.png)
+
+### 2. Provide Variables (If applicable)
+If your agent uses dynamic variables (e.g., `{customer_name}`, `{balance}`), a dialog will appear asking you to provide sample values for this test session.
+![Test Agent Button](/images/agents/form.png)
+- *Tip*: Enter realistic data to see how the agent handles specific scenarios.
+
+### 3. Simulation Interface
+A testing sidebar will open with two modes:
+- **Voice Chat**: Speak to your agent using your microphone. This simulates a real phone call.
+- **Text Chat**: Type messages to test the logic and responses without speaking.
+
+![Test Agent Simulation](/images/agents/start_test.png)

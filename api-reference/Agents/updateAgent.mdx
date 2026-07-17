@@ -1,0 +1,69 @@
+---
+title: "Update Agent"
+description: "Update the configuration or parameters of an existing AI agent."
+openapi: "PATCH /api/agents/{id}"
+---
+
+## Overview
+Use this endpoint to update any properties of an existing AI agent, such as changing its system prompt, voice settings, name, or metadata tags. Unprovided fields will remain unchanged.
+
+## Request
+<ParamField header="Authorization" type="string" required>
+Bearer token for an authenticated workspace user.
+</ParamField>
+
+<ParamField path="id" type="string" required>
+The unique identifier of the agent to update.
+</ParamField>
+
+<ParamField body="Any agent property" type="mixed">
+You can pass any top-level or nested properties inside the agent schema to update them (e.g., `agent_name`, `systemMessage`, `callSetting`).
+</ParamField>
+
+<RequestExample>
+```bash cURL
+curl --location --request PATCH '{{baseUrl}}/api/agents/64e5f12345abcdef12345678' \
+  --header 'Authorization: Bearer {{authToken}}' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "agent_name": "Updated Sales Rep",
+    "callSetting": {
+      "voiceSpeed": 1.1,
+      "callTimeout": 45
+    }
+  }'
+```
+</RequestExample>
+
+## Response
+
+<ResponseExample>
+```json 200 OK
+{
+  "message": "Agent updated successfully",
+  "status": true,
+  "code": 200,
+  "errorMessage": "",
+  "data": {
+    "_id": "64e5f12345abcdef12345678",
+    "agent_name": "Updated Sales Rep",
+    ...
+  }
+}
+```
+</ResponseExample>
+
+<ResponseField name="status" type="boolean" required>
+Indicates whether the agent was successfully updated.
+</ResponseField>
+
+<ResponseField name="data" type="object">
+The updated agent payload.
+</ResponseField>
+
+## Error Handling
+
+- **400 Bad Request** – Invalid configuration values provided.
+- **401 Unauthorized** – Bearer token missing or expired.
+- **404 Not Found** – Agent not found or access denied.
+- **500 Internal Server Error** – Failed to update the agent.

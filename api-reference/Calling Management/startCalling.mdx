@@ -37,6 +37,10 @@ Call records to process. Optional if batch already contains calls. If provided, 
 Optional UUID for tracking this calling session.
 </ParamField>
 
+<ParamField body="scheduleAt" type="string">
+Optional ISO 8601 date-time string to schedule the batch dialing in the future.
+</ParamField>
+
 <RequestExample>
 ```bash cURL
 curl --location '{{baseUrl}}/api/call/start-calling' \

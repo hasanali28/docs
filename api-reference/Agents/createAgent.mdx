@@ -1,0 +1,89 @@
+---
+title: "Create Agent"
+description: "Create a new AI agent in the workspace."
+openapi: "POST /api/agents"
+---
+
+## Overview
+Use this endpoint to create a new AI agent with specified configurations, including voice settings, conversational behavior, and system prompt.
+
+## Request
+<ParamField header="Authorization" type="string" required>
+Bearer token for an authenticated workspace user.
+</ParamField>
+
+<ParamField body="agent_name" type="string" required>
+Name for the agent.
+</ParamField>
+
+<ParamField body="gender" type="string" required>
+Gender of the agent voice (`Male` or `Female`).
+</ParamField>
+
+<ParamField body="conversationType" type="string" required>
+Type of conversation (`single_prompt`, `multi_prompt`, `static_voice_blaster`, `dynamic_voice_blaster`). Default is `single_prompt`.
+</ParamField>
+
+<ParamField body="systemMessage" type="object" required>
+System prompt structure detailing the agent's instructions, behavior, and conversational guardrails.
+</ParamField>
+
+<ParamField body="capability" type="string">
+The capability or primary function of the agent.
+</ParamField>
+
+<ParamField body="description" type="string">
+A brief description of the agent.
+</ParamField>
+
+<ParamField body="voice" type="string">
+The Object ID of the Voice associated with the agent.
+</ParamField>
+
+<ParamField body="callSetting" type="object">
+Settings for handling calls, including timeouts, volume, voice speed, and TTS/STT configurations.
+</ParamField>
+
+<RequestExample>
+```bash cURL
+curl --location '{{baseUrl}}/api/agents' \
+  --header 'Authorization: Bearer {{authToken}}' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "agent_name": "Sales Rep",
+    "gender": "Female",
+    "conversationType": "single_prompt",
+    "systemMessage": {
+      "content": "You are a helpful sales agent..."
+    }
+  }'
+```
+</RequestExample>
+
+## Response
+
+<ResponseExample>
+```json 201 Created
+{
+  "message": "Agent created successfully",
+  "status": true,
+  "code": 201,
+  "errorMessage": "",
+  "data": null
+}
+```
+</ResponseExample>
+
+<ResponseField name="status" type="boolean" required>
+Indicates whether the agent was successfully created.
+</ResponseField>
+
+<ResponseField name="code" type="integer" required>
+HTTP status code (201 for success).
+</ResponseField>
+
+## Error Handling
+
+- **400 Bad Request** – Missing required parameters or invalid configuration.
+- **401 Unauthorized** – Bearer token missing or expired.
+- **500 Internal Server Error** – Failed to create the agent.
