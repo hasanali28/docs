@@ -1,0 +1,118 @@
+---
+title: "Get WhatsApp Agents"
+description: "Retrieve all WhatsApp AI Agents available in your workspace."
+openapi: "GET /api/whatsapp/get-whatsapp-agent"
+---
+
+## Overview
+
+Retrieve a list of all WhatsApp AI Agents configured in your workspace. This endpoint is useful for displaying agents, selecting an agent for editing, or managing your WhatsApp automations.
+
+## Prerequisites
+
+- Bearer Token authentication
+
+## Request
+
+<ParamField header="Authorization" type="string" required>
+Bearer token for authenticated workspace access.
+</ParamField>
+
+<RequestExample>
+
+```bash cURL
+curl --location '{{baseUrl}}/api/whatsapp/get-whatsapp-agent' \
+--header 'Authorization: Bearer {{authToken}}'
+```
+
+</RequestExample>
+
+## Response
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "status": true,
+  "code": 200,
+  "message": "WhatsApp Agents fetched successfully",
+  "data": [
+    {
+      "_id": "6894a98a7fcde123456789ab",
+      "agentName": "Support Assistant",
+      "phoneNumberId": "123456789012345",
+      "status": "active",
+      "createdAt": "2026-07-21T13:45:18.000Z"
+    },
+    {
+      "_id": "6894ab427fcde123456789ac",
+      "agentName": "Sales Assistant",
+      "phoneNumberId": "123456789012346",
+      "status": "active",
+      "createdAt": "2026-07-20T10:15:30.000Z"
+    }
+  ]
+}
+```
+
+</ResponseExample>
+
+<ResponseField name="status" type="boolean">
+Indicates whether the request completed successfully.
+</ResponseField>
+
+<ResponseField name="code" type="integer">
+HTTP status code returned by the API.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+Human-readable success message.
+</ResponseField>
+
+<ResponseField name="data" type="array">
+List of WhatsApp Agents available in the workspace.
+</ResponseField>
+
+<ResponseField name="data._id" type="string">
+Unique identifier of the WhatsApp Agent.
+</ResponseField>
+
+<ResponseField name="data.agentName" type="string">
+Display name of the WhatsApp Agent.
+</ResponseField>
+
+<ResponseField name="data.phoneNumberId" type="string">
+WhatsApp Business Phone Number assigned to the agent.
+</ResponseField>
+
+<ResponseField name="data.status" type="string">
+Current status of the WhatsApp Agent.
+</ResponseField>
+
+<ResponseField name="data.createdAt" type="string">
+Timestamp when the agent was created.
+</ResponseField>
+
+## Error Handling
+
+| Status | Description |
+|---------|-------------|
+|401|Unauthorized or invalid Bearer token|
+|403|You do not have permission to access WhatsApp Agents|
+|500|Internal server error|
+
+<Note>
+
+This endpoint returns all WhatsApp Agents created within your authenticated workspace.
+
+</Note>
+
+<Check>
+
+Use the returned **Agent ID** with:
+
+- `GET /api/whatsapp/get-whatsapp-agent/{agentId}` to retrieve a specific agent.
+- `PUT /api/whatsapp/update-whatsapp-agent/{agentId}` to update an agent.
+- `DELETE /api/whatsapp/delete-whatsapp-agent/{agentId}` to remove an agent.
+
+</Check>

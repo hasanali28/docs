@@ -1,0 +1,225 @@
+---
+title: "Update Holiday List"
+openapi: "PUT /api/holiday-lists/{id}"
+description: "Update an existing Holiday List, including its name, description, or list of holidays."
+---
+
+Use this endpoint to update an existing Holiday List. You can modify the Holiday List's name, description, or update the holidays it contains.
+
+<Note>
+Only authenticated users can update Holiday Lists that belong to their workspace.
+</Note>
+
+### OpenAPI
+
+```yaml
+openapi: 3.1.0
+info:
+  title: Update Holiday List
+  version: 1.0.0
+
+paths:
+  /api/holiday-lists/{id}:
+    put:
+      summary: Update a Holiday List
+      description: Updates an existing Holiday List.
+      tags:
+        - Holiday Lists
+
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: Unique identifier of the Holiday List.
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: India Public Holidays
+                description:
+                  type: string
+                  example: Updated list of public holidays.
+                holidays:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                        example: Republic Day
+                      date:
+                        type: string
+                        format: date
+                        example: "2026-01-26"
+
+      responses:
+        "200":
+          description: Holiday List updated successfully.
+
+        "400":
+          description: Invalid request.
+
+        "401":
+          description: Unauthorized.
+
+        "404":
+          description: Holiday List not found.
+
+        "500":
+          description: Internal Server Error.
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+```
+
+## Authorizations
+
+<ParamField header="Authorization" type="string" required>
+Bearer Token for the authenticated user.
+
+Format:
+
+`Authorization: Bearer YOUR_ACCESS_TOKEN`
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="id" type="string" required>
+The unique identifier of the Holiday List to update.
+</ParamField>
+
+## Body Parameters
+
+<ParamField body="name" type="string">
+Updated name of the Holiday List.
+</ParamField>
+
+<ParamField body="description" type="string">
+Updated description for the Holiday List.
+</ParamField>
+
+<ParamField body="holidays" type="array">
+Updated array of holidays to include in the Holiday List.
+</ParamField>
+
+## Example Request
+
+```bash
+curl --location --request PUT '{{baseUrl}}/api/holiday-lists/6863f5ab1e4d7f0012345678' \
+--header 'Authorization: Bearer YOUR_ACCESS_TOKEN' \
+--header 'Content-Type: application/json' \
+--data '{
+  "name": "India Public Holidays 2026",
+  "description": "Updated public holiday schedule.",
+  "holidays": [
+    {
+      "name": "Republic Day",
+      "date": "2026-01-26"
+    },
+    {
+      "name": "Independence Day",
+      "date": "2026-08-15"
+    },
+    {
+      "name": "Gandhi Jayanti",
+      "date": "2026-10-02"
+    }
+  ]
+}'
+```
+
+## Successful Response
+
+```json
+{
+  "success": true,
+  "message": "Holiday List updated successfully.",
+  "data": {
+    "_id": "6863f5ab1e4d7f0012345678",
+    "name": "India Public Holidays 2026",
+    "description": "Updated public holiday schedule.",
+    "enabled": true,
+    "holidayCount": 3,
+    "updatedAt": "2026-07-21T14:30:22.000Z"
+  }
+}
+```
+
+## Response Fields
+
+<ResponseField name="_id" type="string">
+Unique identifier of the Holiday List.
+</ResponseField>
+
+<ResponseField name="name" type="string">
+Updated Holiday List name.
+</ResponseField>
+
+<ResponseField name="description" type="string">
+Updated description of the Holiday List.
+</ResponseField>
+
+<ResponseField name="enabled" type="boolean">
+Whether the Holiday List is currently enabled.
+</ResponseField>
+
+<ResponseField name="holidayCount" type="integer">
+Total number of holidays in the Holiday List.
+</ResponseField>
+
+<ResponseField name="updatedAt" type="string">
+Timestamp indicating when the Holiday List was last updated.
+</ResponseField>
+
+## Error Responses
+
+### Bad Request (400)
+
+```json
+{
+  "success": false,
+  "message": "Invalid request payload."
+}
+```
+
+### Unauthorized (401)
+
+```json
+{
+  "success": false,
+  "message": "Unauthorized"
+}
+```
+
+### Not Found (404)
+
+```json
+{
+  "success": false,
+  "message": "Holiday List not found."
+}
+```
+
+### Internal Server Error (500)
+
+```json
+{
+  "success": false,
+  "message": "Failed to update Holiday List."
+}
+```

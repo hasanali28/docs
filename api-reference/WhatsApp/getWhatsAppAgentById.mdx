@@ -1,0 +1,147 @@
+---
+title: "Get WhatsApp Agent By ID"
+description: "Retrieve the complete configuration and details of a specific WhatsApp AI Agent."
+openapi: "GET /api/whatsapp/get-whatsapp-agent/{agentId}"
+---
+
+## Overview
+
+Retrieve the complete details of a WhatsApp AI Agent using its unique Agent ID. This endpoint returns the agent configuration, including prompts, assigned WhatsApp number, knowledge bases, AI model settings, and conversation configuration.
+
+## Prerequisites
+
+- Bearer Token authentication
+- Valid WhatsApp Agent ID
+
+## Request
+
+<ParamField header="Authorization" type="string" required>
+Bearer token for authenticated workspace access.
+</ParamField>
+
+<ParamField path="agentId" type="string" required>
+Unique identifier of the WhatsApp AI Agent.
+</ParamField>
+
+<RequestExample>
+
+```bash cURL
+curl --location '{{baseUrl}}/api/whatsapp/get-whatsapp-agent/6894a98a7fcde123456789ab' \
+--header 'Authorization: Bearer {{authToken}}'
+```
+
+</RequestExample>
+
+## Response
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "status": true,
+  "code": 200,
+  "message": "WhatsApp Agent fetched successfully",
+  "data": {
+    "_id": "6894a98a7fcde123456789ab",
+    "agentName": "Support Assistant",
+    "phoneNumberId": "123456789012345",
+    "systemPrompt": "You are a helpful customer support assistant.",
+    "welcomeMessage": "Hello! How can I help you today?",
+    "knowledgeBase": [
+      "6892fd48bde23a1234567890"
+    ],
+    "model": "gpt-4.1",
+    "temperature": 0.7,
+    "status": "active",
+    "createdAt": "2026-07-21T13:45:18.000Z",
+    "updatedAt": "2026-07-21T14:12:30.000Z"
+  }
+}
+```
+
+</ResponseExample>
+
+<ResponseField name="status" type="boolean">
+Indicates whether the request completed successfully.
+</ResponseField>
+
+<ResponseField name="code" type="integer">
+HTTP status code returned by the API.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+Human-readable success message.
+</ResponseField>
+
+<ResponseField name="data" type="object">
+Complete configuration of the WhatsApp AI Agent.
+</ResponseField>
+
+<ResponseField name="data._id" type="string">
+Unique identifier of the WhatsApp Agent.
+</ResponseField>
+
+<ResponseField name="data.agentName" type="string">
+Display name of the WhatsApp Agent.
+</ResponseField>
+
+<ResponseField name="data.phoneNumberId" type="string">
+WhatsApp Business Phone Number assigned to the agent.
+</ResponseField>
+
+<ResponseField name="data.systemPrompt" type="string">
+Primary instruction prompt that defines the AI agent's behavior.
+</ResponseField>
+
+<ResponseField name="data.welcomeMessage" type="string">
+Message automatically sent when a new WhatsApp conversation begins.
+</ResponseField>
+
+<ResponseField name="data.knowledgeBase" type="array[string]">
+Knowledge Base IDs associated with the WhatsApp Agent.
+</ResponseField>
+
+<ResponseField name="data.model" type="string">
+AI model used to generate responses.
+</ResponseField>
+
+<ResponseField name="data.temperature" type="number">
+Controls the creativity of AI-generated responses.
+</ResponseField>
+
+<ResponseField name="data.status" type="string">
+Current status of the WhatsApp Agent.
+</ResponseField>
+
+<ResponseField name="data.createdAt" type="string">
+Timestamp when the agent was created.
+</ResponseField>
+
+<ResponseField name="data.updatedAt" type="string">
+Timestamp when the agent was last updated.
+</ResponseField>
+
+## Error Handling
+
+| Status | Description |
+|---------|-------------|
+|400|Invalid Agent ID format|
+|401|Unauthorized or invalid Bearer token|
+|403|You do not have permission to access this WhatsApp Agent|
+|404|WhatsApp Agent not found|
+|500|Internal server error|
+
+<Note>
+
+This endpoint returns the complete configuration of a WhatsApp Agent, making it useful for editing, auditing, or displaying agent settings.
+
+</Note>
+
+<Check>
+
+You can use the returned **Agent ID** with:
+
+- `PUT /api/whatsapp/update-whatsapp-agent/{agentId}` to update the agent.
+- `DELETE /api/whatsapp/delete-whatsapp-agent/{agentId}` to permanently remove the agent.
+
+</Check>

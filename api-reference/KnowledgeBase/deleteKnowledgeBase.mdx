@@ -1,0 +1,98 @@
+---
+title: "Delete Knowledge Base"
+description: "Permanently delete a Knowledge Base and all of its associated documents."
+openapi: "DELETE /api/knowledgeBase/{knowledgeBaseId}"
+---
+
+## Overview
+
+Delete an existing Knowledge Base along with all of its associated documents. Once deleted, the Knowledge Base can no longer be attached to AI agents, and its documents will no longer be available for retrieval.
+
+> **Warning:** This action is permanent and cannot be undone.
+
+## Prerequisites
+
+- Bearer token for an authenticated workspace
+- Valid Knowledge Base ID
+
+## Request
+
+<ParamField header="Authorization" type="string" required>
+Bearer token for authenticated workspace access.
+</ParamField>
+
+<ParamField path="knowledgeBaseId" type="string" required>
+Unique identifier of the Knowledge Base to delete.
+</ParamField>
+
+<RequestExample>
+
+```bash cURL
+curl --location --request DELETE '{{baseUrl}}/api/knowledgeBase/687b1c2ab7c7d3f123456789' \
+  --header 'Authorization: Bearer {{authToken}}'
+```
+
+</RequestExample>
+
+## Response
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "status": true,
+  "code": 200,
+  "message": "Knowledge Base deleted successfully"
+}
+```
+
+</ResponseExample>
+
+## Response Fields
+
+<ResponseField name="status" type="boolean">
+Indicates whether the request completed successfully.
+</ResponseField>
+
+<ResponseField name="code" type="integer">
+HTTP status code returned by the API.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+Confirmation that the Knowledge Base has been permanently deleted.
+</ResponseField>
+
+## Error Handling
+
+| Status Code | Description |
+|-------------|-------------|
+| **400** | Invalid Knowledge Base ID |
+| **401** | Unauthorized |
+| **403** | You do not have permission to delete this Knowledge Base |
+| **404** | Knowledge Base not found |
+| **500** | Internal Server Error |
+
+<Warning>
+
+Deleting a Knowledge Base permanently removes:
+
+- The Knowledge Base itself.
+- All uploaded documents.
+- Any embeddings or indexed data created from those documents.
+- Any future AI agent access to the deleted Knowledge Base.
+
+This action cannot be reversed.
+
+</Warning>
+
+<Check>
+
+Related endpoints:
+
+- `GET /api/knowledgeBase` — List all Knowledge Bases.
+- `GET /api/knowledgeBase/{knowledgeBaseId}` — Retrieve Knowledge Base details.
+- `GET /api/knowledgeBase/{knowledgeBaseId}/documents` — View all documents.
+- `PUT /api/knowledgeBase/{knowledgeBaseId}` — Update the Knowledge Base.
+- `POST /api/knowledgeBase/createKnowledgeBase` — Create a new Knowledge Base.
+
+</Check>

@@ -1,0 +1,144 @@
+---
+title: "Update Agent"
+description: "Update the configuration of an existing AI agent."
+openapi: "PATCH /api/agents/{id}"
+---
+
+## Overview
+
+Update an existing AI agent by providing its unique Agent ID. You can modify the agent's name, prompts, and other configurable settings without creating a new agent.
+
+## Prerequisites
+
+- Bearer token for an authenticated workspace
+- Valid Agent ID
+
+<Tip>
+
+You can retrieve the **Agent ID** using the **Get Agents** endpoint or from the Weya AI Dashboard.
+
+</Tip>
+
+## Path Parameters
+
+<ParamField path="id" type="string" required>
+Unique identifier of the AI agent to update.
+</ParamField>
+
+## Request
+
+<ParamField header="Authorization" type="string" required>
+Bearer token for authenticated workspace access.
+</ParamField>
+
+<RequestExample>
+
+```bash cURL
+curl --location --request PATCH '{{baseUrl}}/api/agents/687b1c2ab7c7d3f123456789' \
+--header 'Authorization: Bearer {{authToken}}' \
+--header 'Content-Type: application/json' \
+--data '{
+  "agent_name": "Updated Sales Agent",
+  "systemMessage": "You are an AI sales assistant that answers customer questions professionally.",
+  "startMessage": "Hello! Welcome to Weya AI. How can I assist you today?"
+}'
+```
+
+</RequestExample>
+
+## Response
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "status": true,
+  "code": 200,
+  "message": "Agent updated successfully",
+  "data": {
+    "_id": "687b1c2ab7c7d3f123456789",
+    "agent_name": "Updated Sales Agent",
+    "systemMessage": "You are an AI sales assistant that answers customer questions professionally.",
+    "startMessage": "Hello! Welcome to Weya AI. How can I assist you today?"
+  }
+}
+```
+
+</ResponseExample>
+
+<ResponseField name="status" type="boolean" required>
+Indicates whether the request completed successfully.
+</ResponseField>
+
+<ResponseField name="code" type="integer" required>
+HTTP status code returned by the API.
+</ResponseField>
+
+<ResponseField name="message" type="string" required>
+Success message returned by the API.
+</ResponseField>
+
+<ResponseField name="data" type="object" required>
+Updated AI agent details.
+</ResponseField>
+
+<ResponseField name="data._id" type="string">
+Unique identifier of the AI agent.
+</ResponseField>
+
+<ResponseField name="data.agent_name" type="string">
+Updated display name of the AI agent.
+</ResponseField>
+
+<ResponseField name="data.systemMessage" type="string">
+Updated system prompt that defines the agent's behavior.
+</ResponseField>
+
+<ResponseField name="data.startMessage" type="string">
+Updated greeting message spoken when the conversation begins.
+</ResponseField>
+
+## Editable Fields
+
+The following fields can be updated:
+
+| Field | Description |
+|--------|-------------|
+| `agent_name` | Display name of the AI agent |
+| `systemMessage` | Main instruction prompt |
+| `startMessage` | First message spoken by the AI |
+
+## Response Codes
+
+| Code | Description |
+|------|-------------|
+| 200 | Agent updated successfully |
+| 400 | Invalid request or Agent ID |
+| 401 | Unauthorized |
+| 403 | Forbidden |
+| 404 | Agent not found |
+| 500 | Internal Server Error |
+
+## Error Handling
+
+- **400 Bad Request** – Invalid request body or Agent ID.
+- **401 Unauthorized** – Missing or invalid Bearer token.
+- **403 Forbidden** – You do not have permission to update this agent.
+- **404 Not Found** – Agent does not exist.
+- **500 Internal Server Error** – Unexpected server error.
+
+<Note>
+
+Only the fields included in the request body will be updated. Fields that are omitted will retain their existing values.
+
+</Note>
+
+<Check>
+
+After updating an agent, you can:
+
+- Retrieve the updated configuration using **GET /api/agents/{id}**
+- Assign the updated agent to campaigns
+- Continue editing the agent from the Weya AI Dashboard
+
+</Check>

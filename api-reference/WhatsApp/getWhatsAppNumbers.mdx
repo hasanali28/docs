@@ -1,0 +1,131 @@
+---
+title: "Get WhatsApp Numbers"
+description: "Retrieve all WhatsApp Business numbers connected to your Weya AI workspace."
+openapi: "GET /api/whatsapp/whatsapp-number"
+---
+
+## Overview
+
+Retrieve all WhatsApp Business phone numbers that have been integrated into your workspace. This endpoint returns the list of connected numbers along with their current status and associated configuration.
+
+## Prerequisites
+
+- Bearer Token authentication
+
+## Request
+
+<ParamField header="Authorization" type="string" required>
+Bearer token for authenticated workspace access.
+</ParamField>
+
+<RequestExample>
+
+```bash cURL
+curl --location '{{baseUrl}}/api/whatsapp/whatsapp-number' \
+--header 'Authorization: Bearer {{authToken}}'
+```
+
+</RequestExample>
+
+## Response
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "status": true,
+  "code": 200,
+  "message": "WhatsApp numbers fetched successfully",
+  "data": [
+    {
+      "_id": "68920d9c56c1a123456789ab",
+      "phoneNumberId": "123456789012345",
+      "phoneNumber": "+15551234567",
+      "displayName": "Weya Support",
+      "status": "connected",
+      "agentId": "68920ea456c1a123456789cd",
+      "createdAt": "2026-07-21T09:15:30.000Z"
+    },
+    {
+      "_id": "68920f5d56c1a123456789ef",
+      "phoneNumberId": "987654321098765",
+      "phoneNumber": "+15557654321",
+      "displayName": "Sales Team",
+      "status": "connected",
+      "agentId": null,
+      "createdAt": "2026-07-21T09:40:18.000Z"
+    }
+  ]
+}
+```
+
+</ResponseExample>
+
+<ResponseField name="status" type="boolean">
+Indicates whether the request completed successfully.
+</ResponseField>
+
+<ResponseField name="code" type="integer">
+HTTP status code returned by the API.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+Human-readable success message.
+</ResponseField>
+
+<ResponseField name="data" type="array">
+List of WhatsApp Business numbers connected to the workspace.
+</ResponseField>
+
+<ResponseField name="data._id" type="string">
+Unique identifier of the integration.
+</ResponseField>
+
+<ResponseField name="data.phoneNumberId" type="string">
+WhatsApp Business Phone Number ID.
+</ResponseField>
+
+<ResponseField name="data.phoneNumber" type="string">
+Connected WhatsApp Business phone number.
+</ResponseField>
+
+<ResponseField name="data.displayName" type="string">
+Display name configured in the WhatsApp Business account.
+</ResponseField>
+
+<ResponseField name="data.status" type="string">
+Current integration status.
+</ResponseField>
+
+<ResponseField name="data.agentId" type="string">
+ID of the WhatsApp Agent currently assigned to this number, if any.
+</ResponseField>
+
+<ResponseField name="data.createdAt" type="string">
+Timestamp when the integration was created.
+</ResponseField>
+
+## Error Handling
+
+| Status | Description |
+|---------|-------------|
+|401|Unauthorized or invalid Bearer token|
+|404|No WhatsApp numbers found|
+|500|Internal server error|
+
+<Note>
+
+This endpoint only returns WhatsApp numbers that belong to the authenticated workspace.
+
+</Note>
+
+<Check>
+
+Use the returned **phoneNumberId** to:
+
+- Assign a WhatsApp Agent to the number.
+- Update the integration.
+- Remove the integration.
+- Retrieve available message templates for that number.
+
+</Check>

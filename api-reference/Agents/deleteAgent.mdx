@@ -1,0 +1,114 @@
+---
+title: "Delete Agent"
+description: "Permanently delete an AI agent from your workspace."
+openapi: "DELETE /api/agents/{id}"
+---
+
+## Overview
+
+Delete an existing AI agent using its unique Agent ID. Once deleted, the agent can no longer be assigned to campaigns or receive calls.
+
+<Warning>
+
+Deleting an AI agent is permanent and cannot be undone.
+
+</Warning>
+
+## Prerequisites
+
+- Bearer token for an authenticated workspace
+- Valid Agent ID
+
+<Tip>
+
+Use the **Get Agents** endpoint to retrieve the Agent ID before deleting an agent.
+
+</Tip>
+
+## Path Parameters
+
+<ParamField path="id" type="string" required>
+Unique identifier of the AI agent to delete.
+</ParamField>
+
+## Request
+
+<ParamField header="Authorization" type="string" required>
+Bearer token for authenticated workspace access.
+</ParamField>
+
+<RequestExample>
+
+```bash cURL
+curl --location --request DELETE '{{baseUrl}}/api/agents/687b1c2ab7c7d3f123456789' \
+--header 'Authorization: Bearer {{authToken}}'
+```
+
+</RequestExample>
+
+## Response
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "status": true,
+  "code": 200,
+  "message": "Agent deleted successfully"
+}
+```
+
+</ResponseExample>
+
+<ResponseField name="status" type="boolean" required>
+Indicates whether the request completed successfully.
+</ResponseField>
+
+<ResponseField name="code" type="integer" required>
+HTTP status code returned by the API.
+</ResponseField>
+
+<ResponseField name="message" type="string" required>
+Confirmation that the AI agent has been deleted.
+</ResponseField>
+
+## Response Codes
+
+| Code | Description |
+|------|-------------|
+| 200 | Agent deleted successfully |
+| 400 | Invalid Agent ID |
+| 401 | Unauthorized |
+| 403 | Forbidden |
+| 404 | Agent not found |
+| 500 | Internal Server Error |
+
+## Error Handling
+
+- **400 Bad Request** – Invalid Agent ID format.
+- **401 Unauthorized** – Missing or invalid Bearer token.
+- **403 Forbidden** – You do not have permission to delete this agent.
+- **404 Not Found** – No AI agent exists with the provided ID.
+- **500 Internal Server Error** – Unexpected server error.
+
+## Common Use Cases
+
+- Remove agents that are no longer in use.
+- Clean up test or development agents.
+- Delete agents before recreating them with a new configuration.
+
+<Note>
+
+Deleting an AI agent does not automatically delete associated Knowledge Bases, phone numbers, or campaign history.
+
+</Note>
+
+<Check>
+
+Before deleting an agent, consider:
+
+- Exporting any required configuration.
+- Removing the agent from active campaigns.
+- Ensuring the agent is no longer assigned to production workflows.
+
+</Check>

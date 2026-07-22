@@ -1,0 +1,125 @@
+---
+title: "Get Available Voices"
+description: "Retrieve the list of voices supported for Video Agents based on the selected mode."
+openapi: "GET /api/video-agent/voices"
+---
+
+## Overview
+
+Retrieve all available voices that can be used when creating or updating a Video Agent. The response may vary depending on the selected video generation mode, allowing your application to display only compatible voices.
+
+## Prerequisites
+
+- Bearer Token authentication
+
+## Request
+
+<ParamField header="Authorization" type="string" required>
+Bearer token for authenticated workspace access.
+</ParamField>
+
+<ParamField query="mode" type="string">
+(Optional) Video generation mode used to filter compatible voices.
+</ParamField>
+
+<RequestExample>
+
+```bash cURL
+curl --location '{{baseUrl}}/api/video-agent/voices?mode=avatar' \
+--header 'Authorization: Bearer {{authToken}}'
+```
+
+</RequestExample>
+
+## Response
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "status": true,
+  "code": 200,
+  "message": "Voices fetched successfully",
+  "data": [
+    {
+      "id": "en-US-Standard-A",
+      "name": "English Female",
+      "language": "English",
+      "gender": "Female",
+      "provider": "Google"
+    },
+    {
+      "id": "en-US-Standard-B",
+      "name": "English Male",
+      "language": "English",
+      "gender": "Male",
+      "provider": "Google"
+    },
+    {
+      "id": "hi-IN-Standard-A",
+      "name": "Hindi Female",
+      "language": "Hindi",
+      "gender": "Female",
+      "provider": "Google"
+    }
+  ]
+}
+```
+
+</ResponseExample>
+
+<ResponseField name="status" type="boolean">
+Indicates whether the request completed successfully.
+</ResponseField>
+
+<ResponseField name="code" type="integer">
+HTTP status code returned by the API.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+Success message returned by the API.
+</ResponseField>
+
+<ResponseField name="data" type="array">
+Collection of voices available for the selected video mode.
+</ResponseField>
+
+<ResponseField name="data.id" type="string">
+Unique identifier of the voice.
+</ResponseField>
+
+<ResponseField name="data.name" type="string">
+Display name of the voice.
+</ResponseField>
+
+<ResponseField name="data.language" type="string">
+Language supported by the voice.
+</ResponseField>
+
+<ResponseField name="data.gender" type="string">
+Gender of the voice.
+</ResponseField>
+
+<ResponseField name="data.provider" type="string">
+Voice provider used by the platform.
+</ResponseField>
+
+## Error Handling
+
+| Status | Description |
+|---------|-------------|
+|400|Invalid mode specified|
+|401|Unauthorized or invalid Bearer token|
+|500|Internal server error|
+
+<Note>
+
+The available voices may differ depending on the selected video generation mode and the configured speech provider.
+
+</Note>
+
+<Check>
+
+Use the returned **Voice ID** when creating or updating a Video Agent.
+
+</Check>

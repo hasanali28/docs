@@ -1,64 +1,136 @@
 ---
-title: "Create your first campaign in 5 mins."
-description: "Build your first AI campaign or phone agent in 5 minutes with Weya"
+title: "Create Your First Campaign in 5 Minutes"
+description: "Build your first AI-powered Phone, Voice Blaster, Video, or WhatsApp agent campaign in 5 minutes with Weya"
 ---
 
 ## Overview
 
-Weya is a platform for building, testing, deploying, and monitoring AI-driven campaigns and phone agents.
+Weya is the all-in-one platform for building, testing, deploying, and monitoring AI-driven campaigns and agents — across **Phone, Video, and WhatsApp** — from a single dashboard.
+
+Unlike single-channel tools, Weya lets you launch a voice agent (including high-volume Voice Blasters), a video agent, and a WhatsApp conversational agent from the same workspace, using the same prompt logic and the same analytics.
 
 This guide will walk you through:
-1. Creating your account  
-2. Building your first phone agent  
-3. Connecting a phone number  
-4. Launching your first campaign  
+
+1. Creating your account
+2. Choosing your Agent Type (Phone, Voice Blaster, Video, or WhatsApp)
+3. Building your agent
+4. Connecting your channel (phone number, WhatsApp Business number, or generating a video link)
+5. Launching your first campaign
+6. Monitoring live performance
 
 ---
 
 ## Steps
 
 ### Step 1: Create Your Account
-1. Visit the **weya Dashboard**.  
-2. Sign up for a new account.  
+
+1. Visit the **Weya Dashboard**.
+2. Sign up for a new account.
+3. Verify your email and complete your workspace setup.
 
 ---
 
-### Step 2: Create New Agent
+### Step 2: Choose Your Agent Type
 
-1. Navigate to the **Agents** tab.  
-2. Click Create an Agent and select **Create Phone Agent**.  
-3. Choose Agent Category **Single-Prompt Agent**.  
-4. Select Call Type **Outbound**.  
-5. Click Choose Template and then continue.  
-6. Update the **Prompt** and **System Message**.  
-7. Click **Save**.  
+Weya supports four agent types out of the box — pick the one that fits your use case, or build several for an omnichannel campaign.
 
----
+| Agent Type | Best For |
+|---|---|
+| **Phone Agent** | 1:1 outbound/inbound voice calls, IVR replacement, sales & support calls |
+| **Voice Blaster** | High-volume outbound voice broadcasts — **Static** (fixed pre-recorded/scripted message) or **Dynamic** (AI-generated, personalized per contact) |
+| **Video Agent** | Face-to-face conversations — currently **Inbound only** |
+| **WhatsApp Agent** | Conversational messaging, reminders, order updates, support chat |
 
-### Step 3: Connect Phone Number
-
-1. Go to the **Phone Numbers** tab.  
-2. Click **Add Number** → select **Add Phone Number**.  
-3. Choose your **service provider**, enter credentials, and click **Save**.  
-4. Click **Assign Outbound Agent**.  
-5. Select the **agent** you created.  
-6. Click **Connect Agent**.  
+1. Navigate to the **Agents** tab.
+2. Click **Create an Agent**.
+3. Select your **Agent Type**: `Phone Agent`, `Voice Blaster`, `Video Agent`, or `WhatsApp Agent`.
 
 ---
 
-### Step 4: Create Campaign
-1. Navigate to the **Campaigns** tab.  
-2. Click **Create Batch** → select **Add Phone Number**.  
-3. Enter all required details.  
-4. Click **Create Campaign**.  
+### Step 3: Build Your Agent
+
+#### Option A — Phone Agent
+1. Choose Agent Category: **Single-Prompt Agent** (or **Multi-Prompt Agent** for complex flows).
+2. Select Call Type: **Outbound** or **Inbound**.
+3. Click **Choose Template** and continue.
+4. Update the **Prompt** and **System Message**.
+5. Set voice, language, and interruption sensitivity.
+6. Click **Save**.
+
+#### Option B — Voice Blaster
+Created from the **Agents** tab just like every other agent type.
+1. Select Blaster Type:
+   - **Static** — upload or record a fixed message that plays the same way for every contact.
+   - **Dynamic** — write a **Prompt** and **System Message** so the AI generates a personalized version of the message per contact (e.g. inserting name, order details, due dates).
+2. Set voice, language, and (for Dynamic) response handling for callee interruptions.
+3. Click **Save**.
+
+#### Option C — Video Agent
+1. Choose an **Avatar** (or upload a custom one) and select a voice to match.
+2. Session Type is currently **Inbound only** — contacts join a video link to reach the agent.
+3. Click **Choose Template** and continue.
+4. Update the **Prompt** and **System Message** — this drives what the avatar says and how it responds on screen.
+5. Click **Save**.
+
+#### Option D — WhatsApp Agent
+1. Choose Agent Category: **Single-Prompt Agent** or **Flow-Based Agent**.
+2. Select Conversation Type: **Outbound Broadcast** or **Inbound Support**.
+3. Click **Choose Template** and continue.
+4. Update the **Prompt**, **System Message**, and any **Quick Reply buttons/menus**.
+5. Click **Save**.
 
 ---
 
-### Congratulations!
+### Step 4: Connect Your Channel
 
-Your agent is now live and can:  
-- Make outbound calls  
-- Handle natural conversations automatically  
-- Process requests 24/7  
+#### Phone Number (Phone Agent & Voice Blaster)
+Voice Blaster uses the exact same phone connection flow as Phone Agent — no separate setup.
+1. Go to the **Phone Numbers** tab.
+2. Click **Add Number** → select **Add Phone Number**.
+3. Choose your **service provider**, enter credentials, and click **Save**.
+4. Click **Assign Outbound Agent** → select your **Phone Agent** or **Voice Blaster** → **Connect Agent**.
+
+#### Video Agent
+No separate connection step needed — your **Video Link** is generated automatically when you create the campaign in Step 5.
+
+#### WhatsApp Business Number
+1. Go to the **WhatsApp** tab.
+2. Click **Add Number** → connect via **WhatsApp Business API** (Meta-verified).
+3. Enter your **Business ID** and credentials, then click **Save**.
+4. Click **Assign WhatsApp Agent** → select your agent → **Connect Agent**.
 
 ---
+
+### Step 5: Create Campaign
+
+1. Navigate to the **Campaigns** tab.
+2. Click **Create Campaign** → choose the channel: **Phone**, **Voice Blaster**, **Video**, or **WhatsApp** (or select **Omnichannel** to combine them). Voice Blaster campaigns follow the exact same setup flow as Phone Agent campaigns.
+3. **For Video campaigns:** your unique **Video Link** is generated automatically at this step — copy or share it directly with contacts (no separate setup required).
+4. Click **Add Contacts** → upload your list or connect a CRM.
+5. Enter all required details (schedule, throttling, retry rules).
+6. Click **Create Campaign**.
+
+---
+
+### Step 6: Monitor & Optimize
+
+1. Go to the **Analytics** tab to track calls, video sessions, and WhatsApp conversations in real time.
+2. Review transcripts, sentiment, and outcome tags per interaction.
+3. A/B test prompts across channels without leaving the dashboard.
+
+---
+
+## Congratulations!
+
+Your Weya agents are now live and can:
+
+- Make outbound calls **and** blast high-volume voice campaigns **and** host video conversations **and** run WhatsApp chats — all from one platform
+- Handle natural, multimodal conversations automatically
+- Process requests 24/7 across every channel your customers actually use
+- Give you unified analytics instead of juggling multiple disconnected tools
+
+---
+
+### Why Weya over single-channel platforms
+
+Most competitors stop at phone agents. Weya gives you Phone, Voice Blaster, Video, and WhatsApp agents in one workspace, one prompt library, and one analytics view — so you can meet customers wherever they are without duct-taping separate tools together.

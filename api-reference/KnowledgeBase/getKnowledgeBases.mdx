@@ -1,0 +1,124 @@
+---
+title: "Get Knowledge Bases"
+description: "Retrieve all Knowledge Bases available in your workspace."
+openapi: "GET /api/knowledgeBase"
+---
+
+## Overview
+
+Retrieve a paginated list of all Knowledge Bases available in your workspace. This endpoint supports pagination and search, making it easy to browse or locate specific Knowledge Bases.
+
+## Prerequisites
+
+- Bearer token for an authenticated workspace.
+
+## Request
+
+<ParamField header="Authorization" type="string" required>
+Bearer token for authenticated workspace access.
+</ParamField>
+
+<ParamField query="page" type="integer">
+Page number to retrieve. Defaults to the first page if omitted.
+</ParamField>
+
+<ParamField query="limit" type="integer">
+Maximum number of Knowledge Bases returned per request.
+</ParamField>
+
+<ParamField query="search" type="string">
+Search Knowledge Bases by name.
+</ParamField>
+
+<RequestExample>
+
+```bash cURL
+curl --location '{{baseUrl}}/api/knowledgeBase?page=1&limit=10&search=sales' \
+--header 'Authorization: Bearer {{authToken}}'
+```
+
+</RequestExample>
+
+## Response
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "status": true,
+  "code": 200,
+  "message": "Knowledge Bases fetched successfully",
+  "data": [
+    {
+      "_id": "687b1c2ab7c7d3f123456789",
+      "knowledgeBaseName": "Sales Knowledge Base",
+      "description": "Contains sales documents and FAQs."
+    },
+    {
+      "_id": "687b1c2ab7c7d3f987654321",
+      "knowledgeBaseName": "Support Knowledge Base",
+      "description": "Customer support documentation."
+    }
+  ]
+}
+```
+
+</ResponseExample>
+
+<ResponseField name="status" type="boolean" required>
+Indicates whether the request completed successfully.
+</ResponseField>
+
+<ResponseField name="code" type="integer" required>
+HTTP status code returned by the API.
+</ResponseField>
+
+<ResponseField name="message" type="string" required>
+Human-readable success message.
+</ResponseField>
+
+<ResponseField name="data" type="array" required>
+Array containing the Knowledge Bases available in the workspace.
+</ResponseField>
+
+<ResponseField name="data._id" type="string">
+Unique identifier of the Knowledge Base.
+</ResponseField>
+
+<ResponseField name="data.knowledgeBaseName" type="string">
+Display name of the Knowledge Base.
+</ResponseField>
+
+<ResponseField name="data.description" type="string">
+Description associated with the Knowledge Base.
+</ResponseField>
+
+## Response Codes
+
+| Code | Description |
+|------|-------------|
+| 200 | Knowledge Bases fetched successfully |
+| 401 | Unauthorized |
+| 500 | Internal Server Error |
+
+## Error Handling
+
+- **401 Unauthorized** – Missing or invalid Bearer token.
+- **500 Internal Server Error** – Unexpected server error while retrieving Knowledge Bases.
+
+<Note>
+
+Use the **search** parameter to quickly locate a specific Knowledge Base by its name.
+
+</Note>
+
+<Check>
+
+The returned **Knowledge Base ID** can be used with:
+
+- `GET /api/knowledgeBase/{knowledgeBaseId}`
+- `PUT /api/knowledgeBase/{knowledgeBaseId}`
+- `DELETE /api/knowledgeBase/{knowledgeBaseId}`
+- `GET /api/knowledgeBase/{knowledgeBaseId}/documents`
+
+</Check>

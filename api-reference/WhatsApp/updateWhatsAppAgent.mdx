@@ -1,0 +1,152 @@
+---
+title: "Update WhatsApp Agent"
+description: "Update the configuration and settings of an existing WhatsApp AI Agent."
+openapi: "PUT /api/whatsapp/update-whatsapp-agent/{agentId}"
+---
+
+## Overview
+
+Update an existing WhatsApp AI Agent by modifying its configuration, prompts, AI model, knowledge bases, assigned WhatsApp number, or other settings. Only the fields you provide will be updated.
+
+## Prerequisites
+
+- Bearer Token authentication
+- Valid WhatsApp Agent ID
+
+## Request
+
+<ParamField header="Authorization" type="string" required>
+Bearer token for authenticated workspace access.
+</ParamField>
+
+<ParamField path="agentId" type="string" required>
+Unique identifier of the WhatsApp AI Agent to update.
+</ParamField>
+
+<RequestExample>
+
+```bash cURL
+curl --location --request PUT '{{baseUrl}}/api/whatsapp/update-whatsapp-agent/6894a98a7fcde123456789ab' \
+--header 'Authorization: Bearer {{authToken}}' \
+--header 'Content-Type: application/json' \
+--data '{
+  "agentName": "Premium Support Assistant",
+  "systemPrompt": "You are an expert customer support assistant.",
+  "welcomeMessage": "Hello! Welcome to Weya AI Support.",
+  "model": "gpt-4.1",
+  "temperature": 0.5,
+  "knowledgeBase": [
+    "6892fd48bde23a1234567890",
+    "6892fd48bde23a1234567891"
+  ]
+}'
+```
+
+</RequestExample>
+
+## Request Body
+
+<ParamField body="agentName" type="string">
+Updated display name of the WhatsApp Agent.
+</ParamField>
+
+<ParamField body="phoneNumberId" type="string">
+Assign the agent to a different WhatsApp Business number.
+</ParamField>
+
+<ParamField body="systemPrompt" type="string">
+Updated system prompt that controls the agent's behavior.
+</ParamField>
+
+<ParamField body="welcomeMessage" type="string">
+Updated greeting message shown to users.
+</ParamField>
+
+<ParamField body="knowledgeBase" type="array[string]">
+Updated list of Knowledge Base IDs available to the agent.
+</ParamField>
+
+<ParamField body="model" type="string">
+Updated AI model used by the agent.
+</ParamField>
+
+<ParamField body="temperature" type="number">
+Updated response creativity value.
+</ParamField>
+
+## Response
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "status": true,
+  "code": 200,
+  "message": "WhatsApp Agent updated successfully",
+  "data": {
+    "_id": "6894a98a7fcde123456789ab",
+    "agentName": "Premium Support Assistant",
+    "status": "active",
+    "updatedAt": "2026-07-21T16:15:42.000Z"
+  }
+}
+```
+
+</ResponseExample>
+
+<ResponseField name="status" type="boolean">
+Indicates whether the request completed successfully.
+</ResponseField>
+
+<ResponseField name="code" type="integer">
+HTTP status code returned by the API.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+Confirmation message indicating the agent was updated successfully.
+</ResponseField>
+
+<ResponseField name="data" type="object">
+Updated WhatsApp Agent information.
+</ResponseField>
+
+<ResponseField name="data._id" type="string">
+Unique identifier of the WhatsApp Agent.
+</ResponseField>
+
+<ResponseField name="data.agentName" type="string">
+Updated name of the WhatsApp Agent.
+</ResponseField>
+
+<ResponseField name="data.status" type="string">
+Current status of the agent.
+</ResponseField>
+
+<ResponseField name="data.updatedAt" type="string">
+Timestamp when the agent was last updated.
+</ResponseField>
+
+## Error Handling
+
+| Status | Description |
+|---------|-------------|
+|400|Invalid request body or Agent ID|
+|401|Unauthorized or invalid Bearer token|
+|403|You do not have permission to update this WhatsApp Agent|
+|404|WhatsApp Agent not found|
+|500|Internal server error|
+
+<Note>
+
+Only the fields included in the request are updated. Any omitted fields retain their existing values.
+
+</Note>
+
+<Check>
+
+After updating an agent, you can verify the changes using:
+
+- `GET /api/whatsapp/get-whatsapp-agent`
+- `GET /api/whatsapp/get-whatsapp-agent/{agentId}`
+
+</Check>

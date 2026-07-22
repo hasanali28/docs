@@ -1,0 +1,145 @@
+---
+title: "Create WhatsApp Integration"
+description: "Connect a WhatsApp Business phone number to your Weya AI workspace."
+openapi: "POST /api/whatsapp/whatsapp-integration"
+---
+
+## Overview
+
+Create a new WhatsApp Business integration by connecting a WhatsApp phone number to your Weya AI workspace. Once connected, the number can be used with WhatsApp Agents, templates, and automated conversations.
+
+## Prerequisites
+
+- Bearer Token authentication
+- A valid WhatsApp Business Account
+- A verified WhatsApp Business phone number
+
+## Request
+
+<ParamField header="Authorization" type="string" required>
+Bearer token for authenticated workspace access.
+</ParamField>
+
+<RequestExample>
+
+```bash cURL
+curl --location '{{baseUrl}}/api/whatsapp/whatsapp-integration' \
+--header 'Authorization: Bearer {{authToken}}' \
+--header 'Content-Type: application/json' \
+--data '{
+  "phoneNumberId": "123456789012345",
+  "businessAccountId": "987654321098765",
+  "accessToken": "EAAGxxxxxxxxxxxxxxxx",
+  "phoneNumber": "+15551234567",
+  "displayName": "Weya Support"
+}'
+```
+
+</RequestExample>
+
+## Request Body
+
+<ParamField body="phoneNumberId" type="string" required>
+Unique identifier of the WhatsApp Business phone number.
+</ParamField>
+
+<ParamField body="businessAccountId" type="string" required>
+Meta WhatsApp Business Account ID.
+</ParamField>
+
+<ParamField body="accessToken" type="string" required>
+Meta access token used to authorize the integration.
+</ParamField>
+
+<ParamField body="phoneNumber" type="string" required>
+WhatsApp Business phone number including the country code.
+</ParamField>
+
+<ParamField body="displayName" type="string">
+Display name associated with the WhatsApp Business account.
+</ParamField>
+
+## Response
+
+<ResponseExample>
+
+```json 201 Created
+{
+  "status": true,
+  "code": 201,
+  "message": "WhatsApp integration created successfully",
+  "data": {
+    "_id": "6891f1d0c45d123456789abc",
+    "phoneNumberId": "123456789012345",
+    "phoneNumber": "+15551234567",
+    "displayName": "Weya Support",
+    "status": "connected"
+  }
+}
+```
+
+</ResponseExample>
+
+<ResponseField name="status" type="boolean">
+Indicates whether the integration was created successfully.
+</ResponseField>
+
+<ResponseField name="code" type="integer">
+HTTP status code.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+Confirmation message.
+</ResponseField>
+
+<ResponseField name="data" type="object">
+Details of the newly created WhatsApp integration.
+</ResponseField>
+
+<ResponseField name="data._id" type="string">
+Unique identifier of the integration.
+</ResponseField>
+
+<ResponseField name="data.phoneNumberId" type="string">
+WhatsApp Business Phone Number ID.
+</ResponseField>
+
+<ResponseField name="data.phoneNumber" type="string">
+Connected WhatsApp phone number.
+</ResponseField>
+
+<ResponseField name="data.displayName" type="string">
+Business display name.
+</ResponseField>
+
+<ResponseField name="data.status" type="string">
+Current integration status.
+</ResponseField>
+
+## Error Handling
+
+| Status | Description |
+|---------|-------------|
+|400|Missing or invalid request parameters|
+|401|Unauthorized or invalid Bearer token|
+|403|Invalid WhatsApp Business credentials|
+|409|Phone number is already integrated|
+|500|Internal server error|
+
+<Note>
+
+Each WhatsApp Business phone number can only be connected to one workspace at a time.
+
+</Note>
+
+<Check>
+
+Typical workflow:
+
+1. Validate the WhatsApp number.
+2. Create the WhatsApp integration.
+3. Create a WhatsApp Agent.
+4. Assign the agent to the integrated phone number.
+5. Configure webhooks and templates.
+
+</Check>

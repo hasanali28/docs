@@ -1,0 +1,112 @@
+---
+title: "Update WhatsApp Webhook"
+description: "Update the webhook configuration for a connected WhatsApp Business phone number."
+openapi: "POST /api/whatsapp/update-whatsapp-webhook"
+---
+
+## Overview
+
+Update the webhook URL associated with a connected WhatsApp Business phone number. The webhook receives incoming message events, delivery statuses, and other WhatsApp events required for AI Agent communication.
+
+## Prerequisites
+
+- Bearer Token authentication
+- A connected WhatsApp Business phone number
+
+## Request
+
+<ParamField header="Authorization" type="string" required>
+Bearer token for authenticated workspace access.
+</ParamField>
+
+<RequestExample>
+
+```bash cURL
+curl --location '{{baseUrl}}/api/whatsapp/update-whatsapp-webhook' \
+--header 'Authorization: Bearer {{authToken}}' \
+--header 'Content-Type: application/json' \
+--data '{
+  "phoneNumberId": "123456789012345",
+  "webhookUrl": "https://example.com/webhook"
+}'
+```
+
+</RequestExample>
+
+## Request Body
+
+<ParamField body="phoneNumberId" type="string" required>
+Unique identifier of the connected WhatsApp Business phone number.
+</ParamField>
+
+<ParamField body="webhookUrl" type="string" required>
+Public HTTPS endpoint that will receive WhatsApp webhook events.
+</ParamField>
+
+## Response
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "status": true,
+  "code": 200,
+  "message": "WhatsApp webhook updated successfully",
+  "data": {
+    "phoneNumberId": "123456789012345",
+    "webhookUrl": "https://example.com/webhook"
+  }
+}
+```
+
+</ResponseExample>
+
+<ResponseField name="status" type="boolean">
+Indicates whether the request completed successfully.
+</ResponseField>
+
+<ResponseField name="code" type="integer">
+HTTP status code returned by the API.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+Confirmation message indicating the webhook was updated successfully.
+</ResponseField>
+
+<ResponseField name="data" type="object">
+Updated webhook configuration.
+</ResponseField>
+
+<ResponseField name="data.phoneNumberId" type="string">
+WhatsApp Business phone number whose webhook was updated.
+</ResponseField>
+
+<ResponseField name="data.webhookUrl" type="string">
+Configured webhook URL.
+</ResponseField>
+
+## Error Handling
+
+| Status | Description |
+|---------|-------------|
+|400|Missing or invalid request parameters|
+|401|Unauthorized or invalid Bearer token|
+|403|Permission denied|
+|404|WhatsApp Business phone number not found|
+|500|Internal server error|
+
+<Note>
+
+The webhook URL must be publicly accessible over HTTPS so Meta can deliver WhatsApp events successfully.
+
+</Note>
+
+<Check>
+
+Related endpoints:
+
+- `POST /api/whatsapp/validate-whatsapp-number` — Validate a WhatsApp Business number.
+- `POST /api/whatsapp/whatsapp-integration` — Create a new WhatsApp integration.
+- `GET /api/whatsapp/whatsapp-number` — View connected WhatsApp Business numbers.
+
+</Check>

@@ -1,0 +1,146 @@
+---
+title: "Get Video Agent By ID"
+description: "Retrieve the complete configuration and details of a specific Video Agent."
+openapi: "GET /api/video-agent/{id}"
+---
+
+## Overview
+
+Retrieve the complete details of a Video Agent using its unique Video Agent ID. This endpoint returns the agent configuration, including its avatar, voice, language, system prompt, greeting message, and associated Knowledge Bases.
+
+## Prerequisites
+
+- Bearer Token authentication
+- Valid Video Agent ID
+
+## Request
+
+<ParamField header="Authorization" type="string" required>
+Bearer token for authenticated workspace access.
+</ParamField>
+
+<ParamField path="id" type="string" required>
+Unique identifier of the Video Agent.
+</ParamField>
+
+<RequestExample>
+
+```bash cURL
+curl --location '{{baseUrl}}/api/video-agent/6891a23bc456def789123456' \
+--header 'Authorization: Bearer {{authToken}}'
+```
+
+</RequestExample>
+
+## Response
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "status": true,
+  "code": 200,
+  "message": "Video Agent fetched successfully",
+  "data": {
+    "_id": "6891a23bc456def789123456",
+    "agent_name": "Sales Video Agent",
+    "gender": "Female",
+    "avatar": "Business Female",
+    "voice": "en-US-Standard-A",
+    "language": "English",
+    "systemMessage": "You are a professional AI sales representative.",
+    "startMessage": "Hello! Welcome to Weya AI. How can I assist you today?",
+    "knowledgeBase": [
+      "6891b56ac123456789abcdef"
+    ],
+    "status": "active",
+    "createdAt": "2026-07-21T09:30:00.000Z",
+    "updatedAt": "2026-07-21T10:12:45.000Z"
+  }
+}
+```
+
+</ResponseExample>
+
+<ResponseField name="status" type="boolean">
+Indicates whether the request completed successfully.
+</ResponseField>
+
+<ResponseField name="code" type="integer">
+HTTP status code returned by the API.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+Human-readable success message.
+</ResponseField>
+
+<ResponseField name="data" type="object">
+Complete Video Agent configuration.
+</ResponseField>
+
+<ResponseField name="data._id" type="string">
+Unique identifier of the Video Agent.
+</ResponseField>
+
+<ResponseField name="data.agent_name" type="string">
+Display name of the Video Agent.
+</ResponseField>
+
+<ResponseField name="data.gender" type="string">
+Configured avatar gender.
+</ResponseField>
+
+<ResponseField name="data.avatar" type="string">
+Avatar assigned to the Video Agent.
+</ResponseField>
+
+<ResponseField name="data.voice" type="string">
+Voice assigned to the Video Agent.
+</ResponseField>
+
+<ResponseField name="data.language" type="string">
+Primary language used by the Video Agent.
+</ResponseField>
+
+<ResponseField name="data.systemMessage" type="string">
+System prompt that defines the Video Agent's behavior.
+</ResponseField>
+
+<ResponseField name="data.startMessage" type="string">
+Greeting message spoken when a conversation starts.
+</ResponseField>
+
+<ResponseField name="data.knowledgeBase" type="array[string]">
+Knowledge Base IDs attached to the Video Agent.
+</ResponseField>
+
+<ResponseField name="data.status" type="string">
+Current status of the Video Agent.
+</ResponseField>
+
+<ResponseField name="data.createdAt" type="string">
+Timestamp indicating when the Video Agent was created.
+</ResponseField>
+
+<ResponseField name="data.updatedAt" type="string">
+Timestamp indicating when the Video Agent was last updated.
+</ResponseField>
+
+## Error Handling
+
+| Status | Description |
+|---------|-------------|
+|400|Invalid Video Agent ID|
+|401|Unauthorized or invalid Bearer token|
+|403|You do not have permission to access this Video Agent|
+|404|Video Agent not found|
+|500|Internal server error|
+
+<Check>
+
+The returned **Video Agent ID** can be used with:
+
+- `PATCH /api/video-agent/{id}` to update the Video Agent.
+- `DELETE /api/video-agent/{id}` to permanently delete the Video Agent.
+
+</Check>

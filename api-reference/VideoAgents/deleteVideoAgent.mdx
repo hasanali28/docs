@@ -1,0 +1,85 @@
+---
+title: "Delete Video Agent"
+description: "Permanently delete a Video Agent from your workspace."
+openapi: "DELETE /api/video-agent/{id}"
+---
+
+## Overview
+
+Delete an existing Video Agent using its unique Video Agent ID. Once deleted, the Video Agent can no longer be used for video conversations or assigned to future workflows.
+
+## Prerequisites
+
+- Bearer Token authentication
+- Valid Video Agent ID
+
+## Request
+
+<ParamField header="Authorization" type="string" required>
+Bearer token for authenticated workspace access.
+</ParamField>
+
+<ParamField path="id" type="string" required>
+Unique identifier of the Video Agent to delete.
+</ParamField>
+
+<RequestExample>
+
+```bash cURL
+curl --location --request DELETE '{{baseUrl}}/api/video-agent/6891a23bc456def789123456' \
+--header 'Authorization: Bearer {{authToken}}'
+```
+
+</RequestExample>
+
+## Response
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "status": true,
+  "code": 200,
+  "message": "Video Agent deleted successfully"
+}
+```
+
+</ResponseExample>
+
+<ResponseField name="status" type="boolean">
+Indicates whether the request completed successfully.
+</ResponseField>
+
+<ResponseField name="code" type="integer">
+HTTP status code returned by the API.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+Confirmation message indicating that the Video Agent was deleted successfully.
+</ResponseField>
+
+## Error Handling
+
+| Status | Description |
+|---------|-------------|
+|400|Invalid Video Agent ID|
+|401|Unauthorized or invalid Bearer token|
+|403|You do not have permission to delete this Video Agent|
+|404|Video Agent not found|
+|500|Internal server error|
+
+<Warning>
+
+Deleting a Video Agent is **permanent** and cannot be undone. Any workflows or applications using this Video Agent should be updated before deletion.
+
+</Warning>
+
+<Check>
+
+Before deleting a Video Agent, you may want to:
+
+- Retrieve its configuration using `GET /api/video-agent/{id}`.
+- Export or save any configuration you may need later.
+- Ensure it is no longer assigned to any active workflows or applications.
+
+</Check>

@@ -1,0 +1,124 @@
+---
+title: "Get All WhatsApp Templates"
+description: "Retrieve all WhatsApp message templates available in your workspace."
+openapi: "GET /api/whatsapp/get-all-templates"
+---
+
+## Overview
+
+Retrieve all WhatsApp message templates that are available within your workspace. This endpoint returns every template synchronized from your connected WhatsApp Business accounts, making it useful for browsing, selecting templates, or configuring WhatsApp AI Agents and campaigns.
+
+## Prerequisites
+
+- Bearer Token authentication
+
+## Request
+
+<ParamField header="Authorization" type="string" required>
+Bearer token for authenticated workspace access.
+</ParamField>
+
+<RequestExample>
+
+```bash cURL
+curl --location '{{baseUrl}}/api/whatsapp/get-all-templates' \
+--header 'Authorization: Bearer {{authToken}}'
+```
+
+</RequestExample>
+
+## Response
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "status": true,
+  "code": 200,
+  "message": "Templates fetched successfully",
+  "data": [
+    {
+      "id": "987654321",
+      "name": "appointment_reminder",
+      "language": "en",
+      "category": "UTILITY",
+      "status": "APPROVED"
+    },
+    {
+      "id": "987654322",
+      "name": "payment_followup",
+      "language": "en",
+      "category": "MARKETING",
+      "status": "APPROVED"
+    },
+    {
+      "id": "987654323",
+      "name": "welcome_message",
+      "language": "en",
+      "category": "AUTHENTICATION",
+      "status": "APPROVED"
+    }
+  ]
+}
+```
+
+</ResponseExample>
+
+<ResponseField name="status" type="boolean">
+Indicates whether the request completed successfully.
+</ResponseField>
+
+<ResponseField name="code" type="integer">
+HTTP status code returned by the API.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+Confirmation message indicating the templates were retrieved successfully.
+</ResponseField>
+
+<ResponseField name="data" type="array">
+List of all WhatsApp templates available in the workspace.
+</ResponseField>
+
+<ResponseField name="data[].id" type="string">
+Unique identifier of the WhatsApp template.
+</ResponseField>
+
+<ResponseField name="data[].name" type="string">
+Registered name of the WhatsApp template.
+</ResponseField>
+
+<ResponseField name="data[].language" type="string">
+Language configured for the template.
+</ResponseField>
+
+<ResponseField name="data[].category" type="string">
+Template category such as Utility, Marketing, or Authentication.
+</ResponseField>
+
+<ResponseField name="data[].status" type="string">
+Current approval status of the template.
+</ResponseField>
+
+## Error Handling
+
+| Status | Description |
+|---------|-------------|
+|401|Unauthorized or invalid Bearer token|
+|403|Permission denied|
+|500|Internal server error|
+
+<Note>
+
+Unlike **Get WhatsApp Templates**, which retrieves templates for a specific WhatsApp Business phone number, this endpoint returns every template available across your workspace.
+
+</Note>
+
+<Check>
+
+Related endpoints:
+
+- `GET /api/whatsapp/get-templates/{phoneNumberId}` — Retrieve templates for a specific WhatsApp Business number.
+- `GET /api/whatsapp/get-variable-by-template-id/{phoneNumberId}/{templateId}` — Retrieve variables required by a template.
+
+</Check>

@@ -1,0 +1,132 @@
+---
+title: "Get Agents"
+description: "Retrieve all AI agents available in your workspace with pagination and search support."
+openapi: "GET /api/agents"
+---
+
+## Overview
+
+Retrieve a paginated list of all AI agents in your workspace. This endpoint supports pagination and search, making it easy to browse or locate specific agents.
+
+## Prerequisites
+
+- Bearer token for an authenticated workspace
+- Permission to access Agents
+
+## Request
+
+<ParamField header="Authorization" type="string" required>
+Bearer token for authenticated workspace access.
+</ParamField>
+
+<ParamField query="page" type="integer">
+Page number for pagination. Default is `1`.
+</ParamField>
+
+<ParamField query="limit" type="integer">
+Number of agents to return per page. Default is `10`.
+</ParamField>
+
+<ParamField query="search" type="string">
+Optional search term to filter agents by name.
+</ParamField>
+
+<RequestExample>
+
+```bash cURL
+curl --location '{{baseUrl}}/api/agents?page=1&limit=10&search=sales' \
+  --header 'Authorization: Bearer {{authToken}}'
+```
+
+</RequestExample>
+
+## Response
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "status": true,
+  "code": 200,
+  "message": "Fetched agents successfully",
+  "data": {
+    "docs": [
+      {
+        "_id": "687b1c2ab7c7d3f123456789",
+        "agent_name": "Sales Agent",
+        "gender": "Female",
+        "voice": "en-US-Standard-A",
+        "conversationType": "single_prompt"
+      },
+      {
+        "_id": "687b1c2ab7c7d3f987654321",
+        "agent_name": "Support Agent",
+        "gender": "Male",
+        "voice": "en-US-Standard-B",
+        "conversationType": "single_prompt"
+      }
+    ],
+    "page": 1,
+    "limit": 10,
+    "totalPages": 2,
+    "totalDocs": 15
+  }
+}
+```
+
+</ResponseExample>
+
+<ResponseField name="status" type="boolean" required>
+Indicates whether the request completed successfully.
+</ResponseField>
+
+<ResponseField name="code" type="integer" required>
+HTTP status code.
+</ResponseField>
+
+<ResponseField name="message" type="string" required>
+Human-readable success message.
+</ResponseField>
+
+<ResponseField name="data.docs" type="array" required>
+List of AI agents available in the workspace.
+</ResponseField>
+
+<ResponseField name="data.page" type="integer">
+Current page number.
+</ResponseField>
+
+<ResponseField name="data.limit" type="integer">
+Maximum number of records returned per page.
+</ResponseField>
+
+<ResponseField name="data.totalPages" type="integer">
+Total number of available pages.
+</ResponseField>
+
+<ResponseField name="data.totalDocs" type="integer">
+Total number of AI agents in the workspace.
+</ResponseField>
+
+## Error Handling
+
+- **400 Bad Request** – Invalid query parameters.
+- **401 Unauthorized** – Missing or invalid Bearer token.
+- **403 Forbidden** – You do not have permission to access agents.
+- **500 Internal Server Error** – Unexpected server error.
+
+<Note>
+
+This endpoint supports **pagination** and **search**. If no search term is provided, all agents in the workspace are returned.
+
+</Note>
+
+<Check>
+
+Use the returned **Agent ID** with:
+
+- `GET /api/agents/{id}` to retrieve complete agent details.
+- `PATCH /api/agents/{id}` to update an agent.
+- `DELETE /api/agents/{id}` to remove an agent.
+
+</Check>

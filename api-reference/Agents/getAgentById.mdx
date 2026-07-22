@@ -1,0 +1,130 @@
+---
+title: "Get Agent By ID"
+description: "Retrieve the complete configuration and details of a specific AI agent."
+openapi: "GET /api/agents/{id}"
+---
+
+## Overview
+
+Retrieve the complete details of an AI agent using its unique Agent ID. This endpoint returns the agent configuration, including its prompt, voice settings, conversation configuration, and associated knowledge bases.
+
+## Prerequisites
+
+- Bearer token for an authenticated workspace
+- Valid Agent ID
+
+## Request
+
+<ParamField header="Authorization" type="string" required>
+Bearer token for authenticated workspace access.
+</ParamField>
+
+<ParamField path="id" type="string" required>
+Unique identifier of the AI agent.
+</ParamField>
+
+<RequestExample>
+
+```bash cURL
+curl --location '{{baseUrl}}/api/agents/687b1c2ab7c7d3f123456789' \
+  --header 'Authorization: Bearer {{authToken}}'
+```
+
+</RequestExample>
+
+## Response
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "status": true,
+  "code": 200,
+  "message": "Agent details fetched successfully",
+  "data": {
+    "_id": "687b1c2ab7c7d3f123456789",
+    "agent_name": "Sales Agent",
+    "gender": "Female",
+    "voice": "en-US-Standard-A",
+    "conversationType": "single_prompt",
+    "systemMessage": "You are a helpful sales assistant.",
+    "startMessage": "Hello! How can I help you today?",
+    "knowledgeBase": [
+      "687b1c2ab7c7d3f987654321"
+    ]
+  }
+}
+```
+
+</ResponseExample>
+
+<ResponseField name="status" type="boolean" required>
+Indicates whether the request completed successfully.
+</ResponseField>
+
+<ResponseField name="code" type="integer" required>
+HTTP status code returned by the API.
+</ResponseField>
+
+<ResponseField name="message" type="string" required>
+Human-readable success message.
+</ResponseField>
+
+<ResponseField name="data" type="object" required>
+Complete AI agent configuration and metadata.
+</ResponseField>
+
+<ResponseField name="data._id" type="string">
+Unique identifier of the AI agent.
+</ResponseField>
+
+<ResponseField name="data.agent_name" type="string">
+Display name of the AI agent.
+</ResponseField>
+
+<ResponseField name="data.gender" type="string">
+Configured voice gender.
+</ResponseField>
+
+<ResponseField name="data.voice" type="string">
+Voice model assigned to the AI agent.
+</ResponseField>
+
+<ResponseField name="data.conversationType" type="string">
+Conversation configuration type.
+</ResponseField>
+
+<ResponseField name="data.systemMessage" type="string">
+Primary instruction prompt that defines the AI agent's behavior.
+</ResponseField>
+
+<ResponseField name="data.startMessage" type="string">
+Greeting message spoken at the beginning of the conversation.
+</ResponseField>
+
+<ResponseField name="data.knowledgeBase" type="array[string]">
+Knowledge Base IDs associated with the AI agent.
+</ResponseField>
+
+## Error Handling
+
+- **400 Bad Request** – Invalid Agent ID format.
+- **401 Unauthorized** – Missing or invalid Bearer token.
+- **403 Forbidden** – You do not have permission to access this agent.
+- **404 Not Found** – No AI agent found for the provided ID.
+- **500 Internal Server Error** – Unexpected server error.
+
+<Note>
+
+Use this endpoint whenever you need the complete configuration of an AI agent before updating or assigning it to campaigns.
+
+</Note>
+
+<Check>
+
+You can use the returned **Agent ID** with:
+
+- `PATCH /api/agents/{id}` to update the agent.
+- `DELETE /api/agents/{id}` to permanently remove the agent.
+
+</Check>

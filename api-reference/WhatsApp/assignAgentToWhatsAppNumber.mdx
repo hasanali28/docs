@@ -1,0 +1,114 @@
+---
+title: "Assign Agent to WhatsApp Number"
+description: "Assign an existing WhatsApp AI Agent to a connected WhatsApp Business phone number."
+openapi: "POST /api/whatsapp/add-agent-in-whatsapp-number"
+---
+
+## Overview
+
+Assign a WhatsApp AI Agent to a connected WhatsApp Business phone number. Once assigned, all incoming WhatsApp conversations on that number will be handled by the selected AI Agent.
+
+## Prerequisites
+
+- Bearer Token authentication
+- A connected WhatsApp Business phone number
+- An existing WhatsApp AI Agent
+
+## Request
+
+<ParamField header="Authorization" type="string" required>
+Bearer token for authenticated workspace access.
+</ParamField>
+
+<RequestExample>
+
+```bash cURL
+curl --location '{{baseUrl}}/api/whatsapp/add-agent-in-whatsapp-number' \
+--header 'Authorization: Bearer {{authToken}}' \
+--header 'Content-Type: application/json' \
+--data '{
+  "phoneNumberId": "123456789012345",
+  "agentId": "6894a98a7fcde123456789ab"
+}'
+```
+
+</RequestExample>
+
+## Request Body
+
+<ParamField body="phoneNumberId" type="string" required>
+Unique identifier of the connected WhatsApp Business phone number.
+</ParamField>
+
+<ParamField body="agentId" type="string" required>
+Unique identifier of the WhatsApp AI Agent to assign.
+</ParamField>
+
+## Response
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "status": true,
+  "code": 200,
+  "message": "Agent assigned successfully",
+  "data": {
+    "phoneNumberId": "123456789012345",
+    "agentId": "6894a98a7fcde123456789ab"
+  }
+}
+```
+
+</ResponseExample>
+
+<ResponseField name="status" type="boolean">
+Indicates whether the request completed successfully.
+</ResponseField>
+
+<ResponseField name="code" type="integer">
+HTTP status code returned by the API.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+Confirmation message indicating the agent was assigned successfully.
+</ResponseField>
+
+<ResponseField name="data" type="object">
+Assignment details.
+</ResponseField>
+
+<ResponseField name="data.phoneNumberId" type="string">
+WhatsApp Business phone number that received the agent assignment.
+</ResponseField>
+
+<ResponseField name="data.agentId" type="string">
+Assigned WhatsApp AI Agent ID.
+</ResponseField>
+
+## Error Handling
+
+| Status | Description |
+|---------|-------------|
+|400|Missing or invalid request parameters|
+|401|Unauthorized or invalid Bearer token|
+|403|Permission denied|
+|404|WhatsApp number or Agent not found|
+|409|An agent is already assigned to this WhatsApp number|
+|500|Internal server error|
+
+<Note>
+
+A WhatsApp Business phone number can have only one active AI Agent assigned at a time. Assigning a different agent may replace the existing assignment.
+
+</Note>
+
+<Check>
+
+Related endpoints:
+
+- `GET /api/whatsapp/whatsapp-number` — List connected WhatsApp numbers.
+- `GET /api/whatsapp/get-whatsapp-agent` — List available WhatsApp Agents.
+- `PUT /api/whatsapp/remove-agent-in-whatsapp-number/{phoneNumberId}` — Remove the assigned agent from a WhatsApp number.
+
+</Check>

@@ -1,0 +1,124 @@
+---
+title: "Get WhatsApp Templates"
+description: "Retrieve all approved WhatsApp message templates available for a connected WhatsApp Business phone number."
+openapi: "GET /api/whatsapp/get-templates/{phoneNumberId}"
+---
+
+## Overview
+
+Retrieve all WhatsApp message templates associated with a connected WhatsApp Business phone number. These templates can be used when creating WhatsApp campaigns or configuring WhatsApp AI Agents.
+
+## Prerequisites
+
+- Bearer Token authentication
+- A connected WhatsApp Business phone number
+
+## Request
+
+<ParamField header="Authorization" type="string" required>
+Bearer token for authenticated workspace access.
+</ParamField>
+
+<ParamField path="phoneNumberId" type="string" required>
+Unique identifier of the connected WhatsApp Business phone number.
+</ParamField>
+
+<RequestExample>
+
+```bash cURL
+curl --location '{{baseUrl}}/api/whatsapp/get-templates/123456789012345' \
+--header 'Authorization: Bearer {{authToken}}'
+```
+
+</RequestExample>
+
+## Response
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "status": true,
+  "code": 200,
+  "message": "Templates fetched successfully",
+  "data": [
+    {
+      "id": "987654321",
+      "name": "appointment_reminder",
+      "language": "en",
+      "category": "UTILITY",
+      "status": "APPROVED"
+    },
+    {
+      "id": "987654322",
+      "name": "payment_followup",
+      "language": "en",
+      "category": "MARKETING",
+      "status": "APPROVED"
+    }
+  ]
+}
+```
+
+</ResponseExample>
+
+<ResponseField name="status" type="boolean">
+Indicates whether the request completed successfully.
+</ResponseField>
+
+<ResponseField name="code" type="integer">
+HTTP status code returned by the API.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+Confirmation message indicating the templates were fetched successfully.
+</ResponseField>
+
+<ResponseField name="data" type="array">
+List of available WhatsApp templates.
+</ResponseField>
+
+<ResponseField name="data[].id" type="string">
+Unique identifier of the template.
+</ResponseField>
+
+<ResponseField name="data[].name" type="string">
+Template name registered in WhatsApp Business.
+</ResponseField>
+
+<ResponseField name="data[].language" type="string">
+Language supported by the template.
+</ResponseField>
+
+<ResponseField name="data[].category" type="string">
+Template category such as Utility, Marketing, or Authentication.
+</ResponseField>
+
+<ResponseField name="data[].status" type="string">
+Current approval status of the template.
+</ResponseField>
+
+## Error Handling
+
+| Status | Description |
+|---------|-------------|
+|400|Invalid phone number ID|
+|401|Unauthorized or invalid Bearer token|
+|403|Permission denied|
+|404|WhatsApp phone number not found|
+|500|Internal server error|
+
+<Note>
+
+Only templates that are available for the selected WhatsApp Business phone number are returned.
+
+</Note>
+
+<Check>
+
+Related endpoints:
+
+- `GET /api/whatsapp/get-variable-by-template-id/{phoneNumberId}/{templateId}` — Retrieve variables for a template.
+- `GET /api/whatsapp/get-all-templates` — Retrieve all templates stored in the workspace.
+
+</Check>

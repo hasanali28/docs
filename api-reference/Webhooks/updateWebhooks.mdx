@@ -1,0 +1,165 @@
+---
+title: "Update Webhook"
+description: "Update the configuration of an existing webhook."
+openapi: "PATCH /api/webhooks/{webhookId}"
+---
+
+## Overview
+
+Update an existing webhook to modify its destination URL, subscribed events, status, or signing secret. Changes take effect immediately after the request is successful.
+
+## Prerequisites
+
+- Bearer Token authentication
+- Valid Webhook ID
+
+## Request
+
+<ParamField header="Authorization" type="string" required>
+Bearer token for authenticated workspace access.
+</ParamField>
+
+<ParamField path="webhookId" type="string" required>
+Unique identifier of the webhook.
+</ParamField>
+
+### Request Body
+
+<ParamField body="name" type="string">
+Updated display name of the webhook.
+</ParamField>
+
+<ParamField body="url" type="string">
+Updated HTTPS endpoint that will receive webhook events.
+</ParamField>
+
+<ParamField body="events" type="array[string]">
+List of events that should trigger the webhook.
+
+Supported events include:
+
+- `call.started`
+- `call.answered`
+- `call.completed`
+- `call.failed`
+- `call.transferred`
+- `call.recording.available`
+- `call.summary.generated`
+- `call.analysis.completed`
+</ParamField>
+
+<ParamField body="secret" type="string">
+Updated webhook signing secret.
+</ParamField>
+
+<ParamField body="active" type="boolean">
+Enable or disable the webhook.
+</ParamField>
+
+<RequestExample>
+
+```bash cURL
+curl --location --request PATCH '{{baseUrl}}/api/webhooks/6890abc123456789abcdef01' \
+--header 'Authorization: Bearer {{authToken}}' \
+--header 'Content-Type: application/json' \
+--data '{
+  "name": "Updated CRM Webhook",
+  "url": "https://example.com/new-webhook",
+  "events": [
+    "call.completed",
+    "call.failed",
+    "call.recording.available"
+  ],
+  "active": true
+}'
+```
+
+</RequestExample>
+
+## Response
+
+<ResponseExample>
+
+```json 200
+{
+  "status": true,
+  "code": 200,
+  "message": "Webhook updated successfully",
+  "data": {
+    "_id": "6890abc123456789abcdef01",
+    "name": "Updated CRM Webhook",
+    "url": "https://example.com/new-webhook",
+    "events": [
+      "call.completed",
+      "call.failed",
+      "call.recording.available"
+    ],
+    "active": true,
+    "updatedAt": "2026-07-20T15:42:18.000Z"
+  }
+}
+```
+
+</ResponseExample>
+
+<ResponseField name="status" type="boolean">
+Indicates whether the request completed successfully.
+</ResponseField>
+
+<ResponseField name="code" type="integer">
+HTTP status code returned by the API.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+Success message returned by the API.
+</ResponseField>
+
+<ResponseField name="data" type="object">
+Updated webhook information.
+</ResponseField>
+
+<ResponseField name="data._id" type="string">
+Unique identifier of the webhook.
+</ResponseField>
+
+<ResponseField name="data.name" type="string">
+Webhook display name.
+</ResponseField>
+
+<ResponseField name="data.url" type="string">
+Webhook destination URL.
+</ResponseField>
+
+<ResponseField name="data.events" type="array[string]">
+List of subscribed events.
+</ResponseField>
+
+<ResponseField name="data.active" type="boolean">
+Whether the webhook is currently enabled.
+</ResponseField>
+
+<ResponseField name="data.updatedAt" type="string">
+Timestamp of the most recent update.
+</ResponseField>
+
+## Error Handling
+
+| Status | Description |
+|---------|-------------|
+|400|Invalid request body|
+|401|Unauthorized|
+|404|Webhook not found|
+|422|Invalid webhook URL|
+|500|Internal server error|
+
+<Note>
+
+Only include the fields you want to update. Any fields omitted from the request remain unchanged.
+
+</Note>
+
+<Check>
+
+After updating a webhook, Weya AI immediately begins sending events using the new configuration.
+
+</Check>

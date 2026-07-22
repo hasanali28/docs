@@ -1,0 +1,150 @@
+---
+title: "Create Knowledge Base"
+description: "Create a new Knowledge Base by uploading one or more documents for your AI agents."
+openapi: "POST /api/knowledgeBase/createKnowledgeBase"
+---
+
+## Overview
+
+Create a new Knowledge Base by uploading documents that your AI agents can use during conversations. A Knowledge Base can contain PDFs, Word documents, text files, and other supported formats.
+
+## Prerequisites
+
+- Bearer token for an authenticated workspace
+- One or more supported documents
+- `multipart/form-data` request
+
+## Request
+
+<ParamField header="Authorization" type="string" required>
+Bearer token for authenticated workspace access.
+</ParamField>
+
+<ParamField body="knowledgeBaseName" type="string" required>
+Unique name of the Knowledge Base.
+</ParamField>
+
+<ParamField body="description" type="string">
+Description of the Knowledge Base.
+</ParamField>
+
+<ParamField body="files" type="file[]" required>
+One or more files to upload. Supports PDF, DOCX, TXT, CSV and other supported document formats.
+</ParamField>
+
+<RequestExample>
+
+```bash cURL
+curl --location '{{baseUrl}}/api/knowledgeBase/createKnowledgeBase' \
+  --header 'Authorization: Bearer {{authToken}}' \
+  --form 'knowledgeBaseName="Customer Support KB"' \
+  --form 'description="Knowledge base for customer support queries"' \
+  --form 'files=@"/Users/john/Documents/FAQ.pdf"' \
+  --form 'files=@"/Users/john/Documents/Pricing.pdf"'
+```
+
+</RequestExample>
+
+## Response
+
+<ResponseExample>
+
+```json 201 Created
+{
+  "status": true,
+  "code": 201,
+  "message": "Knowledge Base created successfully",
+  "data": {
+    "_id": "687b1c2ab7c7d3f123456789",
+    "knowledgeBaseName": "Customer Support KB",
+    "description": "Knowledge base for customer support queries",
+    "documents": [
+      {
+        "fileName": "FAQ.pdf"
+      },
+      {
+        "fileName": "Pricing.pdf"
+      }
+    ],
+    "createdAt": "2026-07-20T10:35:00.000Z"
+  }
+}
+```
+
+</ResponseExample>
+
+## Request Fields
+
+<RequestField name="knowledgeBaseName" type="string" required>
+Name of the Knowledge Base.
+</RequestField>
+
+<RequestField name="description" type="string">
+Optional description for the Knowledge Base.
+</RequestField>
+
+<RequestField name="files" type="file[]" required>
+One or more documents to upload into the Knowledge Base.
+</RequestField>
+
+## Response Fields
+
+<ResponseField name="status" type="boolean">
+Indicates whether the request was successful.
+</ResponseField>
+
+<ResponseField name="code" type="integer">
+HTTP status code.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+Response message.
+</ResponseField>
+
+<ResponseField name="data._id" type="string">
+Unique identifier of the Knowledge Base.
+</ResponseField>
+
+<ResponseField name="data.knowledgeBaseName" type="string">
+Name of the Knowledge Base.
+</ResponseField>
+
+<ResponseField name="data.description" type="string">
+Description of the Knowledge Base.
+</ResponseField>
+
+<ResponseField name="data.documents" type="array">
+Documents uploaded to the Knowledge Base.
+</ResponseField>
+
+<ResponseField name="data.createdAt" type="string">
+Timestamp when the Knowledge Base was created.
+</ResponseField>
+
+## Error Handling
+
+| Status Code | Description |
+|-------------|-------------|
+| **400** | Missing required fields or invalid request |
+| **401** | Unauthorized |
+| **413** | Uploaded file is too large |
+| **415** | Unsupported file type |
+| **500** | Internal Server Error |
+
+<Note>
+
+Large Knowledge Bases may take a few moments to finish processing before they become available for AI agents.
+
+</Note>
+
+<Check>
+
+After creating a Knowledge Base, you can:
+
+- `GET /api/knowledgeBase` — View all Knowledge Bases.
+- `GET /api/knowledgeBase/{knowledgeBaseId}` — Retrieve Knowledge Base details.
+- `GET /api/knowledgeBase/{knowledgeBaseId}/documents` — View uploaded documents.
+- `PUT /api/knowledgeBase/{knowledgeBaseId}` — Upload additional documents or update metadata.
+- Attach the Knowledge Base to an AI Agent during agent creation or update.
+
+</Check>

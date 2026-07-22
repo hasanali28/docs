@@ -1,0 +1,87 @@
+---
+title: "Delete Webhook"
+description: "Delete an existing webhook from your workspace."
+openapi: "DELETE /api/webhooks/{webhookId}"
+---
+
+## Overview
+
+Delete a webhook from your Weya AI workspace. Once deleted, Weya AI will immediately stop sending event notifications to the configured endpoint.
+
+> This action is permanent and cannot be undone.
+
+## Prerequisites
+
+- Bearer Token authentication
+- Valid Webhook ID
+
+## Request
+
+<ParamField header="Authorization" type="string" required>
+Bearer token for authenticated workspace access.
+</ParamField>
+
+<ParamField path="webhookId" type="string" required>
+Unique identifier of the webhook to delete.
+</ParamField>
+
+<RequestExample>
+
+```bash cURL
+curl --location --request DELETE '{{baseUrl}}/api/webhooks/6890abc123456789abcdef01' \
+--header 'Authorization: Bearer {{authToken}}'
+```
+
+</RequestExample>
+
+## Response
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "status": true,
+  "code": 200,
+  "message": "Webhook deleted successfully"
+}
+```
+
+</ResponseExample>
+
+<ResponseField name="status" type="boolean">
+Indicates whether the request completed successfully.
+</ResponseField>
+
+<ResponseField name="code" type="integer">
+HTTP status code returned by the API.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+Confirmation message indicating that the webhook has been deleted.
+</ResponseField>
+
+## Error Handling
+
+| Status | Description |
+|---------|-------------|
+|400|Invalid Webhook ID|
+|401|Unauthorized or invalid Bearer token|
+|403|You do not have permission to delete this webhook|
+|404|Webhook not found|
+|500|Internal server error|
+
+<Warning>
+
+Deleting a webhook immediately stops all future event deliveries to the configured endpoint. Any integrations depending on this webhook will no longer receive notifications.
+
+</Warning>
+
+<Check>
+
+Before deleting a webhook, make sure:
+
+- The webhook is no longer required by your application.
+- A replacement webhook has been configured if necessary.
+- Any downstream integrations have been updated.
+
+</Check>

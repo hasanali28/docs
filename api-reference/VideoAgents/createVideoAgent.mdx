@@ -1,0 +1,169 @@
+---
+title: "Create Video Agent"
+description: "Create a new AI Video Agent for your workspace."
+openapi: "POST /api/video-agent"
+---
+
+## Overview
+
+Create a new Video Agent that can interact with users using an AI-generated avatar, voice, and knowledge base. Configure the agent's behavior, appearance, and conversation settings during creation.
+
+## Prerequisites
+
+- Bearer Token authentication
+- Workspace access with permission to create Video Agents
+
+## Request
+
+<ParamField header="Authorization" type="string" required>
+Bearer token for authenticated workspace access.
+</ParamField>
+
+<RequestExample>
+
+```bash cURL
+curl --location '{{baseUrl}}/api/video-agent' \
+--header 'Authorization: Bearer {{authToken}}' \
+--header 'Content-Type: application/json' \
+--data '{
+  "agent_name": "Sales Video Agent",
+  "gender": "Female",
+  "avatar": "Business Female",
+  "voice": "en-US-Standard-A",
+  "language": "English",
+  "systemMessage": "You are a professional AI sales representative.",
+  "startMessage": "Hello! Welcome to Weya AI. How can I assist you today?",
+  "knowledgeBase": [
+    "6891a23bc456def789123456"
+  ]
+}'
+```
+
+</RequestExample>
+
+## Request Body
+
+<ParamField body="agent_name" type="string" required>
+Unique name for the Video Agent.
+</ParamField>
+
+<ParamField body="gender" type="string" required>
+Gender of the AI avatar.
+</ParamField>
+
+<ParamField body="avatar" type="string">
+Avatar that represents the Video Agent.
+</ParamField>
+
+<ParamField body="voice" type="string">
+Voice assigned to the Video Agent.
+</ParamField>
+
+<ParamField body="language" type="string">
+Primary language spoken by the Video Agent.
+</ParamField>
+
+<ParamField body="systemMessage" type="string">
+Instructions that define the Video Agent's behavior.
+</ParamField>
+
+<ParamField body="startMessage" type="string">
+Greeting spoken when the conversation begins.
+</ParamField>
+
+<ParamField body="knowledgeBase" type="array[string]">
+Knowledge Base IDs attached to the Video Agent.
+</ParamField>
+
+## Response
+
+<ResponseExample>
+
+```json 201 Created
+{
+  "status": true,
+  "code": 201,
+  "message": "Video Agent created successfully",
+  "data": {
+    "_id": "6891a23bc456def789123456",
+    "agent_name": "Sales Video Agent",
+    "gender": "Female",
+    "avatar": "Business Female",
+    "voice": "en-US-Standard-A",
+    "language": "English",
+    "status": "active",
+    "createdAt": "2026-07-21T09:30:00.000Z"
+  }
+}
+```
+
+</ResponseExample>
+
+<ResponseField name="status" type="boolean">
+Indicates whether the request completed successfully.
+</ResponseField>
+
+<ResponseField name="code" type="integer">
+HTTP status code returned by the API.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+Success message returned by the API.
+</ResponseField>
+
+<ResponseField name="data" type="object">
+Details of the newly created Video Agent.
+</ResponseField>
+
+<ResponseField name="data._id" type="string">
+Unique identifier of the Video Agent.
+</ResponseField>
+
+<ResponseField name="data.agent_name" type="string">
+Name of the Video Agent.
+</ResponseField>
+
+<ResponseField name="data.gender" type="string">
+Configured avatar gender.
+</ResponseField>
+
+<ResponseField name="data.avatar" type="string">
+Selected avatar for the Video Agent.
+</ResponseField>
+
+<ResponseField name="data.voice" type="string">
+Voice assigned to the Video Agent.
+</ResponseField>
+
+<ResponseField name="data.language" type="string">
+Primary language configured for the Video Agent.
+</ResponseField>
+
+<ResponseField name="data.status" type="string">
+Current status of the Video Agent.
+</ResponseField>
+
+<ResponseField name="data.createdAt" type="string">
+Timestamp when the Video Agent was created.
+</ResponseField>
+
+## Error Handling
+
+| Status | Description |
+|---------|-------------|
+|400|Invalid request body or missing required fields|
+|401|Unauthorized or invalid Bearer token|
+|403|Insufficient permissions|
+|409|A Video Agent with the same name already exists|
+|500|Internal server error|
+
+<Check>
+
+After creating a Video Agent, you can:
+
+- Retrieve it using `GET /api/video-agent/{id}`
+- Update it using `PATCH /api/video-agent/{id}`
+- Attach Knowledge Bases
+- Configure supported voices using the Voices endpoint
+
+</Check>

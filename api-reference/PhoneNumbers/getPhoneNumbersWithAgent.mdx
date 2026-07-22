@@ -1,0 +1,150 @@
+---
+title: "Get Phone Numbers with Assigned Agents"
+openapi: "GET /api/phone-numbers/with-agent"
+description: "Retrieve all phone numbers along with the AI Agents currently assigned to them."
+---
+
+Use this endpoint to retrieve all configured phone numbers together with the AI Agents assigned to each number. This endpoint is useful for viewing phone number-to-agent mappings within your Weya AI workspace.
+
+<Note>
+Only authenticated users can retrieve phone numbers and their associated AI Agents.
+</Note>
+
+### OpenAPI
+
+```yaml
+openapi: 3.1.0
+info:
+  title: Get Phone Numbers with Assigned Agents
+  version: 1.0.0
+
+paths:
+  /api/phone-numbers/with-agent:
+    get:
+      summary: Retrieve phone numbers with assigned agents
+      description: Returns all configured phone numbers along with their assigned AI Agents.
+      tags:
+        - Phone Numbers
+
+      security:
+        - bearerAuth: []
+
+      responses:
+        "200":
+          description: Phone numbers retrieved successfully.
+
+        "401":
+          description: Unauthorized.
+
+        "500":
+          description: Internal Server Error.
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+```
+
+## Authorizations
+
+<ParamField header="Authorization" type="string" required>
+Bearer Token for the authenticated user.
+
+Format:
+
+`Authorization: Bearer YOUR_ACCESS_TOKEN`
+</ParamField>
+
+## Example Request
+
+```bash
+curl --location '{{baseUrl}}/api/phone-numbers/with-agent' \
+--header 'Authorization: Bearer YOUR_ACCESS_TOKEN'
+```
+
+## Successful Response
+
+```json
+[
+  {
+    "_id": "6872d4b5f8d7a91234567890",
+    "phoneNumber": "+14155552671",
+    "provider": "Twilio",
+    "country": "United States",
+    "status": "Active",
+    "agent": {
+      "_id": "686ab1234567890abcdef123",
+      "name": "Customer Support Agent",
+      "type": "Voice Agent"
+    }
+  },
+  {
+    "_id": "6872d4b5f8d7a91234567891",
+    "phoneNumber": "+919876543210",
+    "provider": "Plivo",
+    "country": "India",
+    "status": "Active",
+    "agent": {
+      "_id": "686ab1234567890abcdef456",
+      "name": "Sales Agent",
+      "type": "Voice Agent"
+    }
+  }
+]
+```
+
+## Response Fields
+
+<ResponseField name="_id" type="string">
+Unique identifier of the phone number.
+</ResponseField>
+
+<ResponseField name="phoneNumber" type="string">
+The configured phone number in international format.
+</ResponseField>
+
+<ResponseField name="provider" type="string">
+The telephony provider associated with the phone number.
+</ResponseField>
+
+<ResponseField name="country" type="string">
+Country associated with the phone number.
+</ResponseField>
+
+<ResponseField name="status" type="string">
+Current status of the phone number.
+</ResponseField>
+
+<ResponseField name="agent._id" type="string">
+Unique identifier of the assigned AI Agent.
+</ResponseField>
+
+<ResponseField name="agent.name" type="string">
+Name of the AI Agent assigned to the phone number.
+</ResponseField>
+
+<ResponseField name="agent.type" type="string">
+Type of AI Agent assigned to the phone number (for example, Voice Agent).
+</ResponseField>
+
+## Error Responses
+
+### Unauthorized (401)
+
+```json
+{
+  "success": false,
+  "message": "Unauthorized"
+}
+```
+
+### Internal Server Error (500)
+
+```json
+{
+  "success": false,
+  "message": "Failed to retrieve phone numbers with assigned agents."
+}
+```

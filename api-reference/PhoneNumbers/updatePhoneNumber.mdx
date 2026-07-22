@@ -1,0 +1,211 @@
+---
+title: "Update Phone Number"
+openapi: "PATCH /api/phone-numbers/{id}"
+description: "Update the configuration of an existing phone number in your Weya AI workspace."
+---
+
+Use this endpoint to update an existing phone number. You can modify its configuration, provider settings, or update the AI Agent associated with the phone number, depending on your workspace configuration.
+
+<Note>
+Only authenticated users can update phone numbers within their workspace.
+</Note>
+
+### OpenAPI
+
+```yaml
+openapi: 3.1.0
+info:
+  title: Update Phone Number
+  version: 1.0.0
+
+paths:
+  /api/phone-numbers/{id}:
+    patch:
+      summary: Update a phone number
+      description: Updates the configuration of an existing phone number.
+      tags:
+        - Phone Numbers
+
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: Unique identifier of the phone number.
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                phoneNumber:
+                  type: string
+                  example: "+14155552671"
+                provider:
+                  type: string
+                  example: Twilio
+                assignedAgentId:
+                  type: string
+                  example: 686ab1234567890abcdef123
+                status:
+                  type: string
+                  enum:
+                    - Active
+                    - Inactive
+
+      responses:
+        "200":
+          description: Phone number updated successfully.
+
+        "400":
+          description: Invalid request.
+
+        "401":
+          description: Unauthorized.
+
+        "404":
+          description: Phone number not found.
+
+        "500":
+          description: Internal Server Error.
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+```
+
+## Authorizations
+
+<ParamField header="Authorization" type="string" required>
+Bearer Token for the authenticated user.
+
+Format:
+
+`Authorization: Bearer YOUR_ACCESS_TOKEN`
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="id" type="string" required>
+The unique identifier of the phone number to update.
+</ParamField>
+
+## Body Parameters
+
+<ParamField body="phoneNumber" type="string">
+Updated phone number in international (E.164) format.
+</ParamField>
+
+<ParamField body="provider" type="string">
+Updated telephony provider associated with the phone number.
+</ParamField>
+
+<ParamField body="assignedAgentId" type="string">
+Unique identifier of the AI Agent to assign to this phone number.
+</ParamField>
+
+<ParamField body="status" type="string">
+Status of the phone number (`Active` or `Inactive`).
+</ParamField>
+
+## Example Request
+
+```bash
+curl --location --request PATCH '{{baseUrl}}/api/phone-numbers/6872d4b5f8d7a91234567890' \
+--header 'Authorization: Bearer YOUR_ACCESS_TOKEN' \
+--header 'Content-Type: application/json' \
+--data '{
+  "assignedAgentId": "686ab1234567890abcdef123",
+  "status": "Active"
+}'
+```
+
+## Successful Response
+
+```json
+{
+  "success": true,
+  "message": "Phone number updated successfully.",
+  "data": {
+    "_id": "6872d4b5f8d7a91234567890",
+    "phoneNumber": "+14155552671",
+    "provider": "Twilio",
+    "status": "Active",
+    "assignedAgent": "Customer Support Agent",
+    "updatedAt": "2026-07-22T09:15:42.000Z"
+  }
+}
+```
+
+## Response Fields
+
+<ResponseField name="_id" type="string">
+Unique identifier of the phone number.
+</ResponseField>
+
+<ResponseField name="phoneNumber" type="string">
+The updated phone number.
+</ResponseField>
+
+<ResponseField name="provider" type="string">
+Telephony provider associated with the phone number.
+</ResponseField>
+
+<ResponseField name="status" type="string">
+Current status of the phone number.
+</ResponseField>
+
+<ResponseField name="assignedAgent" type="string">
+Name of the AI Agent currently assigned to the phone number.
+</ResponseField>
+
+<ResponseField name="updatedAt" type="string">
+Timestamp indicating when the phone number was last updated.
+</ResponseField>
+
+## Error Responses
+
+### Bad Request (400)
+
+```json
+{
+  "success": false,
+  "message": "Invalid request payload."
+}
+```
+
+### Unauthorized (401)
+
+```json
+{
+  "success": false,
+  "message": "Unauthorized"
+}
+```
+
+### Not Found (404)
+
+```json
+{
+  "success": false,
+  "message": "Phone number not found."
+}
+```
+
+### Internal Server Error (500)
+
+```json
+{
+  "success": false,
+  "message": "Failed to update phone number."
+}
+```

@@ -1,0 +1,128 @@
+---
+title: "List Knowledge Base Documents"
+description: "Retrieve all documents that belong to a specific Knowledge Base."
+openapi: "GET /api/knowledgeBase/{knowledgeBaseId}/documents"
+---
+
+## Overview
+
+Retrieve the list of all documents uploaded to a specific Knowledge Base. This endpoint allows you to inspect the files available for an AI agent before updating or deleting them.
+
+## Prerequisites
+
+- Bearer token for an authenticated workspace
+- Valid Knowledge Base ID
+
+## Request
+
+<ParamField header="Authorization" type="string" required>
+Bearer token for authenticated workspace access.
+</ParamField>
+
+<ParamField path="knowledgeBaseId" type="string" required>
+Unique identifier of the Knowledge Base.
+</ParamField>
+
+<RequestExample>
+
+```bash cURL
+curl --location '{{baseUrl}}/api/knowledgeBase/687b1c2ab7c7d3f123456789/documents' \
+  --header 'Authorization: Bearer {{authToken}}'
+```
+
+</RequestExample>
+
+## Response
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "status": true,
+  "code": 200,
+  "message": "Documents fetched successfully",
+  "data": [
+    {
+      "fileName": "FAQ.pdf",
+      "fileType": "application/pdf",
+      "fileSize": 245760,
+      "fileUrl": "https://storage.weya.ai/files/FAQ.pdf",
+      "uploadedAt": "2026-07-20T10:30:00.000Z"
+    },
+    {
+      "fileName": "Pricing.docx",
+      "fileType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "fileSize": 185430,
+      "fileUrl": "https://storage.weya.ai/files/Pricing.docx",
+      "uploadedAt": "2026-07-20T10:35:00.000Z"
+    }
+  ]
+}
+```
+
+</ResponseExample>
+
+## Response Fields
+
+<ResponseField name="status" type="boolean">
+Indicates whether the request completed successfully.
+</ResponseField>
+
+<ResponseField name="code" type="integer">
+HTTP status code.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+Response message.
+</ResponseField>
+
+<ResponseField name="data" type="array">
+Array containing all documents associated with the Knowledge Base.
+</ResponseField>
+
+<ResponseField name="data[].fileName" type="string">
+Name of the uploaded document.
+</ResponseField>
+
+<ResponseField name="data[].fileType" type="string">
+MIME type of the uploaded file.
+</ResponseField>
+
+<ResponseField name="data[].fileSize" type="integer">
+Size of the document in bytes.
+</ResponseField>
+
+<ResponseField name="data[].fileUrl" type="string">
+URL of the uploaded document.
+</ResponseField>
+
+<ResponseField name="data[].uploadedAt" type="string">
+Timestamp when the document was uploaded.
+</ResponseField>
+
+## Error Handling
+
+| Status Code | Description |
+|------------|-------------|
+| **400** | Invalid Knowledge Base ID |
+| **401** | Unauthorized |
+| **403** | Access denied |
+| **404** | Knowledge Base not found |
+| **500** | Internal Server Error |
+
+<Note>
+
+This endpoint only lists the documents attached to a Knowledge Base. It does not return the Knowledge Base metadata itself.
+
+</Note>
+
+<Check>
+
+Related endpoints:
+
+- `GET /api/knowledgeBase/{knowledgeBaseId}` — Retrieve Knowledge Base details.
+- `PUT /api/knowledgeBase/{knowledgeBaseId}` — Update the Knowledge Base or upload additional documents.
+- `DELETE /api/knowledgeBase/{knowledgeBaseId}/documents/{fileName}` — Delete a specific document.
+- `DELETE /api/knowledgeBase/{knowledgeBaseId}` — Delete the entire Knowledge Base.
+
+</Check>

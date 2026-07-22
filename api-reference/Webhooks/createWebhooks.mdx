@@ -1,0 +1,170 @@
+---
+title: "Create Webhook"
+description: "Create a webhook endpoint to receive real-time events from Weya AI."
+openapi: "POST /api/webhooks"
+---
+
+## Overview
+
+Create a webhook to receive real-time event notifications from Weya AI. Once configured, Weya AI automatically sends HTTP POST requests to your endpoint whenever the selected events occur.
+
+Webhooks can be used to integrate with CRMs, internal applications, analytics platforms, or other third-party services.
+
+## Prerequisites
+
+- Bearer Token authentication
+- A publicly accessible HTTPS endpoint
+- Endpoint capable of accepting `POST` requests
+
+## Request
+
+<ParamField header="Authorization" type="string" required>
+Bearer token for authenticated workspace access.
+</ParamField>
+
+### Request Body
+
+<ParamField body="name" type="string" required>
+Display name for the webhook.
+</ParamField>
+
+<ParamField body="url" type="string" required>
+Public HTTPS endpoint that will receive webhook events.
+</ParamField>
+
+<ParamField body="events" type="array[string]" required>
+List of events that should trigger webhook notifications.
+
+Supported events include:
+
+- `call.started`
+- `call.answered`
+- `call.completed`
+- `call.failed`
+- `call.transferred`
+- `call.recording.available`
+- `call.summary.generated`
+- `call.analysis.completed`
+</ParamField>
+
+<ParamField body="secret" type="string">
+Optional signing secret used to verify incoming webhook requests.
+</ParamField>
+
+<ParamField body="active" type="boolean">
+Enable or disable the webhook after creation.
+
+Default: `true`
+</ParamField>
+
+<RequestExample>
+
+```bash cURL
+curl --location '{{baseUrl}}/api/webhooks' \
+--header 'Authorization: Bearer {{authToken}}' \
+--header 'Content-Type: application/json' \
+--data '{
+  "name": "CRM Webhook",
+  "url": "https://example.com/webhooks/weya",
+  "events": [
+    "call.completed",
+    "call.recording.available"
+  ],
+  "secret": "my-webhook-secret",
+  "active": true
+}'
+```
+
+</RequestExample>
+
+## Response
+
+<ResponseExample>
+
+```json 201
+{
+  "status": true,
+  "code": 201,
+  "message": "Webhook created successfully",
+  "data": {
+    "_id": "6890abc123456789abcdef01",
+    "name": "CRM Webhook",
+    "url": "https://example.com/webhooks/weya",
+    "events": [
+      "call.completed",
+      "call.recording.available"
+    ],
+    "active": true,
+    "createdAt": "2026-07-20T12:45:00.000Z"
+  }
+}
+```
+
+</ResponseExample>
+
+<ResponseField name="status" type="boolean">
+Indicates whether the request was successful.
+</ResponseField>
+
+<ResponseField name="code" type="integer">
+HTTP status code returned by the API.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+Success message.
+</ResponseField>
+
+<ResponseField name="data" type="object">
+Information about the created webhook.
+</ResponseField>
+
+<ResponseField name="data._id" type="string">
+Unique identifier of the webhook.
+</ResponseField>
+
+<ResponseField name="data.name" type="string">
+Webhook display name.
+</ResponseField>
+
+<ResponseField name="data.url" type="string">
+Destination URL that receives webhook events.
+</ResponseField>
+
+<ResponseField name="data.events" type="array[string]">
+Subscribed webhook events.
+</ResponseField>
+
+<ResponseField name="data.active" type="boolean">
+Whether the webhook is enabled.
+</ResponseField>
+
+<ResponseField name="data.createdAt" type="string">
+Webhook creation timestamp.
+</ResponseField>
+
+## Error Handling
+
+| Status | Description |
+|---------|-------------|
+|400|Invalid request body or missing required fields|
+|401|Unauthorized|
+|409|Webhook already exists|
+|422|Invalid webhook URL|
+|500|Internal server error|
+
+<Note>
+
+Your webhook endpoint should return an HTTP **200 OK** response within a few seconds. If Weya AI does not receive a successful response, the webhook delivery may be retried.
+
+</Note>
+
+<Check>
+
+After creating a webhook, you can:
+
+- View all registered webhooks.
+- Update webhook settings.
+- Enable or disable webhook delivery.
+- Delete the webhook when it is no longer required.
+
+</Check>

@@ -1,0 +1,92 @@
+---
+title: "Delete Knowledge Base Document"
+description: "Delete a specific document from an existing Knowledge Base."
+openapi: "DELETE /api/knowledgeBase/{knowledgeBaseId}/documents/{fileName}"
+---
+
+## Overview
+
+Delete a specific document from a Knowledge Base without affecting the Knowledge Base itself. This endpoint is useful for removing outdated, duplicate, or incorrect files while preserving the remaining documents.
+
+## Prerequisites
+
+- Bearer token for an authenticated workspace
+- Valid Knowledge Base ID
+- Valid document filename
+
+## Request
+
+<ParamField header="Authorization" type="string" required>
+Bearer token for authenticated workspace access.
+</ParamField>
+
+<ParamField path="knowledgeBaseId" type="string" required>
+Unique identifier of the Knowledge Base.
+</ParamField>
+
+<ParamField path="fileName" type="string" required>
+Name of the document to delete from the Knowledge Base.
+</ParamField>
+
+<RequestExample>
+
+```bash cURL
+curl --location --request DELETE '{{baseUrl}}/api/knowledgeBase/687b1c2ab7c7d3f123456789/documents/FAQ.pdf' \
+  --header 'Authorization: Bearer {{authToken}}'
+```
+
+</RequestExample>
+
+## Response
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "status": true,
+  "code": 200,
+  "message": "Document deleted successfully"
+}
+```
+
+</ResponseExample>
+
+## Response Fields
+
+<ResponseField name="status" type="boolean">
+Indicates whether the request completed successfully.
+</ResponseField>
+
+<ResponseField name="code" type="integer">
+HTTP status code returned by the API.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+Confirmation message indicating the document was deleted.
+</ResponseField>
+
+## Error Handling
+
+| Status Code | Description |
+|-------------|-------------|
+| **400** | Invalid Knowledge Base ID or filename |
+| **401** | Unauthorized |
+| **403** | You do not have permission to modify this Knowledge Base |
+| **404** | Knowledge Base or document not found |
+| **500** | Internal Server Error |
+
+<Warning>
+
+Deleting a document permanently removes it from the Knowledge Base. AI agents will no longer use the deleted document when answering user queries.
+
+</Warning>
+
+<Check>
+
+Related endpoints:
+
+- `GET /api/knowledgeBase/{knowledgeBaseId}/documents` — View all documents in the Knowledge Base.
+- `PUT /api/knowledgeBase/{knowledgeBaseId}` — Upload additional documents or update the Knowledge Base.
+- `DELETE /api/knowledgeBase/{knowledgeBaseId}` — Delete the entire Knowledge Base.
+
+</Check>

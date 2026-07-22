@@ -1,0 +1,140 @@
+---
+title: "Get Holiday Lists"
+openapi: "GET /api/holiday-lists"
+description: "Retrieve all Holiday Lists available in your Weya AI workspace."
+---
+
+Use this endpoint to retrieve all Holiday Lists configured in your workspace. Holiday Lists help prevent outbound campaigns from calling contacts on specified holidays.
+
+<Note>
+Only authenticated users can retrieve Holiday Lists associated with their workspace.
+</Note>
+
+### OpenAPI
+
+```yaml
+openapi: 3.1.0
+info:
+  title: Get Holiday Lists
+  version: 1.0.0
+
+paths:
+  /api/holiday-lists:
+    get:
+      summary: Retrieve all Holiday Lists
+      description: Returns all Holiday Lists configured for the authenticated workspace.
+      tags:
+        - Holiday Lists
+
+      security:
+        - bearerAuth: []
+
+      responses:
+        "200":
+          description: Holiday Lists retrieved successfully.
+
+        "401":
+          description: Unauthorized.
+
+        "500":
+          description: Internal Server Error.
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+```
+
+## Authorizations
+
+<ParamField header="Authorization" type="string" required>
+Bearer Token for the authenticated user.
+
+Format:
+
+`Authorization: Bearer YOUR_ACCESS_TOKEN`
+</ParamField>
+
+## Example Request
+
+```bash
+curl --location '{{baseUrl}}/api/holiday-lists' \
+--header 'Authorization: Bearer YOUR_ACCESS_TOKEN'
+```
+
+## Successful Response
+
+```json
+[
+  {
+    "_id": "6863f5ab1e4d7f0012345678",
+    "name": "United States Holidays",
+    "description": "Federal holidays observed in the United States.",
+    "enabled": true,
+    "holidayCount": 11,
+    "createdAt": "2025-06-15T10:15:32.000Z",
+    "updatedAt": "2025-06-15T10:15:32.000Z"
+  },
+  {
+    "_id": "6863f5ab1e4d7f0098765432",
+    "name": "India Public Holidays",
+    "description": "National holidays observed across India.",
+    "enabled": false,
+    "holidayCount": 17,
+    "createdAt": "2025-06-18T09:30:10.000Z",
+    "updatedAt": "2025-06-18T09:30:10.000Z"
+  }
+]
+```
+
+## Response Fields
+
+<ResponseField name="_id" type="string">
+Unique identifier of the Holiday List.
+</ResponseField>
+
+<ResponseField name="name" type="string">
+Name of the Holiday List.
+</ResponseField>
+
+<ResponseField name="description" type="string">
+Description of the Holiday List.
+</ResponseField>
+
+<ResponseField name="enabled" type="boolean">
+Indicates whether the Holiday List is currently active.
+</ResponseField>
+
+<ResponseField name="holidayCount" type="integer">
+Total number of holidays contained in the list.
+</ResponseField>
+
+<ResponseField name="createdAt" type="string">
+Timestamp when the Holiday List was created.
+</ResponseField>
+
+<ResponseField name="updatedAt" type="string">
+Timestamp when the Holiday List was last updated.
+</ResponseField>
+
+## Error Responses
+
+### Unauthorized (401)
+
+```json
+{
+  "success": false,
+  "message": "Unauthorized"
+}
+```
+
+### Internal Server Error (500)
+
+```json
+{
+  "success": false,
+  "message": "Failed to retrieve Holiday Lists."
+}
+```

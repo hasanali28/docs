@@ -1,0 +1,106 @@
+---
+title: "Validate WhatsApp Number"
+description: "Validate a WhatsApp Business phone number before integrating it with your workspace."
+openapi: "POST /api/whatsapp/validate-whatsapp-number"
+---
+
+## Overview
+
+Validate a WhatsApp Business phone number before creating an integration. This endpoint verifies that the phone number is eligible for use with the Weya AI platform and can be connected successfully.
+
+## Prerequisites
+
+- Bearer Token authentication
+- A valid WhatsApp Business phone number
+
+## Request
+
+<ParamField header="Authorization" type="string" required>
+Bearer token for authenticated workspace access.
+</ParamField>
+
+<RequestExample>
+
+```bash cURL
+curl --location '{{baseUrl}}/api/whatsapp/validate-whatsapp-number' \
+--header 'Authorization: Bearer {{authToken}}' \
+--header 'Content-Type: application/json' \
+--data '{
+    "phoneNumber": "+15551234567"
+}'
+```
+
+</RequestExample>
+
+## Request Body
+
+<ParamField body="phoneNumber" type="string" required>
+WhatsApp Business phone number including the country code.
+</ParamField>
+
+## Response
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "status": true,
+  "code": 200,
+  "message": "WhatsApp number validated successfully",
+  "data": {
+    "phoneNumber": "+15551234567",
+    "isValid": true
+  }
+}
+```
+
+</ResponseExample>
+
+<ResponseField name="status" type="boolean">
+Indicates whether the request completed successfully.
+</ResponseField>
+
+<ResponseField name="code" type="integer">
+HTTP status code returned by the API.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+Human-readable success message.
+</ResponseField>
+
+<ResponseField name="data" type="object">
+Validation result.
+</ResponseField>
+
+<ResponseField name="data.phoneNumber" type="string">
+The WhatsApp number that was validated.
+</ResponseField>
+
+<ResponseField name="data.isValid" type="boolean">
+Whether the phone number is valid for integration.
+</ResponseField>
+
+## Error Handling
+
+| Status | Description |
+|---------|-------------|
+|400|Invalid or malformed phone number|
+|401|Unauthorized or invalid Bearer token|
+|404|Phone number not found|
+|500|Internal server error|
+
+<Note>
+
+A successful validation does not create an integration. After validation, use the **Create WhatsApp Integration** endpoint to connect the number to your workspace.
+
+</Note>
+
+<Check>
+
+Typical workflow:
+
+1. Validate the WhatsApp number.
+2. Create a WhatsApp integration.
+3. Assign a WhatsApp Agent to the integrated number.
+
+</Check>

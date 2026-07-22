@@ -1,0 +1,162 @@
+---
+title: "Update Knowledge Base"
+description: "Update the details of an existing Knowledge Base or upload additional documents."
+openapi: "PUT /api/knowledgeBase/{knowledgeBaseId}"
+---
+
+## Overview
+
+Update an existing Knowledge Base by modifying its name, description, or uploading additional documents. Existing documents remain unchanged unless explicitly deleted using the Delete Document endpoint.
+
+## Prerequisites
+
+- Bearer token for an authenticated workspace
+- Valid Knowledge Base ID
+- `multipart/form-data` request
+
+## Request
+
+<ParamField header="Authorization" type="string" required>
+Bearer token for authenticated workspace access.
+</ParamField>
+
+<ParamField path="knowledgeBaseId" type="string" required>
+Unique identifier of the Knowledge Base.
+</ParamField>
+
+<ParamField body="knowledgeBaseName" type="string">
+Updated name of the Knowledge Base.
+</ParamField>
+
+<ParamField body="description" type="string">
+Updated description of the Knowledge Base.
+</ParamField>
+
+<ParamField body="files" type="file[]">
+One or more new documents to upload. Existing documents are preserved.
+</ParamField>
+
+<RequestExample>
+
+```bash cURL
+curl --location --request PUT '{{baseUrl}}/api/knowledgeBase/687b1c2ab7c7d3f123456789' \
+  --header 'Authorization: Bearer {{authToken}}' \
+  --form 'knowledgeBaseName="Updated Customer Support KB"' \
+  --form 'description="Updated support documentation"' \
+  --form 'files=@"/Users/john/Documents/RefundPolicy.pdf"' \
+  --form 'files=@"/Users/john/Documents/NewPricing.pdf"'
+```
+
+</RequestExample>
+
+## Response
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "status": true,
+  "code": 200,
+  "message": "Knowledge Base updated successfully",
+  "data": {
+    "_id": "687b1c2ab7c7d3f123456789",
+    "knowledgeBaseName": "Updated Customer Support KB",
+    "description": "Updated support documentation",
+    "documents": [
+      {
+        "fileName": "FAQ.pdf"
+      },
+      {
+        "fileName": "Pricing.pdf"
+      },
+      {
+        "fileName": "RefundPolicy.pdf"
+      },
+      {
+        "fileName": "NewPricing.pdf"
+      }
+    ],
+    "updatedAt": "2026-07-20T16:45:18.000Z"
+  }
+}
+```
+
+</ResponseExample>
+
+## Request Fields
+
+<RequestField name="knowledgeBaseName" type="string">
+New name of the Knowledge Base.
+</RequestField>
+
+<RequestField name="description" type="string">
+Updated description for the Knowledge Base.
+</RequestField>
+
+<RequestField name="files" type="file[]">
+Additional documents to upload. Multiple files are supported.
+</RequestField>
+
+## Response Fields
+
+<ResponseField name="status" type="boolean">
+Indicates whether the update was successful.
+</ResponseField>
+
+<ResponseField name="code" type="integer">
+HTTP status code.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+Response message.
+</ResponseField>
+
+<ResponseField name="data._id" type="string">
+Unique identifier of the Knowledge Base.
+</ResponseField>
+
+<ResponseField name="data.knowledgeBaseName" type="string">
+Updated Knowledge Base name.
+</ResponseField>
+
+<ResponseField name="data.description" type="string">
+Updated Knowledge Base description.
+</ResponseField>
+
+<ResponseField name="data.documents" type="array">
+Complete list of documents currently stored in the Knowledge Base.
+</ResponseField>
+
+<ResponseField name="data.updatedAt" type="string">
+Timestamp of the latest update.
+</ResponseField>
+
+## Error Handling
+
+| Status Code | Description |
+|-------------|-------------|
+| **400** | Invalid request or Knowledge Base ID |
+| **401** | Unauthorized |
+| **403** | Permission denied |
+| **404** | Knowledge Base not found |
+| **413** | Uploaded file exceeds the maximum allowed size |
+| **415** | Unsupported file format |
+| **500** | Internal Server Error |
+
+<Note>
+
+Updating a Knowledge Base does not remove existing documents. To remove a document, use the **Delete Knowledge Base Document** endpoint.
+
+</Note>
+
+<Check>
+
+Related endpoints:
+
+- `GET /api/knowledgeBase` — List all Knowledge Bases.
+- `GET /api/knowledgeBase/{knowledgeBaseId}` — Retrieve Knowledge Base details.
+- `GET /api/knowledgeBase/{knowledgeBaseId}/documents` — View uploaded documents.
+- `DELETE /api/knowledgeBase/{knowledgeBaseId}/documents/{fileName}` — Delete a specific document.
+- `DELETE /api/knowledgeBase/{knowledgeBaseId}` — Delete the entire Knowledge Base.
+
+</Check>

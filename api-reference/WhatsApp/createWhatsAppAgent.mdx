@@ -1,0 +1,159 @@
+---
+title: "Create WhatsApp Agent"
+description: "Create a new AI-powered WhatsApp Agent for handling customer conversations."
+openapi: "POST /api/whatsapp/save-whatsapp-agent"
+---
+
+## Overview
+
+Create a WhatsApp Agent that can automatically respond to customer messages on an integrated WhatsApp Business number. The agent can be configured with prompts, AI models, knowledge bases, templates, and conversation settings.
+
+## Prerequisites
+
+- Bearer Token authentication
+- At least one integrated WhatsApp Business number
+- (Optional) Knowledge Base created
+- (Optional) WhatsApp templates configured
+
+## Request
+
+<ParamField header="Authorization" type="string" required>
+Bearer token for authenticated workspace access.
+</ParamField>
+
+<RequestExample>
+
+```bash cURL
+curl --location '{{baseUrl}}/api/whatsapp/save-whatsapp-agent' \
+--header 'Authorization: Bearer {{authToken}}' \
+--header 'Content-Type: application/json' \
+--data '{
+  "agentName": "Support Assistant",
+  "phoneNumberId": "123456789012345",
+  "systemPrompt": "You are a helpful customer support assistant.",
+  "welcomeMessage": "Hello 👋 How can I help you today?",
+  "knowledgeBase": [
+    "6892fd48bde23a1234567890"
+  ],
+  "model": "gpt-4.1",
+  "temperature": 0.7
+}'
+```
+
+</RequestExample>
+
+## Request Body
+
+<ParamField body="agentName" type="string" required>
+Name of the WhatsApp AI Agent.
+</ParamField>
+
+<ParamField body="phoneNumberId" type="string" required>
+WhatsApp Business Phone Number ID that the agent will be assigned to.
+</ParamField>
+
+<ParamField body="systemPrompt" type="string" required>
+Primary instructions that define the behavior of the AI agent.
+</ParamField>
+
+<ParamField body="welcomeMessage" type="string">
+Message automatically sent when a new conversation starts.
+</ParamField>
+
+<ParamField body="knowledgeBase" type="array[string]">
+List of Knowledge Base IDs the agent can use while answering questions.
+</ParamField>
+
+<ParamField body="model" type="string">
+AI model used for generating responses.
+</ParamField>
+
+<ParamField body="temperature" type="number">
+Controls the creativity of the AI responses.
+</ParamField>
+
+## Response
+
+<ResponseExample>
+
+```json 201 Created
+{
+  "status": true,
+  "code": 201,
+  "message": "WhatsApp Agent created successfully",
+  "data": {
+    "_id": "6894a98a7fcde123456789ab",
+    "agentName": "Support Assistant",
+    "phoneNumberId": "123456789012345",
+    "status": "active",
+    "createdAt": "2026-07-21T13:45:18.000Z"
+  }
+}
+```
+
+</ResponseExample>
+
+<ResponseField name="status" type="boolean">
+Indicates whether the request was successful.
+</ResponseField>
+
+<ResponseField name="code" type="integer">
+HTTP status code.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+Success message returned by the API.
+</ResponseField>
+
+<ResponseField name="data" type="object">
+Information about the newly created WhatsApp Agent.
+</ResponseField>
+
+<ResponseField name="data._id" type="string">
+Unique identifier of the WhatsApp Agent.
+</ResponseField>
+
+<ResponseField name="data.agentName" type="string">
+Name of the WhatsApp Agent.
+</ResponseField>
+
+<ResponseField name="data.phoneNumberId" type="string">
+WhatsApp Business Phone Number assigned to the agent.
+</ResponseField>
+
+<ResponseField name="data.status" type="string">
+Current status of the agent.
+</ResponseField>
+
+<ResponseField name="data.createdAt" type="string">
+Timestamp when the agent was created.
+</ResponseField>
+
+## Error Handling
+
+| Status | Description |
+|---------|-------------|
+|400|Missing or invalid request parameters|
+|401|Unauthorized or invalid Bearer token|
+|403|You do not have permission to create WhatsApp agents|
+|404|WhatsApp number or Knowledge Base not found|
+|409|An agent already exists for the selected WhatsApp number|
+|500|Internal server error|
+
+<Note>
+
+A WhatsApp Agent must be associated with an integrated WhatsApp Business number before it can start responding to incoming messages.
+
+</Note>
+
+<Check>
+
+Typical workflow:
+
+1. Validate the WhatsApp number.
+2. Create the WhatsApp integration.
+3. Create the WhatsApp Agent.
+4. Assign the agent to the integrated number.
+5. Test the agent by sending a WhatsApp message.
+
+</Check>

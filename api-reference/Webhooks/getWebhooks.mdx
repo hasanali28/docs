@@ -1,0 +1,117 @@
+---
+title: "Webhooks"
+description: "View the webhook endpoints available for telephony providers supported by Weya AI."
+openapi: "GET /api/webhooks"
+---
+
+## Overview
+
+Webhooks allow telephony providers to notify Weya AI about call events in real time. These events include inbound calls, outbound calls, call status updates, recordings, transfers, voicemail detection, and more.
+
+Depending on the provider you use, you'll need to configure one or more webhook URLs inside your telephony provider's dashboard.
+
+---
+
+## Supported Providers
+
+<CardGroup cols={2}>
+
+<Card title="Twilio" icon="phone">
+Supports inbound calls, call status updates, recordings, and AMD callbacks.
+</Card>
+
+<Card title="Plivo" icon="phone">
+Supports inbound/outbound calls, recordings, and call status updates.
+</Card>
+
+<Card title="Telnyx" icon="phone">
+Supports inbound calls, status updates, and recording retrieval.
+</Card>
+
+<Card title="SIP" icon="network-wired">
+Supports SIP call status callbacks.
+</Card>
+
+<Card title="Vobiz" icon="phone">
+Supports inbound/outbound calls, recordings, and hangup events.
+</Card>
+
+<Card title="Jambonz" icon="server">
+Supports advanced call routing, transfers, recordings, and event callbacks.
+</Card>
+
+<Card title="Nexmo" icon="phone">
+Supports call status notifications.
+</Card>
+
+<Card title="Elisiontec" icon="phone">
+Supports hangup callbacks.
+</Card>
+
+</CardGroup>
+
+---
+
+## Available Webhook Endpoints
+
+| Provider | Events |
+|----------|--------|
+| Twilio | Inbound Call, Call Status, Recording Status, AMD Callback |
+| Plivo | Inbound Call, Outbound Call, Call Status, Recording |
+| Telnyx | Inbound Call, Call Status, Recording |
+| SIP | Call Status |
+| Vobiz | Inbound Call, Outbound Call, Call Status, Recording, Hangup |
+| Nexmo | Call Status |
+| Elisiontec | Hangup |
+| Jambonz | Receive Call, Inbound Call, Outbound Call, Call Status, Recording, Listen Complete, Transfer |
+
+---
+
+## Typical Event Flow
+
+```text
+Customer
+      │
+      ▼
+Telephony Provider
+      │
+      ▼
+Webhook Event
+      │
+      ▼
+Weya AI
+      │
+      ▼
+Agent Processing
+      │
+      ▼
+CRM / Dashboard / Analytics
+```
+
+---
+
+## Common Webhook Events
+
+| Event | Description |
+|--------|-------------|
+| Inbound Call | Triggered when a customer calls your phone number. |
+| Outbound Call | Triggered when Weya AI places a call. |
+| Call Status | Reports ringing, answered, completed, failed, or busy states. |
+| Recording | Sends recording information after the call ends. |
+| AMD Callback | Detects whether a human or voicemail answered the call. |
+| Transfer | Triggered when a call is transferred to another destination. |
+| Hangup | Sent when the call disconnects. |
+
+---
+
+<Note>
+
+Webhook endpoints are intended to be called automatically by telephony providers. They are **not** designed to be invoked directly by users.
+
+</Note>
+
+<Check>
+
+Refer to the provider-specific webhook documentation for request payloads, callback events, and expected responses.
+
+</Check>

@@ -13,104 +13,193 @@
       {
         "tab": "Guides",
         "groups": [
-        
           {
             "group": " ",
             "pages": ["index"]
-            
-          },
-           {
-            "group": "Get Started",
-            "pages": ["essentials/settings"]
-            
-          },
-        {
-  "group": "Build",
-  "pages": [
-    {
-      "group": "Build AI Agent",
-      "pages": [
-        "single-prompt/step1",
-        "single-prompt/step2",
-        "single-prompt/step3",
-        "single-prompt/step4"
-      ]
-    }
-  ]
-},
-   {
-            "group": "Phone Numbers",
-            "pages": ["phonenumbers/addphonenumber"]
-            
-          },
-           {
-            "group": "Knowledge Bases",
-            "pages": ["knowledgebase/knowledgebase"]
-            
           },
           {
-  "group": "Tools & Integrations",
-  "pages": [
-    {
-      "group": "Tools",
-      "pages": [
-        "tools/customtool",
-        "tools/postcallwhatsapp",
-        "tools/calltransfer"
-      ]
-    },
-    {
-      "group": "Integrations",
-      "pages": [
-        "/integration/crmintegration"
-      ]
-    }
-  ]
-},
- {
-  "group": "Campaign",
-  "pages": [
-    {
-      "group": "Campaign  Management ",
-      "pages": [
-        "campaigns/createcampaign",
-        "campaigns/analytics"
-      ]
-    }
-  ]
-}
+            "group": "Get Started",
+            "pages": ["essentials/settings"]
+          },
+          {
+            "group": "Build",
+            "pages": [
+              {
+                "group": "Voice Agents",
+                "pages": [
+                  "single-prompt/step1",
+                  "single-prompt/step2",
+                  "single-prompt/step3",
+                  "single-prompt/step4"
+                ]
+              },
+              {
+                "group": "Video Agents",
+                "pages": [
+                  "video-agents/create-video-agent",
+                  "video-agents/avatar",
+                  "video-agents/knowledge-base",
+                  "video-agents/deploy"
+                ]
+              },
+              {
+                "group": "WhatsApp Agents",
+                "pages": [
+                  "whatsapp/create-whatsapp-agent",
+                  "whatsapp/connect-whatsapp-number",
+                  "whatsapp/templates",
+                  "whatsapp/deploy"
+                ]
+              },
+              {
+                "group": "Knowledge Bases",
+                "pages": [
+                  "knowledgebase/knowledgebase"
+                ]
+              },
+              {
+                "group": "Phone Numbers",
+                "pages": [
+                  "phonenumbers/addphonenumber"
+                ]
+              },
+              {
+                "group": "Campaigns",
+                "pages": [
+                  "campaigns/createcampaign",
+                  "campaigns/analytics"
+                ]
+              },
+              {
+                "group": "Tools",
+                "pages": [
+                  "tools/customtool",
+                  "tools/postcallwhatsapp",
+                  "tools/calltransfer"
+                ]
+              },
+              {
+                "group": "Integrations",
+                "pages": [
+                  "integration/crmintegration"
+                ]
+              }
+            ]
+          }
         ]
       },
       {
         "tab": "API reference",
         "groups": [
           {
-            "group": "Call Management",
+            "group": "Agents",
             "pages": [
-              "api-reference/Calling Management/addPhone",
-              "api-reference/Calling Management/deletePhone",
-              "api-reference/Calling Management/createBatch",
-              "api-reference/Calling Management/deleteBatch",
-              "api-reference/Calling Management/addCallsToBatch",
-              "api-reference/Calling Management/uploadCSV",
-              "api-reference/Calling Management/startCalling",
-              "api-reference/Calling Management/stopCalling",
-              "api-reference/Calling Management/getBatch",
-              "api-reference/Calling Management/getBatchById"
+              "api-reference/Agents/getAgents",
+              "api-reference/Agents/createAgent",
+              "api-reference/Agents/getAgentById",
+              "api-reference/Agents/updateAgent",
+              "api-reference/Agents/deleteAgent"
             ]
           },
-          {
-            "group": "DNC (Do Not Call)",
-            "pages": [
-              "api-reference/DNC/addToDNC",
-              "api-reference/DNC/getDNCList",
-              "api-reference/DNC/removeFromDNC",
-              "api-reference/DNC/enableDisableDNC"
-            ]
-          }
-        ]
-      }
-    ],
+        {
+          "group": "Knowledge Base",
+          "pages": [
+            "api-reference/KnowledgeBase/getKnowledgeBases",
+            "api-reference/KnowledgeBase/createKnowledgeBase",
+            "api-reference/KnowledgeBase/getKnowledgeBaseById",
+            "api-reference/KnowledgeBase/listKnowledgeBaseDocuments",
+            "api-reference/KnowledgeBase/updateKnowledgeBase",
+            "api-reference/KnowledgeBase/deleteKnowledgeBaseDocument",
+            "api-reference/KnowledgeBase/deleteKnowledgeBase"
+          ]
+        },
+        {
+          "group": "Webhooks",
+          "pages": [
+            "api-reference/Webhooks/getWebhooks",
+            "api-reference/Webhooks/createWebhooks",
+            "api-reference/Webhooks/updateWebhooks",
+            "api-reference/Webhooks/deleteWebhooks"
+          ]
+        },
+        {
+          "group": "Video Agents",
+          "pages": [
+            "api-reference/VideoAgents/getVideoAgents",
+            "api-reference/VideoAgents/createVideoAgent",
+            "api-reference/VideoAgents/getModeAwareVoices",
+            "api-reference/VideoAgents/getVideoAgentById",
+            "api-reference/VideoAgents/updateVideoAgent",
+            "api-reference/VideoAgents/deleteVideoAgent"
+          ]
+        },
+{
+  "group": "WhatsApp",
+  "pages": [
+    "api-reference/WhatsApp/createWhatsAppIntegration",
+    "api-reference/WhatsApp/updateWhatsAppIntegration",
+    "api-reference/WhatsApp/createWhatsAppAgent",
+    "api-reference/WhatsApp/getWhatsAppAgents",
+    "api-reference/WhatsApp/getWhatsAppAgentById",
+    "api-reference/WhatsApp/updateWhatsAppAgent",
+    "api-reference/WhatsApp/deleteWhatsAppAgent",
+    "api-reference/WhatsApp/getTemplates",
+    "api-reference/WhatsApp/getTemplateVariables",
+    "api-reference/WhatsApp/getAllTemplates",
+    "api-reference/WhatsApp/updateWhatsAppWebhook",
+    "api-reference/WhatsApp/storeEmailAndWhatsapp"
+  ]
+},
+       {
+  "group": "Phone Numbers",
+  "pages": [
+    "api-reference/Calling Management/addPhone",
+    "api-reference/PhoneNumbers/getPhoneNumbers",
+    "api-reference/PhoneNumbers/getPhoneNumbersWithAgent",
+    "api-reference/PhoneNumbers/updatePhoneNumber",
+    "api-reference/PhoneNumbers/deletePhoneNumber",
+    "api-reference/WhatsApp/validateWhatsAppNumber",
+    "api-reference/WhatsApp/getWhatsAppNumbers",
+    "api-reference/WhatsApp/deleteWhatsAppNumber",
+    "api-reference/WhatsApp/removeAgentFromWhatsAppNumber"
+  ]
+},
+{
+  "group": "Batch Management",
+  "pages": [
+    "api-reference/calling Management/getBatch",
+    "api-reference/Calling Management/getBatchById",
+    "api-reference/Calling Management/addCallsToBatch",
+    "api-reference/Calling Management/uploadCSV",
+    "api-reference/Calling Management/startCalling",
+    "api-reference/Calling Management/stopCalling",
+    "api-reference/Calling Management/deleteBatch",
+    "api-reference/WhatsApp/assignAgentToWhatsAppNumber"
+  ]
+},
+        {
+          "group": "DNC (Do Not Call)",
+          "pages": [
+            "api-reference/DNC/addToDNC",
+            "api-reference/DNC/getDNCList",
+            "api-reference/DNC/removeFromDNC",
+            "api-reference/DNC/enableDisableDNC"
+          ]
+        },
+        {
+          "group": "Holiday Lists",
+          "pages": [
+            "api-reference/HolidayLists/getHolidayLists",
+            "api-reference/HolidayLists/createHolidayList",
+            "api-reference/HolidayLists/getTemplateHolidays",
+            "api-reference/HolidayLists/updateHolidayList",
+            "api-reference/HolidayLists/toggleHolidayList",
+            "api-reference/HolidayLists/deleteHolidayList"
+          ]
+        }
+      ]
+    }
+  ],
     "global": {
       "anchors": [
         {

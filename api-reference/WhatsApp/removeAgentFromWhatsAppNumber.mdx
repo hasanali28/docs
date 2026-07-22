@@ -1,0 +1,102 @@
+---
+title: "Remove Agent from WhatsApp Number"
+description: "Remove the assigned WhatsApp AI Agent from a connected WhatsApp Business phone number."
+openapi: "PUT /api/whatsapp/remove-agent-in-whatsapp-number/{phoneNumberId}"
+---
+
+## Overview
+
+Remove the currently assigned WhatsApp AI Agent from a connected WhatsApp Business phone number. After removing the assignment, the number will no longer be handled by an AI Agent until another agent is assigned.
+
+## Prerequisites
+
+- Bearer Token authentication
+- A connected WhatsApp Business phone number with an assigned AI Agent
+
+## Request
+
+<ParamField header="Authorization" type="string" required>
+Bearer token for authenticated workspace access.
+</ParamField>
+
+<ParamField path="phoneNumberId" type="string" required>
+Unique identifier of the WhatsApp Business phone number.
+</ParamField>
+
+<RequestExample>
+
+```bash cURL
+curl --location --request PUT '{{baseUrl}}/api/whatsapp/remove-agent-in-whatsapp-number/123456789012345' \
+--header 'Authorization: Bearer {{authToken}}'
+```
+
+</RequestExample>
+
+## Response
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "status": true,
+  "code": 200,
+  "message": "Agent removed successfully",
+  "data": {
+    "phoneNumberId": "123456789012345",
+    "agentAssigned": false
+  }
+}
+```
+
+</ResponseExample>
+
+<ResponseField name="status" type="boolean">
+Indicates whether the request completed successfully.
+</ResponseField>
+
+<ResponseField name="code" type="integer">
+HTTP status code returned by the API.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+Confirmation message indicating the agent was removed successfully.
+</ResponseField>
+
+<ResponseField name="data" type="object">
+Details of the updated WhatsApp number.
+</ResponseField>
+
+<ResponseField name="data.phoneNumberId" type="string">
+WhatsApp Business phone number from which the agent was removed.
+</ResponseField>
+
+<ResponseField name="data.agentAssigned" type="boolean">
+Indicates whether an AI Agent is currently assigned to the phone number.
+</ResponseField>
+
+## Error Handling
+
+| Status | Description |
+|---------|-------------|
+|400|Invalid phone number ID|
+|401|Unauthorized or invalid Bearer token|
+|403|Permission denied|
+|404|WhatsApp number not found|
+|409|No agent is currently assigned to this WhatsApp number|
+|500|Internal server error|
+
+<Note>
+
+Removing an agent does not delete the WhatsApp Agent itself. It only unlinks the agent from the selected WhatsApp Business phone number.
+
+</Note>
+
+<Check>
+
+Related endpoints:
+
+- `POST /api/whatsapp/add-agent-in-whatsapp-number` — Assign an AI Agent to a WhatsApp number.
+- `GET /api/whatsapp/whatsapp-number` — List connected WhatsApp Business numbers.
+- `GET /api/whatsapp/get-whatsapp-agent` — List available WhatsApp AI Agents.
+
+</Check>

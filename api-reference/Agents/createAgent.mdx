@@ -1,0 +1,70 @@
+---
+title: "Create Agent"
+description: "Create a new AI voice agent."
+openapi: "POST /api/agents/create"
+---
+
+## Overview
+
+Create a new AI agent that can be used for voice calls, campaigns, or inbound phone numbers.
+
+## Prerequisites
+
+- API Key or Bearer Token
+- Organization access
+- At least one supported LLM configured
+
+## Request
+
+<ParamField header="Authorization" type="string">
+Bearer token for authentication.
+</ParamField>
+
+<ParamField body="agentName" type="string" required>
+Unique name of the agent.
+</ParamField>
+
+<ParamField body="prompt" type="string" required>
+System prompt used by the agent.
+</ParamField>
+
+<ParamField body="voiceId" type="string">
+Voice to use.
+</ParamField>
+
+<RequestExample>
+
+```bash
+curl ...
+```
+
+</RequestExample>
+
+## Response
+
+<ResponseExample>
+
+```json
+{
+  "status": true,
+  "message": "Agent created successfully",
+  "data": {
+    "_id": "...",
+    "agentName": "Sales Agent"
+  }
+}
+```
+
+</ResponseExample>
+
+## Errors
+
+- 400 Bad Request
+- 401 Unauthorized
+- 500 Internal Server Error
+
+<Check>
+
+Use **GET /api/agents/{id}** to verify the agent was created.
+
+</Check>

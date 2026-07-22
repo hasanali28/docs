@@ -1,80 +1,181 @@
 ---
 title: "Quickstart"
-description: "Start building awesome documentation in minutes"
+description: "Create your first AI Agent, connect a phone number, build a knowledge base, and launch your first AI-powered campaign with Weya AI."
 ---
 
-## Get started in three steps
+# Quickstart
 
-Get your documentation site running locally and make your first customization.
+Welcome to Weya AI! This guide walks you through creating your first AI-powered solution—from building an agent to launching a live campaign.
 
-### Step 1: Set up your local environment
+By the end of this guide, you'll have:
 
-<AccordionGroup>
-  <Accordion icon="copy" title="Clone your docs locally">
-    During the onboarding process, you created a GitHub repository with your docs content if you didn't already have one. You can find a link to this repository in your [dashboard](https://dashboard.mintlify.com).
-    
-    To clone the repository locally so that you can make and preview changes to your docs, follow the [Cloning a repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) guide in the GitHub docs.
-  </Accordion>
-  <Accordion icon="rectangle-terminal" title="Start the preview server">
-    1. Install the Mintlify CLI: `npm i -g mint`
-    2. Navigate to your docs directory and run: `mint dev`
-    3. Open `http://localhost:3000` to see your docs live!
-    
-    <Tip>Your preview updates automatically as you edit files.</Tip>
-  </Accordion>
-</AccordionGroup>
+- 🤖 An AI Agent ready to answer customers
+- 📚 A Knowledge Base connected to your agent
+- 📞 A phone number linked to your workspace
+- 📢 A campaign ready to make or receive calls
+- 📊 Access to analytics, call recordings, and transcripts
 
-### Step 2: Deploy your changes
+---
 
-<AccordionGroup>
-  <Accordion icon="github" title="Install our GitHub app">
-    Install the Mintlify GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app).
-    
-    Our GitHub app automatically deploys your changes to your docs site, so you don't need to manage deployments yourself.
-</Accordion>
-<Accordion icon="palette" title="Update your site name and colors">
-    For a first change, let's update the name and colors of your docs site.
-
-    1. Open `docs.json` in your editor.
-    2. Change the `"name"` field to your project name.
-    3. Update the `"colors"` to match your brand.
-    4. Save and see your changes instantly at `http://localhost:3000`.
-
-    <Tip>Try changing the primary color to see an immediate difference!</Tip>
-  </Accordion>
-</AccordionGroup>
-
-### Step 3: Go live
-
-<Accordion icon="rocket" title="Publish your docs">
-  1. Commit and push your changes.
-  2. Your docs will update and be live in moments!
-</Accordion>
-
-## Next steps
-
-Now that you have your docs running, explore these key features:
+## What can you build?
 
 <CardGroup cols={2}>
 
-<Card title="Write Content" icon="pen-to-square" href="/essentials/markdown">
-  Learn MDX syntax and start writing your documentation.
+<Card title="Voice Agents" icon="phone">
+Build AI voice agents for inbound support, outbound campaigns, appointment scheduling, collections, sales, and customer service.
 </Card>
 
-<Card title="Customize style" icon="palette" href="/essentials/settings">
-  Make your docs match your brand perfectly.
+<Card title="Video Agents" icon="video">
+Create AI-powered video agents for interactive customer conversations and digital experiences.
 </Card>
 
-<Card title="Add code examples" icon="square-code" href="/essentials/code">
-  Include syntax-highlighted code blocks.
+<Card title="WhatsApp Agents" icon="message">
+Automate customer conversations on WhatsApp using AI, templates, workflows, and integrations.
 </Card>
 
-<Card title="API documentation" icon="code" href="/api-reference/introduction">
-  Auto-generate API docs from OpenAPI specs.
+<Card title="Voice Campaigns" icon="bullhorn">
+Launch outbound calling campaigns with AI voice agents, contact lists, scheduling, retries, and analytics.
 </Card>
 
 </CardGroup>
 
-<Note>
-  **Need help?** See our [full documentation](https://mintlify.com/docs) or join our [community](https://mintlify.com/community).
-</Note>
+---
+
+## Before You Begin
+
+Make sure you have:
+
+- A Weya AI account
+- Access to the Weya AI Dashboard
+- A verified email address
+- Internet access
+
+You can sign in using:
+
+- Email & Password
+- Google
+- LinkedIn
+
+---
+
+# Build Your First AI Solution
+
+Follow these guides in order.
+
+<CardGroup cols={5}>
+
+<Card
+title="Step 1"
+icon="user"
+href="/quickstart/sign-in"
+>
+
+Sign in to your Weya AI Dashboard.
+
+</Card>
+
+<Card
+title="Step 2"
+icon="robot"
+href="/quickstart/create-agent"
+>
+
+Create your first AI Agent.
+
+</Card>
+
+<Card
+title="Step 3"
+icon="book-open"
+href="/quickstart/create-knowledge-base"
+>
+
+Upload documents and build a Knowledge Base.
+
+</Card>
+
+<Card
+title="Step 4"
+icon="phone"
+href="/quickstart/add-phone-number"
+>
+
+Connect a phone number to your workspace.
+
+</Card>
+
+<Card
+title="Step 5"
+icon="rocket"
+href="/quickstart/create-campaign"
+>
+
+Launch your first AI-powered campaign.
+
+</Card>
+
+</CardGroup>
+
+---
+
+## After You're Live
+
+Once your campaign is running, Weya AI provides everything you need to monitor and improve performance.
+
+<CardGroup cols={3}>
+
+<Card title="Analytics" icon="chart-line">
+Track campaign performance, call volume, and AI insights.
+</Card>
+
+<Card title="Call Logs" icon="phone-call">
+Review call recordings, transcripts, summaries, and outcomes.
+</Card>
+
+<Card title="Integrations" icon="plug">
+Connect CRMs, Webhooks, WhatsApp, and Custom Tools.
+</Card>
+
+</CardGroup>
+
+---
+
+## Next Steps
+
+After completing the Quickstart, you can continue exploring Weya AI.
+
+<CardGroup cols={2}>
+
+<Card
+title="Developer API"
+icon="code"
+href="/api-reference/Agents/createAgent"
+>
+
+Integrate Weya AI directly into your applications using our REST APIs.
+
+</Card>
+
+<Card
+title="Platform Guides"
+icon="book-open"
+href="/single-prompt/step1"
+>
+
+Learn how to build advanced AI agents, campaigns, and integrations.
+
+</Card>
+
+</CardGroup>
+
+<Check>
+
+The complete Quickstart takes approximately **10–15 minutes**.
+
+</Check>
+
+<Tip>
+
+If you're integrating Weya AI into your own application, you can jump directly to the **API Reference** after creating your workspace.
+
+</Tip>

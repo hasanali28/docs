@@ -1,0 +1,173 @@
+---
+title: "Get Template Holidays"
+openapi: "GET /api/holiday-lists/templates/{region}"
+description: "Retrieve predefined holiday templates for a specific region to quickly create Holiday Lists."
+---
+
+Use this endpoint to retrieve a predefined set of holidays for a supported region. Template holidays can be used as a starting point when creating a Holiday List instead of manually adding each holiday.
+
+<Note>
+Holiday templates are maintained by Weya AI and may be updated periodically to reflect official public holidays.
+</Note>
+
+### OpenAPI
+
+```yaml
+openapi: 3.1.0
+info:
+  title: Get Template Holidays
+  version: 1.0.0
+
+paths:
+  /api/holiday-lists/templates/{region}:
+    get:
+      summary: Retrieve template holidays
+      description: Returns a predefined list of holidays for the specified region.
+      tags:
+        - Holiday Lists
+
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - in: path
+          name: region
+          required: true
+          schema:
+            type: string
+          example: india
+
+      responses:
+        "200":
+          description: Holiday template retrieved successfully.
+
+        "400":
+          description: Invalid region.
+
+        "401":
+          description: Unauthorized.
+
+        "404":
+          description: Region not found.
+
+        "500":
+          description: Internal Server Error.
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+```
+
+## Authorizations
+
+<ParamField header="Authorization" type="string" required>
+Bearer Token for the authenticated user.
+
+Format:
+
+`Authorization: Bearer YOUR_ACCESS_TOKEN`
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="region" type="string" required>
+The region or country for which predefined holidays should be returned.
+
+Examples:
+
+- `india`
+- `united-states`
+- `united-kingdom`
+- `australia`
+</ParamField>
+
+## Example Request
+
+```bash
+curl --location '{{baseUrl}}/api/holiday-lists/templates/india' \
+--header 'Authorization: Bearer YOUR_ACCESS_TOKEN'
+```
+
+## Successful Response
+
+```json
+{
+  "success": true,
+  "data": {
+    "region": "india",
+    "holidays": [
+      {
+        "name": "Republic Day",
+        "date": "2026-01-26"
+      },
+      {
+        "name": "Independence Day",
+        "date": "2026-08-15"
+      },
+      {
+        "name": "Gandhi Jayanti",
+        "date": "2026-10-02"
+      }
+    ]
+  }
+}
+```
+
+## Response Fields
+
+<ResponseField name="region" type="string">
+The region associated with the returned holiday template.
+</ResponseField>
+
+<ResponseField name="holidays" type="array">
+Array of predefined holidays available for the selected region.
+</ResponseField>
+
+<ResponseField name="holidays[].name" type="string">
+Name of the holiday.
+</ResponseField>
+
+<ResponseField name="holidays[].date" type="string">
+Date of the holiday in ISO format (`YYYY-MM-DD`).
+</ResponseField>
+
+## Error Responses
+
+### Bad Request (400)
+
+```json
+{
+  "success": false,
+  "message": "Invalid region supplied."
+}
+```
+
+### Unauthorized (401)
+
+```json
+{
+  "success": false,
+  "message": "Unauthorized"
+}
+```
+
+### Region Not Found (404)
+
+```json
+{
+  "success": false,
+  "message": "Holiday template not found for the specified region."
+}
+```
+
+### Internal Server Error (500)
+
+```json
+{
+  "success": false,
+  "message": "Failed to retrieve holiday template."
+}
+```

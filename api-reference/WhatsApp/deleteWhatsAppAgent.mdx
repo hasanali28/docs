@@ -1,0 +1,85 @@
+---
+title: "Delete WhatsApp Agent"
+description: "Permanently delete an existing WhatsApp AI Agent from your workspace."
+openapi: "DELETE /api/whatsapp/delete-whatsapp-agent/{agentId}"
+---
+
+## Overview
+
+Delete a WhatsApp AI Agent from your workspace. Once deleted, the agent will no longer respond to incoming WhatsApp messages, and its configuration cannot be recovered.
+
+## Prerequisites
+
+- Bearer Token authentication
+- Valid WhatsApp Agent ID
+
+## Request
+
+<ParamField header="Authorization" type="string" required>
+Bearer token for authenticated workspace access.
+</ParamField>
+
+<ParamField path="agentId" type="string" required>
+Unique identifier of the WhatsApp AI Agent to delete.
+</ParamField>
+
+<RequestExample>
+
+```bash cURL
+curl --location --request DELETE '{{baseUrl}}/api/whatsapp/delete-whatsapp-agent/6894a98a7fcde123456789ab' \
+--header 'Authorization: Bearer {{authToken}}'
+```
+
+</RequestExample>
+
+## Response
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "status": true,
+  "code": 200,
+  "message": "WhatsApp Agent deleted successfully"
+}
+```
+
+</ResponseExample>
+
+<ResponseField name="status" type="boolean">
+Indicates whether the request completed successfully.
+</ResponseField>
+
+<ResponseField name="code" type="integer">
+HTTP status code returned by the API.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+Confirmation message indicating the WhatsApp Agent was deleted successfully.
+</ResponseField>
+
+## Error Handling
+
+| Status | Description |
+|---------|-------------|
+|400|Invalid WhatsApp Agent ID|
+|401|Unauthorized or invalid Bearer token|
+|403|You do not have permission to delete this WhatsApp Agent|
+|404|WhatsApp Agent not found|
+|500|Internal server error|
+
+<Warning>
+
+Deleting a WhatsApp Agent is permanent. Any conversations routed to this agent will stop being handled until another agent is assigned.
+
+</Warning>
+
+<Check>
+
+Before deleting a WhatsApp Agent, you may want to:
+
+- Retrieve the agent using `GET /api/whatsapp/get-whatsapp-agent/{agentId}`.
+- Export or save the agent configuration if needed.
+- Assign another WhatsApp Agent to the WhatsApp Business number to avoid service interruption.
+
+</Check>

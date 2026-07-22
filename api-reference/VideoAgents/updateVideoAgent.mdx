@@ -1,0 +1,166 @@
+---
+title: "Update Video Agent"
+description: "Update the configuration of an existing Video Agent."
+openapi: "PATCH /api/video-agent/{id}"
+---
+
+## Overview
+
+Update the configuration of an existing Video Agent. You can modify its name, avatar, voice, language, prompts, and associated Knowledge Bases without recreating the agent.
+
+## Prerequisites
+
+- Bearer Token authentication
+- Valid Video Agent ID
+
+## Request
+
+<ParamField header="Authorization" type="string" required>
+Bearer token for authenticated workspace access.
+</ParamField>
+
+<ParamField path="id" type="string" required>
+Unique identifier of the Video Agent.
+</ParamField>
+
+<RequestExample>
+
+```bash cURL
+curl --location --request PATCH '{{baseUrl}}/api/video-agent/6891a23bc456def789123456' \
+--header 'Authorization: Bearer {{authToken}}' \
+--header 'Content-Type: application/json' \
+--data '{
+  "agent_name": "Updated Sales Video Agent",
+  "avatar": "Professional Female",
+  "voice": "en-US-Standard-B",
+  "language": "English",
+  "systemMessage": "You are an experienced AI sales consultant.",
+  "startMessage": "Hello! Welcome back. How may I assist you today?",
+  "knowledgeBase": [
+    "6891b56ac123456789abcdef"
+  ]
+}'
+```
+
+</RequestExample>
+
+## Request Body
+
+<ParamField body="agent_name" type="string">
+Updated display name of the Video Agent.
+</ParamField>
+
+<ParamField body="avatar" type="string">
+Avatar assigned to the Video Agent.
+</ParamField>
+
+<ParamField body="voice" type="string">
+Voice to be used during conversations.
+</ParamField>
+
+<ParamField body="language" type="string">
+Primary language spoken by the Video Agent.
+</ParamField>
+
+<ParamField body="systemMessage" type="string">
+System prompt that controls the Video Agent's behavior.
+</ParamField>
+
+<ParamField body="startMessage" type="string">
+Greeting message spoken at the beginning of a conversation.
+</ParamField>
+
+<ParamField body="knowledgeBase" type="array[string]">
+List of Knowledge Base IDs associated with the Video Agent.
+</ParamField>
+
+## Response
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "status": true,
+  "code": 200,
+  "message": "Video Agent updated successfully",
+  "data": {
+    "_id": "6891a23bc456def789123456",
+    "agent_name": "Updated Sales Video Agent",
+    "avatar": "Professional Female",
+    "voice": "en-US-Standard-B",
+    "language": "English",
+    "status": "active",
+    "updatedAt": "2026-07-21T11:45:18.000Z"
+  }
+}
+```
+
+</ResponseExample>
+
+<ResponseField name="status" type="boolean">
+Indicates whether the request completed successfully.
+</ResponseField>
+
+<ResponseField name="code" type="integer">
+HTTP status code returned by the API.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+Confirmation message indicating the Video Agent was updated successfully.
+</ResponseField>
+
+<ResponseField name="data" type="object">
+Updated Video Agent information.
+</ResponseField>
+
+<ResponseField name="data._id" type="string">
+Unique identifier of the Video Agent.
+</ResponseField>
+
+<ResponseField name="data.agent_name" type="string">
+Updated display name.
+</ResponseField>
+
+<ResponseField name="data.avatar" type="string">
+Updated avatar.
+</ResponseField>
+
+<ResponseField name="data.voice" type="string">
+Updated voice.
+</ResponseField>
+
+<ResponseField name="data.language" type="string">
+Updated language.
+</ResponseField>
+
+<ResponseField name="data.status" type="string">
+Current status of the Video Agent.
+</ResponseField>
+
+<ResponseField name="data.updatedAt" type="string">
+Timestamp indicating when the Video Agent was last updated.
+</ResponseField>
+
+## Error Handling
+
+| Status | Description |
+|---------|-------------|
+|400|Invalid request body or Video Agent ID|
+|401|Unauthorized or invalid Bearer token|
+|403|You do not have permission to update this Video Agent|
+|404|Video Agent not found|
+|500|Internal server error|
+
+<Note>
+
+Only the fields included in the request body are updated. Any omitted fields retain their existing values.
+
+</Note>
+
+<Check>
+
+After updating the Video Agent, you can retrieve the latest configuration using:
+
+- `GET /api/video-agent/{id}`
+
+</Check>

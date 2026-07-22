@@ -1,0 +1,131 @@
+---
+title: "Get Template Variables"
+description: "Retrieve all variables required by a specific WhatsApp message template."
+openapi: "GET /api/whatsapp/get-variable-by-template-id/{phoneNumberId}/{templateId}"
+---
+
+## Overview
+
+Retrieve the list of variables required by a WhatsApp message template. These variables must be supplied when sending template messages or configuring WhatsApp AI Agents that use the selected template.
+
+## Prerequisites
+
+- Bearer Token authentication
+- Connected WhatsApp Business phone number
+- Valid WhatsApp Template ID
+
+## Request
+
+<ParamField header="Authorization" type="string" required>
+Bearer token for authenticated workspace access.
+</ParamField>
+
+<ParamField path="phoneNumberId" type="string" required>
+Unique identifier of the connected WhatsApp Business phone number.
+</ParamField>
+
+<ParamField path="templateId" type="string" required>
+Unique identifier of the WhatsApp message template.
+</ParamField>
+
+<RequestExample>
+
+```bash cURL
+curl --location '{{baseUrl}}/api/whatsapp/get-variable-by-template-id/123456789012345/987654321' \
+--header 'Authorization: Bearer {{authToken}}'
+```
+
+</RequestExample>
+
+## Response
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "status": true,
+  "code": 200,
+  "message": "Template variables fetched successfully",
+  "data": {
+    "templateId": "987654321",
+    "templateName": "appointment_reminder",
+    "variables": [
+      {
+        "name": "customer_name",
+        "type": "string"
+      },
+      {
+        "name": "appointment_date",
+        "type": "string"
+      },
+      {
+        "name": "appointment_time",
+        "type": "string"
+      }
+    ]
+  }
+}
+```
+
+</ResponseExample>
+
+<ResponseField name="status" type="boolean">
+Indicates whether the request completed successfully.
+</ResponseField>
+
+<ResponseField name="code" type="integer">
+HTTP status code returned by the API.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+Confirmation message indicating the template variables were retrieved successfully.
+</ResponseField>
+
+<ResponseField name="data" type="object">
+Contains information about the selected template and its variables.
+</ResponseField>
+
+<ResponseField name="data.templateId" type="string">
+Unique identifier of the WhatsApp template.
+</ResponseField>
+
+<ResponseField name="data.templateName" type="string">
+Name of the WhatsApp template.
+</ResponseField>
+
+<ResponseField name="data.variables" type="array">
+List of variables required by the template.
+</ResponseField>
+
+<ResponseField name="data.variables[].name" type="string">
+Variable name that should be populated before sending the template.
+</ResponseField>
+
+<ResponseField name="data.variables[].type" type="string">
+Expected data type of the variable.
+</ResponseField>
+
+## Error Handling
+
+| Status | Description |
+|---------|-------------|
+|400|Invalid phone number ID or template ID|
+|401|Unauthorized or invalid Bearer token|
+|403|Permission denied|
+|404|Template or WhatsApp phone number not found|
+|500|Internal server error|
+
+<Note>
+
+The returned variables correspond to the placeholders defined in the WhatsApp Business template. Every required variable should be populated before the template is sent.
+
+</Note>
+
+<Check>
+
+Related endpoints:
+
+- `GET /api/whatsapp/get-templates/{phoneNumberId}` — Retrieve all templates for a WhatsApp number.
+- `GET /api/whatsapp/get-all-templates` — Retrieve all templates available in the workspace.
+
+</Check>

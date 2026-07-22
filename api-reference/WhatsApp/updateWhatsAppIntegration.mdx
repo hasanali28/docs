@@ -1,0 +1,142 @@
+---
+title: "Update WhatsApp Integration"
+description: "Update the configuration of an existing WhatsApp Business integration."
+openapi: "PUT /api/whatsapp/update-integration/{phoneNumberId}"
+---
+
+## Overview
+
+Update an existing WhatsApp Business integration. This endpoint allows you to modify the configuration of a connected WhatsApp number, such as its display name, access token, or other integration settings without recreating the integration.
+
+## Prerequisites
+
+- Bearer Token authentication
+- Valid WhatsApp Phone Number ID
+
+## Request
+
+<ParamField header="Authorization" type="string" required>
+Bearer token for authenticated workspace access.
+</ParamField>
+
+<ParamField path="phoneNumberId" type="string" required>
+Unique identifier of the WhatsApp Business phone number.
+</ParamField>
+
+<RequestExample>
+
+```bash cURL
+curl --location --request PUT '{{baseUrl}}/api/whatsapp/update-integration/123456789012345' \
+--header 'Authorization: Bearer {{authToken}}' \
+--header 'Content-Type: application/json' \
+--data '{
+  "displayName": "Weya Customer Support",
+  "accessToken": "EAAGxxxxxxxxxxxxxxxxxxxxxxxx",
+  "businessAccountId": "987654321098765"
+}'
+```
+
+</RequestExample>
+
+## Request Body
+
+<ParamField body="displayName" type="string">
+Updated display name for the WhatsApp Business account.
+</ParamField>
+
+<ParamField body="accessToken" type="string">
+Updated Meta access token used for the integration.
+</ParamField>
+
+<ParamField body="businessAccountId" type="string">
+Updated WhatsApp Business Account ID.
+</ParamField>
+
+## Response
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "status": true,
+  "code": 200,
+  "message": "WhatsApp integration updated successfully",
+  "data": {
+    "_id": "6891f1d0c45d123456789abc",
+    "phoneNumberId": "123456789012345",
+    "phoneNumber": "+15551234567",
+    "displayName": "Weya Customer Support",
+    "status": "connected",
+    "updatedAt": "2026-07-21T14:32:18.000Z"
+  }
+}
+```
+
+</ResponseExample>
+
+<ResponseField name="status" type="boolean">
+Indicates whether the request completed successfully.
+</ResponseField>
+
+<ResponseField name="code" type="integer">
+HTTP status code returned by the API.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+Confirmation message indicating the integration was updated successfully.
+</ResponseField>
+
+<ResponseField name="data" type="object">
+Updated WhatsApp integration details.
+</ResponseField>
+
+<ResponseField name="data._id" type="string">
+Unique identifier of the integration.
+</ResponseField>
+
+<ResponseField name="data.phoneNumberId" type="string">
+WhatsApp Business Phone Number ID.
+</ResponseField>
+
+<ResponseField name="data.phoneNumber" type="string">
+Connected WhatsApp Business phone number.
+</ResponseField>
+
+<ResponseField name="data.displayName" type="string">
+Updated display name.
+</ResponseField>
+
+<ResponseField name="data.status" type="string">
+Current status of the integration.
+</ResponseField>
+
+<ResponseField name="data.updatedAt" type="string">
+Timestamp indicating when the integration was last updated.
+</ResponseField>
+
+## Error Handling
+
+| Status | Description |
+|---------|-------------|
+|400|Invalid request body or phoneNumberId|
+|401|Unauthorized or invalid Bearer token|
+|403|You do not have permission to update this integration|
+|404|WhatsApp integration not found|
+|409|Integration update conflicts with existing configuration|
+|500|Internal server error|
+
+<Note>
+
+Only the fields included in the request body are updated. Fields that are omitted remain unchanged.
+
+</Note>
+
+<Check>
+
+After updating the integration, you can:
+
+- Retrieve all connected WhatsApp numbers using `GET /api/whatsapp/whatsapp-number`.
+- Assign or update a WhatsApp Agent for the integration.
+- Synchronize templates if your Meta configuration has changed.
+
+</Check>

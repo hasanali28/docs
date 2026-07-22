@@ -1,0 +1,146 @@
+---
+title: "Get Knowledge Base By ID"
+description: "Retrieve the complete details of a specific Knowledge Base, including its metadata and associated documents."
+openapi: "GET /api/knowledgeBase/{knowledgeBaseId}"
+---
+
+## Overview
+
+Retrieve the complete information for a specific Knowledge Base using its unique ID. This endpoint returns the Knowledge Base metadata, document information, and configuration used by your AI agents.
+
+## Prerequisites
+
+- Bearer token for an authenticated workspace
+- Valid Knowledge Base ID
+
+## Request
+
+<ParamField header="Authorization" type="string" required>
+Bearer token for authenticated workspace access.
+</ParamField>
+
+<ParamField path="knowledgeBaseId" type="string" required>
+Unique identifier of the Knowledge Base.
+</ParamField>
+
+<RequestExample>
+
+```bash cURL
+curl --location '{{baseUrl}}/api/knowledgeBase/687b1c2ab7c7d3f123456789' \
+  --header 'Authorization: Bearer {{authToken}}'
+```
+
+</RequestExample>
+
+## Response
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "status": true,
+  "code": 200,
+  "message": "Knowledge Base fetched successfully",
+  "data": {
+    "_id": "687b1c2ab7c7d3f123456789",
+    "knowledgeBaseName": "Customer Support Knowledge Base",
+    "description": "Contains FAQs and support documentation.",
+    "documents": [
+      {
+        "fileName": "FAQ.pdf",
+        "fileUrl": "https://storage.weya.ai/files/FAQ.pdf",
+        "uploadedAt": "2026-07-20T10:30:00.000Z"
+      },
+      {
+        "fileName": "RefundPolicy.docx",
+        "fileUrl": "https://storage.weya.ai/files/RefundPolicy.docx",
+        "uploadedAt": "2026-07-20T10:35:00.000Z"
+      }
+    ],
+    "createdAt": "2026-07-18T08:12:31.000Z",
+    "updatedAt": "2026-07-20T10:35:00.000Z"
+  }
+}
+```
+
+</ResponseExample>
+
+## Response Fields
+
+<ResponseField name="status" type="boolean">
+Indicates whether the request completed successfully.
+</ResponseField>
+
+<ResponseField name="code" type="integer">
+HTTP status code.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+Response message.
+</ResponseField>
+
+<ResponseField name="data" type="object">
+Knowledge Base information.
+</ResponseField>
+
+<ResponseField name="data._id" type="string">
+Unique identifier of the Knowledge Base.
+</ResponseField>
+
+<ResponseField name="data.knowledgeBaseName" type="string">
+Name of the Knowledge Base.
+</ResponseField>
+
+<ResponseField name="data.description" type="string">
+Description of the Knowledge Base.
+</ResponseField>
+
+<ResponseField name="data.documents" type="array">
+List of uploaded documents associated with this Knowledge Base.
+</ResponseField>
+
+<ResponseField name="data.documents[].fileName" type="string">
+Uploaded document name.
+</ResponseField>
+
+<ResponseField name="data.documents[].fileUrl" type="string">
+Public or signed URL of the uploaded document.
+</ResponseField>
+
+<ResponseField name="data.documents[].uploadedAt" type="string">
+Timestamp when the document was uploaded.
+</ResponseField>
+
+<ResponseField name="data.createdAt" type="string">
+Knowledge Base creation timestamp.
+</ResponseField>
+
+<ResponseField name="data.updatedAt" type="string">
+Last updated timestamp.
+</ResponseField>
+
+## Error Handling
+
+| Status Code | Description |
+|------------|-------------|
+| **400** | Invalid Knowledge Base ID |
+| **401** | Unauthorized |
+| **403** | Access denied |
+| **404** | Knowledge Base not found |
+| **500** | Internal Server Error |
+
+<Note>
+
+Use this endpoint whenever you need the complete metadata of a Knowledge Base before updating it, attaching it to an AI agent, or managing its documents.
+
+</Note>
+
+<Check>
+
+Common next steps:
+
+- `PUT /api/knowledgeBase/{knowledgeBaseId}` — Update the Knowledge Base.
+- `GET /api/knowledgeBase/{knowledgeBaseId}/documents` — List all documents.
+- `DELETE /api/knowledgeBase/{knowledgeBaseId}` — Delete the Knowledge Base.
+
+</Check>
