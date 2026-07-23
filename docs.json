@@ -167,7 +167,7 @@
 {
   "group": "Batch Management",
   "pages": [
-    "api-reference/calling Management/getBatch",
+    "api-reference/Calling Management/getBatch",
     "api-reference/Calling Management/getBatchById",
     "api-reference/Calling Management/addCallsToBatch",
     "api-reference/Calling Management/uploadCSV",
