@@ -1,7 +1,7 @@
 ---
 title: "Update Agent"
 description: "Update the configuration of an existing AI agent."
-openapi: "PATCH /api/agents/{id}"
+api: "PATCH /api/agents/{id}"
 ---
 
 ## Overview
@@ -34,7 +34,7 @@ Bearer token for authenticated workspace access.
 <RequestExample>
 
 ```bash cURL
-curl --location --request PATCH '{{baseUrl}}/api/agents/687b1c2ab7c7d3f123456789' \
+curl --location --request PATCH '{{baseUrl}}/build-agents?id=687b1c2ab7c7d3f123456789' \
 --header 'Authorization: Bearer {{authToken}}' \
 --header 'Content-Type: application/json' \
 --data '{

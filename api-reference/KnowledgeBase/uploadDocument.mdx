@@ -1,0 +1,147 @@
+---
+title: "Upload Document"
+description: "Upload documents to a Knowledge Base."
+api: "POST /api/knowledgeBase/createKnowledgeBase"
+---
+
+## Overview
+
+Upload one or more documents while creating a new Knowledge Base.
+
+## Prerequisites
+
+- Bearer token for an authenticated workspace
+- Permission to create Knowledge Bases
+- A Knowledge Base name
+- Documents to upload
+
+## Request
+
+<ParamField header="Authorization" type="string" required>
+Bearer token for authenticated workspace access.
+</ParamField>
+
+<ParamField body="knowledgeBaseName" type="string" required>
+Name of the Knowledge Base.
+</ParamField>
+
+<ParamField body="description" type="string">
+Description of the Knowledge Base.
+</ParamField>
+
+<ParamField body="files" type="file" required>
+Documents to upload to the Knowledge Base.
+</ParamField>
+
+<RequestExample>
+
+```bash cURL
+curl --location '{{baseUrl}}/api/knowledgeBase/createKnowledgeBase' \
+  --header 'Authorization: Bearer {{authToken}}' \
+  --form 'knowledgeBaseName="Customer Support"' \
+  --form 'description="Customer support documentation"' \
+  --form 'files=@"/path/to/document.pdf"'
+```
+
+</RequestExample>
+
+## Response
+
+<ResponseExample>
+
+```json 201 Created
+{
+  "_id": "6895d6a7d3f7a12345678901",
+  "organizationId": "687b1c2ab7c7d3f123456789",
+  "knowledgeBaseName": "Customer Support",
+  "bucketUrl": "https://s3.example.com/customer-support/document.pdf",
+  "vectorDbCollection": "customer_support",
+  "description": "Customer support documentation",
+  "embedding_model": "text-embedding-3-small",
+  "chunk_size": 512,
+  "chunk_overlap": 128,
+  "parsing_mode": "custom",
+  "status": "PENDING",
+  "createdAt": "2025-07-15T10:30:00.000Z",
+  "updatedAt": "2025-07-15T10:30:00.000Z"
+}
+```
+
+</ResponseExample>
+
+<ResponseField name="_id" type="string">
+Unique identifier of the Knowledge Base.
+</ResponseField>
+
+<ResponseField name="organizationId" type="string">
+Identifier of the organization that owns the Knowledge Base.
+</ResponseField>
+
+<ResponseField name="knowledgeBaseName" type="string">
+Name of the Knowledge Base.
+</ResponseField>
+
+<ResponseField name="bucketUrl" type="string">
+S3 URL of the uploaded document.
+</ResponseField>
+
+<ResponseField name="vectorDbCollection" type="string">
+Vector database collection associated with the Knowledge Base.
+</ResponseField>
+
+<ResponseField name="description" type="string">
+Description of the Knowledge Base.
+</ResponseField>
+
+<ResponseField name="embedding_model" type="string">
+Embedding model used for the Knowledge Base. Defaults to `text-embedding-3-small`.
+</ResponseField>
+
+<ResponseField name="chunk_size" type="integer">
+Size of each document chunk. Defaults to `512`.
+</ResponseField>
+
+<ResponseField name="chunk_overlap" type="integer">
+Number of overlapping characters or tokens between chunks. Defaults to `128`.
+</ResponseField>
+
+<ResponseField name="parsing_mode" type="string">
+Document parsing mode. Defaults to `custom`.
+</ResponseField>
+
+<ResponseField name="status" type="string">
+Current processing status of the Knowledge Base.
+</ResponseField>
+
+<ResponseField name="createdAt" type="string">
+Timestamp when the Knowledge Base was created.
+</ResponseField>
+
+<ResponseField name="updatedAt" type="string">
+Timestamp when the Knowledge Base was last updated.
+</ResponseField>
+
+## Error Handling
+
+- **400 Bad Request** – Invalid or missing Knowledge Base information or files.
+- **401 Unauthorized** – Missing or invalid Bearer token.
+- **403 Forbidden** – You do not have permission to create a Knowledge Base.
+- **500 Internal Server Error** – Unexpected server error.
+
+<Note>
+
+The uploaded documents are processed as part of the Knowledge Base creation process. The initial status may be `PENDING` while processing begins.
+
+</Note>
+
+<Check>
+
+Related endpoints:
+
+- `GET /api/knowledgeBase` to list Knowledge Bases.
+- `GET /api/knowledgeBase/{knowledgeBaseId}` to retrieve a Knowledge Base.
+- `PUT /api/knowledgeBase/{knowledgeBaseId}` to update a Knowledge Base.
+- `GET /api/knowledgeBase/{knowledgeBaseId}/documents` to list documents.
+- `DELETE /api/knowledgeBase/{knowledgeBaseId}/documents/{fileName}` to delete a document.
+
+</Check>

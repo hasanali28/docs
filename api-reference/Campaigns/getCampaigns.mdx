@@ -1,0 +1,138 @@
+---
+title: "Get Campaigns"
+description: "Retrieve all campaigns available in your workspace with pagination and search support."
+api: "GET /api/campaigns"
+---
+
+## Overview
+
+Retrieve a paginated list of all campaigns in your workspace. Use this endpoint to view, search, and manage your campaigns.
+
+## Prerequisites
+
+- Bearer token for an authenticated workspace
+- Permission to access Campaigns
+
+## Endpoint
+
+<ParamField method="GET" path="/api/campaigns" />
+
+## Request
+
+<ParamField header="Authorization" type="string" required>
+Bearer token for authenticated workspace access.
+</ParamField>
+
+<ParamField query="page" type="integer">
+Page number for pagination. Default is `1`.
+</ParamField>
+
+<ParamField query="limit" type="integer">
+Number of campaigns to return per page. Default is `10`.
+</ParamField>
+
+<ParamField query="search" type="string">
+Optional search term to filter campaigns by name.
+</ParamField>
+
+<RequestExample>
+
+```bash cURL
+curl --location '{{baseUrl}}/api/campaigns?page=1&limit=10&search=sales' \
+  --header 'Authorization: Bearer {{authToken}}'
+```
+
+</RequestExample>
+
+## Response
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "status": true,
+  "code": 200,
+  "message": "Campaigns fetched successfully",
+  "data": {
+    "docs": [
+      {
+        "_id": "6895d6a7d3f7a12345678901",
+        "campaignName": "Sales Campaign",
+        "type": "outbound",
+        "status": "draft",
+        "createdAt": "2025-07-15T10:30:00.000Z"
+      },
+      {
+        "_id": "6895d6a7d3f7a12345678902",
+        "campaignName": "Customer Follow-up",
+        "type": "outbound",
+        "status": "active",
+        "createdAt": "2025-07-16T08:15:00.000Z"
+      }
+    ],
+    "page": 1,
+    "limit": 10,
+    "totalPages": 2,
+    "totalDocs": 15
+  }
+}
+```
+
+</ResponseExample>
+
+<ResponseField name="status" type="boolean" required>
+Indicates whether the request completed successfully.
+</ResponseField>
+
+<ResponseField name="code" type="integer" required>
+HTTP status code.
+</ResponseField>
+
+<ResponseField name="message" type="string" required>
+Human-readable success message.
+</ResponseField>
+
+<ResponseField name="data.docs" type="array" required>
+List of campaigns available in the workspace.
+</ResponseField>
+
+<ResponseField name="data.page" type="integer">
+Current page number.
+</ResponseField>
+
+<ResponseField name="data.limit" type="integer">
+Maximum number of campaigns returned per page.
+</ResponseField>
+
+<ResponseField name="data.totalPages" type="integer">
+Total number of available pages.
+</ResponseField>
+
+<ResponseField name="data.totalDocs" type="integer">
+Total number of campaigns in the workspace.
+</ResponseField>
+
+## Error Handling
+
+- **400 Bad Request** – Invalid query parameters.
+- **401 Unauthorized** – Missing or invalid Bearer token.
+- **403 Forbidden** – You do not have permission to access campaigns.
+- **500 Internal Server Error** – Unexpected server error.
+
+<Note>
+
+This endpoint supports **pagination** and **search**. If no search term is provided, all campaigns in your workspace are returned.
+
+</Note>
+
+<Check>
+
+Use the returned **Campaign ID** with:
+
+- `GET /api/campaigns/{id}` to retrieve campaign details.
+- `PATCH /api/campaigns/{id}` to update a campaign.
+- `DELETE /api/campaigns/{id}` to delete a campaign.
+- `POST /api/campaigns/{id}/start` to start a campaign.
+- `POST /api/campaigns/{id}/stop` to stop a campaign.
+
+</Check>

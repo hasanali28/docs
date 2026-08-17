@@ -1,70 +1,197 @@
 ---
 title: "Create Agent"
 description: "Create a new AI voice agent."
-openapi: "POST /api/agents/create"
+api: "POST /api/agents"
 ---
 
 ## Overview
 
-Create a new AI agent that can be used for voice calls, campaigns, or inbound phone numbers.
+The **Create Agent** endpoint creates a new AI voice agent.
 
-## Prerequisites
+When creating an agent, you configure the basic settings that define how the agent behaves during calls. These settings are the same as those available in the Weya AI dashboard.
 
-- API Key or Bearer Token
-- Organization access
-- At least one supported LLM configured
+A typical agent configuration includes:
+
+- Voice selection
+- Welcome message
+- System prompt
+- Knowledge bases
+- Tools
+- Call settings
+- Call metrics
+
+Once the agent is created, you can update its configuration or publish it using the respective endpoints.
+
+---
+
+## Endpoint
+
+<ParamField method="POST" path="/backend/api/agents" />
+
+---
 
 ## Request
 
-<ParamField header="Authorization" type="string">
-Bearer token for authentication.
-</ParamField>
-
-<ParamField body="agentName" type="string" required>
-Unique name of the agent.
-</ParamField>
-
-<ParamField body="prompt" type="string" required>
-System prompt used by the agent.
-</ParamField>
-
-<ParamField body="voiceId" type="string">
-Voice to use.
-</ParamField>
-
-<RequestExample>
-
 ```bash
-curl ...
+curl -X POST https://{{baseUrl}}/api/agents \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "agent_name":"Customer Support",
+    "voice":"voice_id",
+    "welcomeMessage":"Hello! How can I help you today?",
+    "systemMessage":{
+      "prompt":"You are a helpful customer support assistant."
+    },
+    "knowledgeBase":[],
+    "tools":{},
+    "callSetting":{},
+    "call_metrics":[]
+  }'
 ```
 
-</RequestExample>
+---
+
+## Request Body
+
+### Agent Information
+
+| Field | Type | Required | Description |
+|------|------|----------|-------------|
+| `agent_name` | string | Yes | Name of the agent. |
+| `voice` | string | Yes | Voice used by the agent. |
+
+### Call Flow
+
+These settings define how the conversation starts.
+
+| Field | Type | Description |
+|------|------|-------------|
+| `welcomeMessage` | string | First message spoken by the agent. |
+| `systemMessage` | object | Instructions that define the agent's behaviour during conversations. |
+
+### Knowledge Base & Tools
+
+These settings allow the agent to access additional information and actions.
+
+| Field | Type | Description |
+|------|------|-------------|
+| `knowledgeBase` | array | Knowledge bases attached to the agent. |
+| `tools` | object | Tools available during conversations. |
+
+### Call Settings
+
+Controls the behaviour of calls.
+
+Examples include:
+
+- Language detection
+- Voicemail handling
+- IVR
+- Call scheduling
+- Speech settings
+- Voice settings
+- Memory
+- LLM configuration
+
+### Call Metrics
+
+Define the information that should be extracted after each call.
+
+Each metric contains:
+
+- Metric name
+- Data type
+- Description
+
+---
 
 ## Response
 
-<ResponseExample>
+### 201 Created
 
 ```json
 {
-  "status": true,
-  "message": "Agent created successfully",
-  "data": {
-    "_id": "...",
-    "agentName": "Sales Agent"
-  }
+  "_id": "665df7dca18d2b4e8d2d8a12",
+  "agent_name": "Customer Support",
+  "createdAt": "2025-07-01T10:30:45Z",
+  "updatedAt": "2025-07-01T10:30:45Z"
 }
 ```
 
-</ResponseExample>
+---
 
-## Errors
+## Response Fields
 
-- 400 Bad Request
-- 401 Unauthorized
-- 500 Internal Server Error
+<ResponseField name="_id" type="string">
+Unique identifier of the agent.
+</ResponseField>
 
-<Check>
+<ResponseField name="agent_name" type="string">
+Name of the created agent.
+</ResponseField>
 
-Use **GET /api/agents/{id}** to verify the agent was created.
+<ResponseField name="createdAt" type="timestamp">
+Time when the agent was created.
+</ResponseField>
 
-</Check>
+<ResponseField name="updatedAt" type="timestamp">
+Time when the agent was last updated.
+</ResponseField>
+
+---
+
+## Status Codes
+
+| Code | Description |
+|------|-------------|
+| `201` | Agent created successfully |
+| `400` | Invalid request |
+| `401` | Unauthorized |
+| `403` | Forbidden |
+| `500` | Internal server error |
+
+---
+
+## Notes
+
+- The **Welcome Message** is the first message spoken by the agent.
+- The **System Prompt** controls how the agent responds during conversations.
+- **Knowledge Bases** provide information that the agent can reference while answering users.
+- **Tools** allow the agent to perform actions during a call.
+- **Call Settings** control voice and runtime behaviour.
+- **Call Metrics** define the information extracted after each completed call.
+
+---
+
+## Related Endpoints
+
+- Get Agents
+- Get Agent by ID
+- Update Agent
+- Delete Agent
+- Publish Agent
+
+---
+
+## FAQ
+
+### What is required to create an agent?
+
+At minimum, provide an agent name, a voice, and a system prompt.
+
+### Can I attach a knowledge base while creating the agent?
+
+Yes. You can attach one or more knowledge bases during agent creation.
+
+### Can I configure call settings?
+
+Yes. Call behaviour such as voicemail, IVR, scheduling, memory, and voice settings can be configured using the `callSetting` object.
+
+### What are call metrics?
+
+Call metrics define the structured information that should be extracted from completed conversations.
+
+### Can I update the agent later?
+
+Yes. After creating the agent, you can modify its configuration using the **Update Agent** endpoint.

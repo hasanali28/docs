@@ -1,0 +1,104 @@
+---
+title: "Get Custom Tool by ID"
+description: "Retrieve the details of a specific custom API tool using its unique ID."
+api: "GET /api/tools/{id}"
+---
+
+## Overview
+
+Retrieve the details of a specific custom API tool using its unique ID.
+
+## Prerequisites
+
+- Bearer token for an authenticated workspace
+- Permission to access Custom API Tools
+- A valid Custom Tool ID
+
+## Request
+
+<ParamField header="Authorization" type="string" required>
+Bearer token for authenticated workspace access.
+</ParamField>
+
+<ParamField path="id" type="string" required>
+Unique identifier of the custom tool.
+</ParamField>
+
+<RequestExample>
+
+```bash cURL
+curl --location '{{baseUrl}}/api/custom-tools/6895d6a7d3f7a12345678901' \
+  --header 'Authorization: Bearer {{authToken}}'
+```
+
+</RequestExample>
+
+## Response
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "_id": "6895d6a7d3f7a12345678901",
+  "title": "Get Customer Details",
+  "description": "Fetch customer details from an external API.",
+  "request_type": "GET",
+  "url": "https://api.example.com/customers",
+  "headers": {},
+  "body_schema": {}
+}
+```
+
+</ResponseExample>
+
+<ResponseField name="_id" type="string">
+Unique identifier of the custom tool.
+</ResponseField>
+
+<ResponseField name="title" type="string">
+Name of the custom tool.
+</ResponseField>
+
+<ResponseField name="description" type="string">
+Description of what the custom tool does.
+</ResponseField>
+
+<ResponseField name="request_type" type="string">
+HTTP method used by the custom tool. Supported methods are `GET`, `POST`, `PUT`, and `DELETE`.
+</ResponseField>
+
+<ResponseField name="url" type="string">
+URL of the external API used by the custom tool.
+</ResponseField>
+
+<ResponseField name="headers" type="object">
+HTTP headers configured for the custom tool.
+</ResponseField>
+
+<ResponseField name="body_schema" type="object">
+Schema for the request body.
+</ResponseField>
+
+## Error Handling
+
+- **401 Unauthorized** – Missing or invalid Bearer token.
+- **403 Forbidden** – You do not have permission to access Custom API Tools.
+- **404 Not Found** – Custom tool not found.
+- **500 Internal Server Error** – Unexpected server error.
+
+<Note>
+
+Use the custom tool ID returned when the tool is created or when listing custom tools.
+
+</Note>
+
+<Check>
+
+Related endpoints:
+
+- `GET /api/custom-tools` to list all custom tools.
+- `POST /api/custom-tools` to create a custom tool.
+- `PUT /api/custom-tools/{id}` to update a custom tool.
+- `DELETE /api/custom-tools/{id}` to delete a custom tool.
+
+</Check>

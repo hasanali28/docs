@@ -1,0 +1,108 @@
+---
+title: "Start Campaign"
+description: "Start a campaign and begin processing outbound calls."
+openapi: "POST /api/campaigns/{id}/start"
+---
+
+## Overview
+
+Start an existing campaign. Once started, the campaign begins processing the uploaded contacts and initiates calls using the assigned AI agent and phone number based on the configured campaign settings.
+
+## Prerequisites
+
+- Bearer token for an authenticated workspace
+- Permission to manage Campaigns
+- A valid Campaign ID
+- The campaign must have an assigned agent and phone number
+
+## Request
+
+<ParamField header="Authorization" type="string" required>
+Bearer token for authenticated workspace access.
+</ParamField>
+
+<ParamField path="id" type="string" required>
+Unique identifier of the campaign to start.
+</ParamField>
+
+<RequestExample>
+
+```bash cURL
+curl --location --request POST '{{baseUrl}}/api/campaigns/6895d6a7d3f7a12345678901/start' \
+--header 'Authorization: Bearer {{authToken}}'
+```
+
+</RequestExample>
+
+## Response
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "status": true,
+  "code": 200,
+  "message": "Campaign started successfully",
+  "data": {
+    "_id": "6895d6a7d3f7a12345678901",
+    "status": "active",
+    "startedAt": "2025-07-20T14:30:00.000Z"
+  }
+}
+```
+
+</ResponseExample>
+
+<ResponseField name="status" type="boolean" required>
+Indicates whether the request completed successfully.
+</ResponseField>
+
+<ResponseField name="code" type="integer" required>
+HTTP status code.
+</ResponseField>
+
+<ResponseField name="message" type="string" required>
+Human-readable success message.
+</ResponseField>
+
+<ResponseField name="data" type="object" required>
+Contains the campaign status after it has been started.
+</ResponseField>
+
+<ResponseField name="data._id" type="string">
+Unique identifier of the campaign.
+</ResponseField>
+
+<ResponseField name="data.status" type="string">
+Current status of the campaign. After a successful request, the status is `active`.
+</ResponseField>
+
+<ResponseField name="data.startedAt" type="string">
+Timestamp indicating when the campaign started.
+</ResponseField>
+
+## Error Handling
+
+- **400 Bad Request** – Campaign cannot be started because its configuration is incomplete.
+- **401 Unauthorized** – Missing or invalid Bearer token.
+- **403 Forbidden** – You do not have permission to start this campaign.
+- **404 Not Found** – Campaign not found.
+- **409 Conflict** – Campaign is already running.
+- **500 Internal Server Error** – Unexpected server error.
+
+<Note>
+
+Before starting a campaign, ensure that an AI agent, a phone number, and the required campaign configuration have been assigned.
+
+</Note>
+
+<Check>
+
+Related endpoints:
+
+- `GET /api/campaigns`
+- `GET /api/campaigns/{id}`
+- `PATCH /api/campaigns/{id}`
+- `POST /api/campaigns/{id}/stop`
+
+</Check>

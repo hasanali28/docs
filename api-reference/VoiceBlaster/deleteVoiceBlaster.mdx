@@ -1,0 +1,96 @@
+---
+title: "Delete Voice Blaster"
+description: "Delete an existing Voice Blaster using its unique ID."
+api: "DELETE /api/voice-blasters/{id}"
+---
+
+## Overview
+
+Delete an existing Voice Blaster using its unique ID.
+
+## Prerequisites
+
+- Bearer token for an authenticated workspace
+- Permission to delete Voice Blasters
+- A valid Voice Blaster ID
+
+## Request
+
+<ParamField header="Authorization" type="string" required>
+Bearer token for authenticated workspace access.
+</ParamField>
+
+<ParamField path="id" type="string" required>
+Unique identifier of the Voice Blaster to delete.
+</ParamField>
+
+<RequestExample>
+
+```bash cURL
+curl --location --request DELETE '{{baseUrl}}/api/voice-blasters/6895d6a7d3f7a12345678901' \
+  --header 'Authorization: Bearer {{authToken}}'
+```
+
+</RequestExample>
+
+## Response
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "status": true,
+  "code": 200,
+  "message": "Voice Blaster deleted successfully",
+  "data": {
+    "_id": "6895d6a7d3f7a12345678901"
+  }
+}
+```
+
+</ResponseExample>
+
+<ResponseField name="status" type="boolean" required>
+Indicates whether the request completed successfully.
+</ResponseField>
+
+<ResponseField name="code" type="integer" required>
+HTTP status code.
+</ResponseField>
+
+<ResponseField name="message" type="string" required>
+Human-readable success message.
+</ResponseField>
+
+<ResponseField name="data" type="object" required>
+Contains information about the deleted Voice Blaster.
+</ResponseField>
+
+<ResponseField name="data._id" type="string">
+Unique identifier of the deleted Voice Blaster.
+</ResponseField>
+
+## Error Handling
+
+- **400 Bad Request** – Invalid Voice Blaster ID.
+- **401 Unauthorized** – Missing or invalid Bearer token.
+- **403 Forbidden** – You do not have permission to delete this Voice Blaster.
+- **404 Not Found** – Voice Blaster not found.
+- **500 Internal Server Error** – Unexpected server error.
+
+<Note>
+
+Deleting a Voice Blaster is a permanent operation and the Voice Blaster cannot be retrieved after deletion.
+
+</Note>
+
+<Check>
+
+Related endpoints:
+
+- `GET /api/voice-blasters` to list all Voice Blasters.
+- `GET /api/voice-blasters/{id}` to retrieve a Voice Blaster.
+- `POST /api/voice-blasters` to create a Voice Blaster.
+- `PATCH /api/voice-blasters/{id}` to update a Voice Blaster.
+
+</Check>

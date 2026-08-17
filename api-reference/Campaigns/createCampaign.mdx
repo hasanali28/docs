@@ -1,0 +1,171 @@
+---
+title: "Create Campaign"
+description: "Create a new outbound calling campaign."
+api: "POST /api/campaigns"
+---
+
+## Overview
+
+Create a new campaign to organize and manage outbound AI calling. A campaign defines the campaign name, assigned agent, phone number, calling schedule, retry settings, and other call configurations.
+
+## Prerequisites
+
+- Bearer token for an authenticated workspace
+- Permission to create campaigns
+- An existing AI Agent
+- A configured Phone Number
+
+## Endpoint
+
+<ParamField method="POST" path="/api/campaigns" />
+
+## Request
+
+<ParamField header="Authorization" type="string" required>
+Bearer token for authenticated workspace access.
+</ParamField>
+
+<RequestExample>
+
+```bash cURL
+curl --location '{{baseUrl}}/api/campaigns' \
+  --header 'Authorization: Bearer {{authToken}}' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "campaignName": "Sales Campaign",
+    "agentId": "687b1c2ab7c7d3f123456789",
+    "phoneNumberId": "6889c4ab7c7d3f987654321",
+    "timezone": "Asia/Kolkata",
+    "retry": 2,
+    "delay": 30
+}'
+```
+
+</RequestExample>
+
+### Request Body
+
+```json
+{
+  "campaignName": "Sales Campaign",
+  "agentId": "687b1c2ab7c7d3f123456789",
+  "phoneNumberId": "6889c4ab7c7d3f987654321",
+  "timezone": "Asia/Kolkata",
+  "retry": 2,
+  "delay": 30
+}
+```
+
+### Request Parameters
+
+<ParamField body="campaignName" type="string" required>
+Name of the campaign.
+</ParamField>
+
+<ParamField body="agentId" type="string" required>
+Unique identifier of the AI agent assigned to the campaign.
+</ParamField>
+
+<ParamField body="phoneNumberId" type="string" required>
+Unique identifier of the phone number used for the campaign.
+</ParamField>
+
+<ParamField body="timezone" type="string">
+Timezone used for campaign scheduling.
+</ParamField>
+
+<ParamField body="retry" type="integer">
+Number of retry attempts for unanswered or failed calls.
+</ParamField>
+
+<ParamField body="delay" type="integer">
+Delay in seconds between retry attempts.
+</ParamField>
+
+## Response
+
+<ResponseExample>
+
+```json 201 Created
+{
+  "status": true,
+  "code": 201,
+  "message": "Campaign created successfully",
+  "data": {
+    "_id": "6895d6a7d3f7a12345678901",
+    "campaignName": "Sales Campaign",
+    "agentId": "687b1c2ab7c7d3f123456789",
+    "phoneNumberId": "6889c4ab7c7d3f987654321",
+    "status": "draft",
+    "createdAt": "2025-07-15T10:30:00.000Z"
+  }
+}
+```
+
+</ResponseExample>
+
+<ResponseField name="status" type="boolean" required>
+Indicates whether the request completed successfully.
+</ResponseField>
+
+<ResponseField name="code" type="integer" required>
+HTTP status code.
+</ResponseField>
+
+<ResponseField name="message" type="string" required>
+Human-readable success message.
+</ResponseField>
+
+<ResponseField name="data" type="object" required>
+Details of the newly created campaign.
+</ResponseField>
+
+<ResponseField name="data._id" type="string">
+Unique identifier of the campaign.
+</ResponseField>
+
+<ResponseField name="data.campaignName" type="string">
+Name of the campaign.
+</ResponseField>
+
+<ResponseField name="data.agentId" type="string">
+Identifier of the assigned AI agent.
+</ResponseField>
+
+<ResponseField name="data.phoneNumberId" type="string">
+Identifier of the assigned phone number.
+</ResponseField>
+
+<ResponseField name="data.status" type="string">
+Current campaign status.
+</ResponseField>
+
+<ResponseField name="data.createdAt" type="string">
+Timestamp when the campaign was created.
+</ResponseField>
+
+## Error Handling
+
+- **400 Bad Request** – Invalid request body or missing required fields.
+- **401 Unauthorized** – Missing or invalid Bearer token.
+- **403 Forbidden** – You do not have permission to create campaigns.
+- **409 Conflict** – A campaign with the same name already exists.
+- **500 Internal Server Error** – Unexpected server error.
+
+<Note>
+
+Creating a campaign only creates the campaign configuration. Calls will not begin until the campaign is started using the **Start Campaign** endpoint.
+
+</Note>
+
+<Check>
+
+After creating a campaign, you can:
+
+- `GET /api/campaigns` to list all campaigns.
+- `GET /api/campaigns/{id}` to retrieve campaign details.
+- `PATCH /api/campaigns/{id}` to update the campaign.
+- `POST /api/campaigns/{id}/start` to start the campaign.
+- `POST /api/campaigns/{id}/stop` to stop the campaign.
+
+</Check>

@@ -1,0 +1,101 @@
+---
+title: "Get Integrations"
+description: "Retrieve all integrations available in your workspace."
+api: "GET /api/integrations"
+---
+
+## Overview
+
+Retrieve a list of integrations available in your workspace.
+
+## Prerequisites
+
+- Bearer token for an authenticated workspace
+- Permission to access Integrations
+
+## Request
+
+<ParamField header="Authorization" type="string" required>
+Bearer token for authenticated workspace access.
+</ParamField>
+
+<RequestExample>
+
+```bash cURL
+curl --location '{{baseUrl}}/api/integrations' \
+  --header 'Authorization: Bearer {{authToken}}'
+```
+
+</RequestExample>
+
+## Response
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "status": true,
+  "code": 200,
+  "message": "Integrations fetched successfully",
+  "data": [
+    {
+      "_id": "6895d6a7d3f7a12345678901",
+      "name": "Twilio",
+      "type": "telephony",
+      "status": "active"
+    },
+    {
+      "_id": "6895d6a7d3f7a12345678902",
+      "name": "Google Calendar",
+      "type": "calendar",
+      "status": "active"
+    }
+  ]
+}
+```
+
+</ResponseExample>
+
+<ResponseField name="status" type="boolean" required>
+Indicates whether the request completed successfully.
+</ResponseField>
+
+<ResponseField name="code" type="integer" required>
+HTTP status code.
+</ResponseField>
+
+<ResponseField name="message" type="string" required>
+Human-readable success message.
+</ResponseField>
+
+<ResponseField name="data" type="array" required>
+List of integrations available in the workspace.
+</ResponseField>
+
+<ResponseField name="data._id" type="string">
+Unique identifier of the integration.
+</ResponseField>
+
+<ResponseField name="data.name" type="string">
+Name of the integration.
+</ResponseField>
+
+<ResponseField name="data.type" type="string">
+Type or category of the integration.
+</ResponseField>
+
+<ResponseField name="data.status" type="string">
+Current status of the integration.
+</ResponseField>
+
+## Error Handling
+
+- **401 Unauthorized** – Missing or invalid Bearer token.
+- **403 Forbidden** – You do not have permission to access integrations.
+- **500 Internal Server Error** – Unexpected server error.
+
+<Note>
+
+A successful request returns the integrations available to the authenticated workspace.
+
+</Note>

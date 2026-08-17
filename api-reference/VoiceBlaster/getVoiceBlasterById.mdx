@@ -1,0 +1,130 @@
+---
+title: "Get Voice Blaster by ID"
+description: "Retrieve the details of a specific Voice Blaster using its unique ID."
+api: "GET /api/voice-blasters/{id}"
+---
+
+## Overview
+
+Retrieve the complete details of a specific Voice Blaster. Use this endpoint to view its configuration, status, voice settings, and other associated information.
+
+## Prerequisites
+
+- Bearer token for an authenticated workspace
+- Permission to access Voice Blasters
+- A valid Voice Blaster ID
+
+## Request
+
+<ParamField header="Authorization" type="string" required>
+Bearer token for authenticated workspace access.
+</ParamField>
+
+<ParamField path="id" type="string" required>
+Unique identifier of the Voice Blaster.
+</ParamField>
+
+<RequestExample>
+
+```bash cURL
+curl --location '{{baseUrl}}/api/voice-blasters/6895d6a7d3f7a12345678901' \
+  --header 'Authorization: Bearer {{authToken}}'
+```
+
+</RequestExample>
+
+## Response
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "status": true,
+  "code": 200,
+  "message": "Voice Blaster fetched successfully",
+  "data": {
+    "_id": "6895d6a7d3f7a12345678901",
+    "agent_name": "Promotional Campaign",
+    "voice": "en-US-Standard-A",
+    "conversationType": "static_voice_blaster",
+    "status": "active",
+    "description": "Voice Blaster for promotional offers",
+    "createdAt": "2025-07-15T10:30:00.000Z",
+    "updatedAt": "2025-07-16T09:45:00.000Z"
+  }
+}
+```
+
+</ResponseExample>
+
+<ResponseField name="status" type="boolean" required>
+Indicates whether the request completed successfully.
+</ResponseField>
+
+<ResponseField name="code" type="integer" required>
+HTTP status code.
+</ResponseField>
+
+<ResponseField name="message" type="string" required>
+Human-readable success message.
+</ResponseField>
+
+<ResponseField name="data" type="object" required>
+Contains the Voice Blaster details.
+</ResponseField>
+
+<ResponseField name="data._id" type="string">
+Unique identifier of the Voice Blaster.
+</ResponseField>
+
+<ResponseField name="data.agent_name" type="string">
+Name of the Voice Blaster.
+</ResponseField>
+
+<ResponseField name="data.voice" type="string">
+Voice assigned to the Voice Blaster.
+</ResponseField>
+
+<ResponseField name="data.conversationType" type="string">
+Conversation mode configured for the Voice Blaster.
+</ResponseField>
+
+<ResponseField name="data.status" type="string">
+Current status of the Voice Blaster.
+</ResponseField>
+
+<ResponseField name="data.description" type="string">
+Brief description of the Voice Blaster.
+</ResponseField>
+
+<ResponseField name="data.createdAt" type="string">
+Timestamp when the Voice Blaster was created.
+</ResponseField>
+
+<ResponseField name="data.updatedAt" type="string">
+Timestamp when the Voice Blaster was last updated.
+</ResponseField>
+
+## Error Handling
+
+- **400 Bad Request** – Invalid Voice Blaster ID.
+- **401 Unauthorized** – Missing or invalid Bearer token.
+- **403 Forbidden** – You do not have permission to access this Voice Blaster.
+- **404 Not Found** – Voice Blaster not found.
+- **500 Internal Server Error** – Unexpected server error.
+
+<Note>
+
+A successful request returns the complete configuration of the specified Voice Blaster.
+
+</Note>
+
+<Check>
+
+Related endpoints:
+
+- `GET /api/voice-blasters` to list all Voice Blasters.
+- `PATCH /api/voice-blasters/{id}` to update a Voice Blaster.
+- `DELETE /api/voice-blasters/{id}` to delete a Voice Blaster.
+
+</Check>

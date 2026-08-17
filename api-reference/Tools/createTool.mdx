@@ -1,0 +1,153 @@
+---
+title: "Create Custom Tool"
+description: "Create a custom API tool for your organization."
+api: "POST /api/tools"
+---
+
+## Overview
+
+Create a custom API tool that can be used by your AI agents to make requests to an external API.
+
+## Prerequisites
+
+- Bearer token for an authenticated workspace
+- Permission to create Custom API Tools
+
+## Request
+
+<ParamField header="Authorization" type="string" required>
+Bearer token for authenticated workspace access.
+</ParamField>
+
+<RequestExample>
+
+```bash cURL
+curl --location '{{baseUrl}}/api/custom-tools' \
+  --header 'Authorization: Bearer {{authToken}}' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "title": "Get Customer Details",
+    "description": "Fetch customer details from an external API.",
+    "request_type": "GET",
+    "url": "https://api.example.com/customers"
+  }'
+```
+
+</RequestExample>
+
+## Request Body
+
+<ParamField body="title" type="string" required>
+Name of the custom tool.
+</ParamField>
+
+<ParamField body="url" type="string" required>
+URL of the external API that the tool will call.
+</ParamField>
+
+<ParamField body="request_type" type="string" required>
+HTTP method used by the custom tool. Supported methods are `GET`, `POST`, `PUT`, and `DELETE`.
+</ParamField>
+
+<ParamField body="description" type="string">
+Description of what the custom tool does.
+</ParamField>
+
+<ParamField body="headers" type="object">
+HTTP headers to send with the API request.
+</ParamField>
+
+<ParamField body="body_schema" type="object">
+Schema for the request body.
+</ParamField>
+
+## Response
+
+<ResponseExample>
+
+```json 201 Created
+{
+  "status": true,
+  "code": 201,
+  "message": "Custom tool created successfully",
+  "data": {
+    "_id": "6895d6a7d3f7a12345678901",
+    "title": "Get Customer Details",
+    "description": "Fetch customer details from an external API.",
+    "request_type": "GET",
+    "url": "https://api.example.com/customers",
+    "headers": {},
+    "body_schema": {}
+  }
+}
+```
+
+</ResponseExample>
+
+<ResponseField name="status" type="boolean">
+Indicates whether the request completed successfully.
+</ResponseField>
+
+<ResponseField name="code" type="integer">
+HTTP status code.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+Human-readable success message.
+</ResponseField>
+
+<ResponseField name="data" type="object">
+Contains the newly created custom tool.
+</ResponseField>
+
+<ResponseField name="data._id" type="string">
+Unique identifier of the custom tool.
+</ResponseField>
+
+<ResponseField name="data.title" type="string">
+Name of the custom tool.
+</ResponseField>
+
+<ResponseField name="data.description" type="string">
+Description of the custom tool.
+</ResponseField>
+
+<ResponseField name="data.request_type" type="string">
+HTTP method used by the custom tool.
+</ResponseField>
+
+<ResponseField name="data.url" type="string">
+URL of the external API.
+</ResponseField>
+
+<ResponseField name="data.headers" type="object">
+HTTP headers configured for the custom tool.
+</ResponseField>
+
+<ResponseField name="data.body_schema" type="object">
+Request body schema configured for the custom tool.
+</ResponseField>
+
+## Error Handling
+
+- **400 Bad Request** – Invalid or missing required fields.
+- **401 Unauthorized** – Missing or invalid Bearer token.
+- **403 Forbidden** – You do not have permission to create Custom API Tools.
+- **500 Internal Server Error** – Unexpected server error.
+
+<Note>
+
+The `title`, `url`, and `request_type` fields are required to create a custom tool.
+
+</Note>
+
+<Check>
+
+Related endpoints:
+
+- `GET /api/custom-tools` to list all custom tools.
+- `GET /api/custom-tools/{id}` to retrieve a specific custom tool.
+- `PUT /api/custom-tools/{id}` to update a custom tool.
+- `DELETE /api/custom-tools/{id}` to delete a custom tool.
+
+</Check>

@@ -1,17 +1,19 @@
 ---
-title: "Get Agents"
-description: "Retrieve all AI agents available in your workspace with pagination and search support."
-openapi: "GET /api/agents"
+title: "Get Agent"
+description: "Create a new AI voice agent."
+api: "Get /api/agents"
 ---
 
 ## Overview
 
-Retrieve a paginated list of all AI agents in your workspace. This endpoint supports pagination and search, making it easy to browse or locate specific agents.
+Create a new AI voice agent for your workspace.
+
+When creating an agent, you can configure its basic details, conversation flow, welcome message, system prompt, knowledge bases, tools, call settings, and call metrics. Once created, the agent can be updated, published, or assigned to other services using their respective endpoints.
 
 ## Prerequisites
 
 - Bearer token for an authenticated workspace
-- Permission to access Agents
+- Permission to create agents
 
 ## Request
 
@@ -19,57 +21,88 @@ Retrieve a paginated list of all AI agents in your workspace. This endpoint supp
 Bearer token for authenticated workspace access.
 </ParamField>
 
-<ParamField query="page" type="integer">
-Page number for pagination. Default is `1`.
-</ParamField>
-
-<ParamField query="limit" type="integer">
-Number of agents to return per page. Default is `10`.
-</ParamField>
-
-<ParamField query="search" type="string">
-Optional search term to filter agents by name.
-</ParamField>
-
 <RequestExample>
 
 ```bash cURL
-curl --location '{{baseUrl}}/api/agents?page=1&limit=10&search=sales' \
-  --header 'Authorization: Bearer {{authToken}}'
+curl --location '{{baseUrl}}/api/agents' \
+  --header 'Authorization: Bearer {{authToken}}' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "agent_name": "Customer Support Agent",
+    "gender": "Female",
+    "voice": "voice_id",
+    "conversationType": "single_prompt",
+    "welcomeMessage": "Hello! How can I help you today?",
+    "systemMessage": {
+      "prompt": "You are a helpful customer support assistant."
+    },
+    "knowledgeBase": [],
+    "tools": {},
+    "callSetting": {},
+    "call_metrics": []
+  }'
 ```
 
 </RequestExample>
+
+## Request Body
+
+<ParamField body="agent_name" type="string" required>
+Name of the AI agent.
+</ParamField>
+
+<ParamField body="gender" type="string" required>
+Voice gender for the agent.
+</ParamField>
+
+<ParamField body="voice" type="string" required>
+Voice to use for conversations.
+</ParamField>
+
+<ParamField body="conversationType" type="string" required>
+Conversation mode for the agent.
+</ParamField>
+
+<ParamField body="welcomeMessage" type="string">
+The first message spoken when the conversation starts.
+</ParamField>
+
+<ParamField body="systemMessage" type="object" required>
+Instructions that define how the AI behaves during conversations.
+</ParamField>
+
+<ParamField body="knowledgeBase" type="array">
+Knowledge Bases attached to the agent.
+</ParamField>
+
+<ParamField body="tools" type="object">
+Tools and integrations available during calls.
+</ParamField>
+
+<ParamField body="callSetting" type="object">
+Voice and runtime settings for the agent.
+</ParamField>
+
+<ParamField body="call_metrics" type="array">
+Metrics to extract after each call.
+</ParamField>
 
 ## Response
 
 <ResponseExample>
 
-```json 200 OK
+```json 201 Created
 {
   "status": true,
-  "code": 200,
-  "message": "Fetched agents successfully",
+  "code": 201,
+  "message": "Agent created successfully",
   "data": {
-    "docs": [
-      {
-        "_id": "687b1c2ab7c7d3f123456789",
-        "agent_name": "Sales Agent",
-        "gender": "Female",
-        "voice": "en-US-Standard-A",
-        "conversationType": "single_prompt"
-      },
-      {
-        "_id": "687b1c2ab7c7d3f987654321",
-        "agent_name": "Support Agent",
-        "gender": "Male",
-        "voice": "en-US-Standard-B",
-        "conversationType": "single_prompt"
-      }
-    ],
-    "page": 1,
-    "limit": 10,
-    "totalPages": 2,
-    "totalDocs": 15
+    "_id": "687b1c2ab7c7d3f123456789",
+    "agent_name": "Customer Support Agent",
+    "gender": "Female",
+    "voice": "voice_id",
+    "conversationType": "single_prompt",
+    "createdAt": "2025-07-21T10:30:45Z"
   }
 }
 ```
@@ -88,45 +121,60 @@ HTTP status code.
 Human-readable success message.
 </ResponseField>
 
-<ResponseField name="data.docs" type="array" required>
-List of AI agents available in the workspace.
+<ResponseField name="data._id" type="string" required>
+Unique identifier of the created agent.
 </ResponseField>
 
-<ResponseField name="data.page" type="integer">
-Current page number.
+<ResponseField name="data.agent_name" type="string">
+Agent name.
 </ResponseField>
 
-<ResponseField name="data.limit" type="integer">
-Maximum number of records returned per page.
+<ResponseField name="data.gender" type="string">
+Configured voice gender.
 </ResponseField>
 
-<ResponseField name="data.totalPages" type="integer">
-Total number of available pages.
+<ResponseField name="data.voice" type="string">
+Selected voice.
 </ResponseField>
 
-<ResponseField name="data.totalDocs" type="integer">
-Total number of AI agents in the workspace.
+<ResponseField name="data.conversationType" type="string">
+Conversation type configured for the agent.
+</ResponseField>
+
+<ResponseField name="data.createdAt" type="string">
+Time when the agent was created.
 </ResponseField>
 
 ## Error Handling
 
-- **400 Bad Request** – Invalid query parameters.
+- **400 Bad Request** – Invalid request body.
 - **401 Unauthorized** – Missing or invalid Bearer token.
-- **403 Forbidden** – You do not have permission to access agents.
+- **403 Forbidden** – You do not have permission to create agents.
+- **409 Conflict** – An agent with the same configuration already exists.
 - **500 Internal Server Error** – Unexpected server error.
 
 <Note>
 
-This endpoint supports **pagination** and **search**. If no search term is provided, all agents in the workspace are returned.
+During agent creation, you can configure:
+
+- Welcome Message
+- System Prompt
+- Knowledge Bases
+- Tools & Integrations
+- Call Settings
+- Call Metrics
+
+Each of these configurations is included as part of the request body.
 
 </Note>
 
 <Check>
 
-Use the returned **Agent ID** with:
+After creating an agent, you can:
 
-- `GET /api/agents/{id}` to retrieve complete agent details.
-- `PATCH /api/agents/{id}` to update an agent.
-- `DELETE /api/agents/{id}` to remove an agent.
+- Retrieve it using `GET /api/agents/{id}`
+- Update it using `PATCH /api/agents/{id}`
+- Publish it using the Publish Agent endpoint
+- Assign it to phone numbers or campaigns using their respective endpoints
 
 </Check>

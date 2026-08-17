@@ -1,0 +1,112 @@
+---
+title: "Create Integration"
+description: "Create a new integration in your workspace."
+api: "POST /api/integrations"
+---
+
+## Overview
+
+Create a new integration in your workspace.
+
+## Prerequisites
+
+- Bearer token for an authenticated workspace
+- Permission to create Integrations
+
+## Request
+
+<ParamField header="Authorization" type="string" required>
+Bearer token for authenticated workspace access.
+</ParamField>
+
+<RequestExample>
+
+```bash cURL
+curl --location '{{baseUrl}}/api/integrations' \
+  --header 'Authorization: Bearer {{authToken}}' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "name": "Twilio",
+    "type": "telephony",
+    "status": "active"
+  }'
+```
+
+</RequestExample>
+
+## Response
+
+<ResponseExample>
+
+```json 201 Created
+{
+  "status": true,
+  "code": 201,
+  "message": "Integration created successfully",
+  "data": {
+    "_id": "6895d6a7d3f7a12345678901",
+    "name": "Twilio",
+    "type": "telephony",
+    "status": "active"
+  }
+}
+```
+
+</ResponseExample>
+
+<ResponseField name="status" type="boolean" required>
+Indicates whether the request completed successfully.
+</ResponseField>
+
+<ResponseField name="code" type="integer" required>
+HTTP status code.
+</ResponseField>
+
+<ResponseField name="message" type="string" required>
+Human-readable success message.
+</ResponseField>
+
+<ResponseField name="data" type="object" required>
+Contains the newly created integration.
+</ResponseField>
+
+<ResponseField name="data._id" type="string">
+Unique identifier of the integration.
+</ResponseField>
+
+<ResponseField name="data.name" type="string">
+Name of the integration.
+</ResponseField>
+
+<ResponseField name="data.type" type="string">
+Type or category of the integration.
+</ResponseField>
+
+<ResponseField name="data.status" type="string">
+Current status of the integration.
+</ResponseField>
+
+## Error Handling
+
+- **400 Bad Request** – Invalid or missing integration data.
+- **401 Unauthorized** – Missing or invalid Bearer token.
+- **403 Forbidden** – You do not have permission to create integrations.
+- **409 Conflict** – An integration with the same configuration already exists.
+- **500 Internal Server Error** – Unexpected server error.
+
+<Note>
+
+The integration is created for the authenticated workspace.
+
+</Note>
+
+<Check>
+
+Related endpoints:
+
+- `GET /api/integrations` to list all integrations.
+- `GET /api/integrations/{id}` to retrieve a specific integration.
+- `PATCH /api/integrations/{id}` to update an integration.
+- `DELETE /api/integrations/{id}` to delete an integration.
+
+</Check>

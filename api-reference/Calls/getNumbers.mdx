@@ -1,0 +1,198 @@
+---
+title: "Get Numbers"
+description: "Retrieve the phone numbers associated with a user."
+api: "GET /api/call/get-phone/{userId}"
+---
+
+## Overview
+
+Retrieve the phone numbers associated with a specific user by providing the user's unique User ID.
+
+## Prerequisites
+
+- Bearer token for an authenticated workspace
+- Valid User ID
+
+<Tip>
+
+You can retrieve the **User ID** from the Weya AI Dashboard or from the relevant user information available in your workspace.
+
+</Tip>
+
+## Path Parameters
+
+<ParamField path="userId" type="string" required>
+Unique identifier of the user whose phone numbers you want to retrieve.
+</ParamField>
+
+## Request
+
+<ParamField header="Authorization" type="string" required>
+Bearer token for authenticated workspace access.
+</ParamField>
+
+<RequestExample>
+
+```bash cURL
+curl --location '{{baseUrl}}/call/get-phone/{userId}' \
+--header 'Authorization: Bearer {{authToken}}'
+````
+
+</RequestExample>
+
+## Response
+
+<ResponseExample>
+
+```json 200 OK
+[
+  {
+    "_id": "string",
+    "userId": "string",
+    "phoneNumber": "string",
+    "integration": "twilio",
+    "authToken": "string",
+    "accSId": "string",
+    "outboundAgentId": "string",
+    "inboundAgentId": "string",
+    "sipHost": "string",
+    "sipPort": 5060,
+    "sipUsername": "string",
+    "sipSecret": "string",
+    "sipFromUser": "string",
+    "sipTransport": "udp",
+    "sipRegister": true,
+    "createdAt": "2026-08-13T07:25:06.997Z",
+    "updatedAt": "2026-08-13T07:25:06.997Z"
+  }
+]
+```
+
+</ResponseExample>
+
+<ResponseField name="_id" type="string" required>
+Unique identifier of the phone number record.
+</ResponseField>
+
+<ResponseField name="userId" type="string" required>
+Unique identifier of the user associated with the phone number.
+</ResponseField>
+
+<ResponseField name="phoneNumber" type="string" required>
+Phone number associated with the user.
+</ResponseField>
+
+<ResponseField name="integration" type="string" required>
+Telephony integration used by the phone number, such as Twilio.
+</ResponseField>
+
+<ResponseField name="authToken" type="string">
+Authentication token associated with the telephony integration.
+</ResponseField>
+
+<ResponseField name="accSId" type="string">
+Account SID associated with the telephony integration.
+</ResponseField>
+
+<ResponseField name="outboundAgentId" type="string">
+Unique identifier of the AI agent assigned to handle outbound calls.
+</ResponseField>
+
+<ResponseField name="inboundAgentId" type="string">
+Unique identifier of the AI agent assigned to handle inbound calls.
+</ResponseField>
+
+<ResponseField name="sipHost" type="string">
+SIP host used for the phone number integration.
+</ResponseField>
+
+<ResponseField name="sipPort" type="integer">
+SIP port used by the phone number integration.
+</ResponseField>
+
+<ResponseField name="sipUsername" type="string">
+Username used for SIP authentication.
+</ResponseField>
+
+<ResponseField name="sipSecret" type="string">
+Secret used for SIP authentication.
+</ResponseField>
+
+<ResponseField name="sipFromUser" type="string">
+SIP From User value used for SIP communication.
+</ResponseField>
+
+<ResponseField name="sipTransport" type="string">
+Transport protocol used for SIP communication.
+</ResponseField>
+
+<ResponseField name="sipRegister" type="boolean">
+Indicates whether SIP registration is enabled.
+</ResponseField>
+
+<ResponseField name="createdAt" type="string">
+Timestamp indicating when the phone number record was created.
+</ResponseField>
+
+<ResponseField name="updatedAt" type="string">
+Timestamp indicating when the phone number record was last updated.
+</ResponseField>
+
+## Response Fields
+
+| Field             | Type    | Description                                   |
+| ----------------- | ------- | --------------------------------------------- |
+| `_id`             | string  | Unique identifier of the phone number record  |
+| `userId`          | string  | User associated with the phone number         |
+| `phoneNumber`     | string  | Phone number                                  |
+| `integration`     | string  | Telephony integration                         |
+| `authToken`       | string  | Authentication token                          |
+| `accSId`          | string  | Telephony account SID                         |
+| `outboundAgentId` | string  | Agent assigned to outbound calls              |
+| `inboundAgentId`  | string  | Agent assigned to inbound calls               |
+| `sipHost`         | string  | SIP host                                      |
+| `sipPort`         | integer | SIP port                                      |
+| `sipUsername`     | string  | SIP username                                  |
+| `sipSecret`       | string  | SIP authentication secret                     |
+| `sipFromUser`     | string  | SIP From User value                           |
+| `sipTransport`    | string  | SIP transport protocol                        |
+| `sipRegister`     | boolean | Indicates whether SIP registration is enabled |
+| `createdAt`       | string  | Record creation timestamp                     |
+| `updatedAt`       | string  | Record update timestamp                       |
+
+## Response Codes
+
+| Code | Description                          |
+| ---- | ------------------------------------ |
+| 200  | Phone numbers retrieved successfully |
+| 400  | Invalid User ID                      |
+| 401  | Unauthorized                         |
+| 403  | Forbidden                            |
+| 404  | User or phone numbers not found      |
+| 500  | Internal Server Error                |
+
+## Error Handling
+
+* **400 Bad Request** – Invalid or missing User ID.
+* **401 Unauthorized** – Missing or invalid Bearer token.
+* **403 Forbidden** – You do not have permission to access these phone numbers.
+* **404 Not Found** – User or phone numbers could not be found.
+* **500 Internal Server Error** – Unexpected server error.
+
+<Note>
+
+The endpoint returns an array containing the phone number records associated with the specified user.
+
+</Note>
+
+<Check>
+
+After retrieving the phone numbers, you can:
+
+* View the phone number configuration
+* Check the agents assigned to inbound and outbound calls
+* Review the telephony integration details
+* Manage phone numbers from the Weya AI Dashboard
+
+</Check>
+```

@@ -1,0 +1,142 @@
+---
+title: "Add Phone"
+description: "Add a phone number and associate it with an AI agent."
+api: "POST /api/call/add-phone"
+---
+
+## Overview
+
+Add a phone number to your Weya AI workspace and associate it with an AI agent.
+
+## Prerequisites
+
+- Bearer token for an authenticated workspace
+- Valid phone number
+- Valid Agent ID
+
+<Tip>
+
+You can retrieve the **Agent ID** using the **Get Agents** endpoint or from the Weya AI Dashboard.
+
+</Tip>
+
+## Request
+
+<ParamField header="Authorization" type="string" required>
+Bearer token for authenticated workspace access.
+</ParamField>
+
+<RequestExample>
+
+```bash cURL
+curl --location '{{baseUrl}}/api/call/add-phone' \
+--header 'Authorization: Bearer {{authToken}}' \
+--header 'Content-Type: application/json' \
+--data '{
+  "phoneNumber": "+919876543210",
+  "agentId": "687b1c2ab7c7d3f123456789"
+}'
+````
+
+</RequestExample>
+
+## Request Body
+
+<ParamField body="phoneNumber" type="string" required>
+Phone number to add, including the country code.
+</ParamField>
+
+<ParamField body="agentId" type="string" required>
+Unique identifier of the AI agent to associate with the phone number.
+</ParamField>
+
+## Response
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "status": true,
+  "code": 200,
+  "message": "Phone number added successfully",
+  "data": {
+    "_id": "688b1c2ab7c7d3f123456789",
+    "phoneNumber": "+919876543210",
+    "agentId": "687b1c2ab7c7d3f123456789"
+  }
+}
+```
+
+</ResponseExample>
+
+<ResponseField name="status" type="boolean" required>
+Indicates whether the request completed successfully.
+</ResponseField>
+
+<ResponseField name="code" type="integer" required>
+HTTP status code returned by the API.
+</ResponseField>
+
+<ResponseField name="message" type="string" required>
+Success message returned by the API.
+</ResponseField>
+
+<ResponseField name="data" type="object" required>
+Details of the added phone number.
+</ResponseField>
+
+<ResponseField name="data._id" type="string">
+Unique identifier of the phone number.
+</ResponseField>
+
+<ResponseField name="data.phoneNumber" type="string">
+Phone number that was added to the workspace.
+</ResponseField>
+
+<ResponseField name="data.agentId" type="string">
+Unique identifier of the AI agent associated with the phone number.
+</ResponseField>
+
+## Request Fields
+
+| Field         | Type   | Required | Description                                                  |
+| ------------- | ------ | -------- | ------------------------------------------------------------ |
+| `phoneNumber` | string | Yes      | Phone number to add, including the country code              |
+| `agentId`     | string | Yes      | Unique ID of the AI agent to associate with the phone number |
+
+## Response Codes
+
+| Code | Description                     |
+| ---- | ------------------------------- |
+| 200  | Phone number added successfully |
+| 400  | Invalid request or phone number |
+| 401  | Unauthorized                    |
+| 403  | Forbidden                       |
+| 409  | Phone number already exists     |
+| 500  | Internal Server Error           |
+
+## Error Handling
+
+* **400 Bad Request** – Invalid request body or phone number.
+* **401 Unauthorized** – Missing or invalid Bearer token.
+* **403 Forbidden** – You do not have permission to add the phone number.
+* **409 Conflict** – Phone number is already registered.
+* **500 Internal Server Error** – Unexpected server error.
+
+<Note>
+
+The phone number should be provided in international format, including the country code.
+
+</Note>
+
+<Check>
+
+After adding a phone number, you can:
+
+* Retrieve the phone number using the **Get Phone** endpoint
+* Update the phone number configuration
+* Associate the phone number with an AI agent
+* Manage the phone number from the Weya AI Dashboard
+
+</Check>
+```

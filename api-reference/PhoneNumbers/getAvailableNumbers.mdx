@@ -1,0 +1,104 @@
+---
+title: "Get Available Numbers"
+description: "Retrieve phone numbers that are available for assignment."
+api: "GET /api/phone-numbers/available"
+---
+
+## Overview
+
+Retrieve the phone numbers that are currently available for assignment in your Weya AI workspace. Use this endpoint to view numbers that can be assigned to agents or other supported services.
+
+## Prerequisites
+
+- Bearer Token authentication
+- Permission to access Phone Numbers
+- An authenticated Weya AI workspace
+
+## Request
+
+<ParamField header="Authorization" type="string" required>
+Bearer token for authenticated workspace access.
+</ParamField>
+
+<RequestExample>
+
+```bash cURL
+curl --location '{{baseUrl}}/api/phone-numbers/available' \
+--header 'Authorization: Bearer {{authToken}}'
+```
+
+</RequestExample>
+
+## Response
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "status": true,
+  "code": 200,
+  "message": "Available phone numbers fetched successfully",
+  "data": [
+    {
+      "_id": "6891f1d0c45d123456789abc",
+      "phoneNumber": "+15551234567",
+      "status": "available"
+    }
+  ]
+}
+```
+
+</ResponseExample>
+
+<ResponseField name="status" type="boolean">
+Indicates whether the request was completed successfully.
+</ResponseField>
+
+<ResponseField name="code" type="integer">
+HTTP status code.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+Confirmation message describing the result of the request.
+</ResponseField>
+
+<ResponseField name="data" type="array">
+List of phone numbers currently available for assignment.
+</ResponseField>
+
+<ResponseField name="data._id" type="string">
+Unique identifier of the available phone number.
+</ResponseField>
+
+<ResponseField name="data.phoneNumber" type="string">
+Phone number that is available for assignment.
+</ResponseField>
+
+<ResponseField name="data.status" type="string">
+Current status of the phone number.
+</ResponseField>
+
+## Error Handling
+
+| Status | Description |
+|---------|-------------|
+| 401 | Unauthorized or invalid Bearer token |
+| 403 | Insufficient permission to access phone numbers |
+| 500 | Internal server error |
+
+<Note>
+
+A successful request returns the phone numbers that are currently available for assignment.
+
+</Note>
+
+<Check>
+
+Typical workflow:
+
+1. Retrieve the available phone numbers.
+2. Select the phone number you want to use.
+3. Assign the phone number to the appropriate agent or service.
+4. Use the assigned number for supported calling or messaging functionality.
+
+</Check>

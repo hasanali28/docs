@@ -1,0 +1,92 @@
+---
+title: "Get Document"
+description: "Retrieve the documents available within a specific Knowledge Base."
+api: "GET /api/knowledgeBase/{knowledgeBaseId}/documents"
+---
+
+## Overview
+
+Retrieve a list of documents stored within a specific Knowledge Base.
+
+## Prerequisites
+
+- Bearer token for an authenticated workspace
+- Permission to access Knowledge Bases
+- A valid Knowledge Base ID
+
+## Request
+
+<ParamField header="Authorization" type="string" required>
+Bearer token for authenticated workspace access.
+</ParamField>
+
+<ParamField path="knowledgeBaseId" type="string" required>
+Unique identifier of the Knowledge Base.
+</ParamField>
+
+<RequestExample>
+
+```bash cURL
+curl --location '{{baseUrl}}/api/knowledgeBase/6895d6a7d3f7a12345678901/documents' \
+  --header 'Authorization: Bearer {{authToken}}'
+```
+
+</RequestExample>
+
+## Response
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "documents": [
+    {
+      "fileName": "customer-support.pdf",
+      "url": "https://s3.example.com/customer-support/customer-support.pdf"
+    },
+    {
+      "fileName": "product-guide.pdf",
+      "url": "https://s3.example.com/customer-support/product-guide.pdf"
+    }
+  ]
+}
+```
+
+</ResponseExample>
+
+<ResponseField name="documents" type="array" required>
+List of documents stored in the Knowledge Base.
+</ResponseField>
+
+<ResponseField name="documents.fileName" type="string">
+Name of the document.
+</ResponseField>
+
+<ResponseField name="documents.url" type="string">
+URL of the stored document.
+</ResponseField>
+
+## Error Handling
+
+- **400 Bad Request** – Invalid Knowledge Base ID.
+- **401 Unauthorized** – Missing or invalid Bearer token.
+- **403 Forbidden** – You do not have permission to access this Knowledge Base.
+- **404 Not Found** – Knowledge Base not found.
+- **500 Internal Server Error** – Unexpected server error.
+
+<Note>
+
+This endpoint lists the documents associated with the specified Knowledge Base.
+
+</Note>
+
+<Check>
+
+Related endpoints:
+
+- `POST /api/knowledgeBase/createKnowledgeBase` to create a Knowledge Base and upload documents.
+- `GET /api/knowledgeBase/{knowledgeBaseId}` to retrieve Knowledge Base details.
+- `PUT /api/knowledgeBase/{knowledgeBaseId}` to update a Knowledge Base.
+- `DELETE /api/knowledgeBase/{knowledgeBaseId}/documents/{fileName}` to delete a document.
+
+</Check>

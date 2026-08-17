@@ -1,0 +1,153 @@
+---
+title: "Create Voice Blaster"
+description: "Create a new voice blaster for outbound voice broadcasting."
+api: "POST /api/voice-blaster"
+---
+
+## Overview
+
+Create a new Voice Blaster to broadcast pre-recorded or AI-generated voice messages to multiple recipients. After creating a Voice Blaster, you can add recipients and start the broadcast using the appropriate endpoints.
+
+## Prerequisites
+
+- Bearer token for an authenticated workspace
+- Permission to create Voice Blasters
+- A configured AI Agent (if required)
+- A Phone Number configured for outbound calling
+
+## Request
+
+<ParamField header="Authorization" type="string" required>
+Bearer token for authenticated workspace access.
+</ParamField>
+
+<RequestExample>
+
+```bash cURL
+curl --location --request POST '{{baseUrl}}/api/voice-blaster' \
+--header 'Authorization: Bearer {{authToken}}' \
+--header 'Content-Type: application/json' \
+--data '{
+  "name": "Festival Campaign",
+  "description": "Outbound voice broadcast for existing customers",
+  "agentId": "687b1c2ab7c7d3f123456789",
+  "phoneNumberId": "6889c4ab7c7d3f987654321"
+}'
+```
+
+</RequestExample>
+
+## Request Body
+
+<ParamField body="name" type="string" required>
+Name of the Voice Blaster.
+</ParamField>
+
+<ParamField body="description" type="string">
+Optional description for the Voice Blaster.
+</ParamField>
+
+<ParamField body="agentId" type="string" required>
+Unique identifier of the AI Agent used for the broadcast.
+</ParamField>
+
+<ParamField body="phoneNumberId" type="string" required>
+Unique identifier of the outbound phone number.
+</ParamField>
+
+## Response
+
+<ResponseExample>
+
+```json 201 Created
+{
+  "status": true,
+  "code": 201,
+  "message": "Voice Blaster created successfully",
+  "data": {
+    "_id": "6897d6a7d3f7a12345678901",
+    "name": "Festival Campaign",
+    "description": "Outbound voice broadcast for existing customers",
+    "agentId": "687b1c2ab7c7d3f123456789",
+    "phoneNumberId": "6889c4ab7c7d3f987654321",
+    "status": "draft",
+    "createdAt": "2025-07-18T10:30:00.000Z",
+    "updatedAt": "2025-07-18T10:30:00.000Z"
+  }
+}
+```
+
+</ResponseExample>
+
+<ResponseField name="status" type="boolean" required>
+Indicates whether the request completed successfully.
+</ResponseField>
+
+<ResponseField name="code" type="integer" required>
+HTTP status code.
+</ResponseField>
+
+<ResponseField name="message" type="string" required>
+Human-readable success message.
+</ResponseField>
+
+<ResponseField name="data" type="object" required>
+Contains the newly created Voice Blaster.
+</ResponseField>
+
+<ResponseField name="data._id" type="string">
+Unique identifier of the Voice Blaster.
+</ResponseField>
+
+<ResponseField name="data.name" type="string">
+Name of the Voice Blaster.
+</ResponseField>
+
+<ResponseField name="data.description" type="string">
+Description of the Voice Blaster.
+</ResponseField>
+
+<ResponseField name="data.agentId" type="string">
+Identifier of the AI Agent assigned to the Voice Blaster.
+</ResponseField>
+
+<ResponseField name="data.phoneNumberId" type="string">
+Identifier of the phone number used for outbound calls.
+</ResponseField>
+
+<ResponseField name="data.status" type="string">
+Current status of the Voice Blaster.
+</ResponseField>
+
+<ResponseField name="data.createdAt" type="string">
+Timestamp when the Voice Blaster was created.
+</ResponseField>
+
+<ResponseField name="data.updatedAt" type="string">
+Timestamp when the Voice Blaster was last updated.
+</ResponseField>
+
+## Error Handling
+
+- **400 Bad Request** – Invalid request body.
+- **401 Unauthorized** – Missing or invalid Bearer token.
+- **403 Forbidden** – You do not have permission to create Voice Blasters.
+- **404 Not Found** – Agent or Phone Number not found.
+- **500 Internal Server Error** – Unexpected server error.
+
+<Note>
+
+Creating a Voice Blaster only creates the configuration. You can upload contacts and start the broadcast using the corresponding Voice Blaster endpoints.
+
+</Note>
+
+<Check>
+
+Use the returned **Voice Blaster ID** with:
+
+- `GET /api/voice-blaster` to list all Voice Blasters.
+- `GET /api/voice-blaster/{id}` to retrieve Voice Blaster details.
+- `PATCH /api/voice-blaster/{id}` to update the Voice Blaster.
+- `DELETE /api/voice-blaster/{id}` to delete the Voice Blaster.
+
+</Check>

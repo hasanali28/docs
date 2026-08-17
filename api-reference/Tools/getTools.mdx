@@ -1,0 +1,100 @@
+---
+title: "Get Tools"
+description: "Retrieve all custom API tools available in your organization."
+api: "GET /api/tools"
+---
+
+## Overview
+
+Retrieve all custom API tools available in your organization.
+
+## Prerequisites
+
+- Bearer token for an authenticated workspace
+- Permission to access Custom API Tools
+
+## Request
+
+<ParamField header="Authorization" type="string" required>
+Bearer token for authenticated workspace access.
+</ParamField>
+
+<RequestExample>
+
+```bash cURL
+curl --location '{{baseUrl}}/api/custom-tools' \
+  --header 'Authorization: Bearer {{authToken}}'
+```
+
+</RequestExample>
+
+## Response
+
+<ResponseExample>
+
+```json 200 OK
+[
+  {
+    "_id": "6895d6a7d3f7a12345678901",
+    "title": "Get Customer Details",
+    "description": "Fetch customer details from an external API.",
+    "request_type": "GET",
+    "url": "https://api.example.com/customers",
+    "headers": {},
+    "body_schema": {}
+  }
+]
+```
+
+</ResponseExample>
+
+<ResponseField name="_id" type="string">
+Unique identifier of the custom tool.
+</ResponseField>
+
+<ResponseField name="title" type="string">
+Name of the custom tool.
+</ResponseField>
+
+<ResponseField name="description" type="string">
+Description of what the custom tool does.
+</ResponseField>
+
+<ResponseField name="request_type" type="string">
+HTTP method used by the custom tool. Supported methods are `GET`, `POST`, `PUT`, and `DELETE`.
+</ResponseField>
+
+<ResponseField name="url" type="string">
+URL that the custom tool sends the request to.
+</ResponseField>
+
+<ResponseField name="headers" type="object">
+HTTP headers used when making the request.
+</ResponseField>
+
+<ResponseField name="body_schema" type="object">
+Schema for the request body.
+</ResponseField>
+
+## Error Handling
+
+- **401 Unauthorized** – Missing or invalid Bearer token.
+- **403 Forbidden** – You do not have permission to access Custom API Tools.
+- **500 Internal Server Error** – Unexpected server error.
+
+<Note>
+
+The endpoint returns custom tools available to the authenticated user's organization.
+
+</Note>
+
+<Check>
+
+Related endpoints:
+
+- `POST /api/custom-tools` to create a custom tool.
+- `GET /api/custom-tools/{id}` to retrieve a specific custom tool.
+- `PUT /api/custom-tools/{id}` to update a custom tool.
+- `DELETE /api/custom-tools/{id}` to delete a custom tool.
+
+</Check>

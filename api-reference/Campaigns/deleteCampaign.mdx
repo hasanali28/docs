@@ -1,0 +1,87 @@
+---
+title: "Delete Campaign"
+description: "Delete an existing campaign using its unique ID."
+openapi: "DELETE /api/campaigns/{id}"
+---
+
+## Overview
+
+Delete an existing campaign from your workspace. Once deleted, the campaign and its configuration can no longer be accessed.
+
+## Prerequisites
+
+- Bearer token for an authenticated workspace
+- Permission to manage Campaigns
+- A valid Campaign ID
+
+## Request
+
+<ParamField header="Authorization" type="string" required>
+Bearer token for authenticated workspace access.
+</ParamField>
+
+<ParamField path="id" type="string" required>
+Unique identifier of the campaign to delete.
+</ParamField>
+
+<RequestExample>
+
+```bash cURL
+curl --location --request DELETE '{{baseUrl}}/api/campaigns/6895d6a7d3f7a12345678901' \
+--header 'Authorization: Bearer {{authToken}}'
+```
+
+</RequestExample>
+
+## Response
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "status": true,
+  "code": 200,
+  "message": "Campaign deleted successfully"
+}
+```
+
+</ResponseExample>
+
+<ResponseField name="status" type="boolean" required>
+Indicates whether the request completed successfully.
+</ResponseField>
+
+<ResponseField name="code" type="integer" required>
+HTTP status code.
+</ResponseField>
+
+<ResponseField name="message" type="string" required>
+Human-readable success message.
+</ResponseField>
+
+## Error Handling
+
+- **400 Bad Request** – Invalid campaign ID.
+- **401 Unauthorized** – Missing or invalid Bearer token.
+- **403 Forbidden** – You do not have permission to delete this campaign.
+- **404 Not Found** – Campaign not found.
+- **409 Conflict** – Campaign cannot be deleted because it is currently running.
+- **500 Internal Server Error** – Unexpected server error.
+
+<Note>
+
+A deleted campaign cannot be recovered. Stop the campaign before attempting to delete it if it is currently running.
+
+</Note>
+
+<Check>
+
+Related endpoints:
+
+- `GET /api/campaigns`
+- `GET /api/campaigns/{id}`
+- `PATCH /api/campaigns/{id}`
+- `POST /api/campaigns/{id}/start`
+- `POST /api/campaigns/{id}/stop`
+
+</Check>

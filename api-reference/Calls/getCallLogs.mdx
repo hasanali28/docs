@@ -1,0 +1,132 @@
+---
+title: "Get Call Logs"
+description: "Retrieve call logs with pagination and filtering support."
+api: "GET /api/calls"
+---
+
+## Overview
+
+Retrieve a paginated list of call logs from your workspace. Use this endpoint to monitor call activity, review call outcomes, and access information such as call duration, recordings, transcriptions, and post-call analysis.
+
+## Prerequisites
+
+- Bearer token for an authenticated workspace
+- Permission to access Calls
+
+## Request
+
+<ParamField header="Authorization" type="string" required>
+Bearer token for authenticated workspace access.
+</ParamField>
+
+<ParamField query="page" type="integer">
+Page number for pagination. Default is `1`.
+</ParamField>
+
+<ParamField query="limit" type="integer">
+Number of call logs to return per page. Default is `10`.
+</ParamField>
+
+<ParamField query="search" type="string">
+Optional search term to filter call logs by phone number or request ID.
+</ParamField>
+
+<ParamField query="status" type="string">
+Filter calls by their current status (for example: `completed`, `failed`, `busy`, or `no-answer`).
+</ParamField>
+
+<RequestExample>
+
+```bash cURL
+curl --location '{{baseUrl}}/api/calls?page=1&limit=10&status=completed' \
+--header 'Authorization: Bearer {{authToken}}'
+```
+
+</RequestExample>
+
+## Response
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "status": true,
+  "code": 200,
+  "message": "Call logs retrieved successfully",
+  "data": {
+    "docs": [
+      {
+        "_id": "6895d6a7d3f7a12345678901",
+        "phoneNumber": "+919876543210",
+        "callingNumber": "+911234567890",
+        "call_status": "completed",
+        "call_direction": "outbound",
+        "call_duration": 145,
+        "vocalyst_call_duration": 141,
+        "requestUUID": "req_123456789",
+        "timestamp": "2025-07-20T10:30:00.000Z"
+      }
+    ],
+    "page": 1,
+    "limit": 10,
+    "totalPages": 5,
+    "totalDocs": 42
+  }
+}
+```
+
+</ResponseExample>
+
+<ResponseField name="status" type="boolean" required>
+Indicates whether the request completed successfully.
+</ResponseField>
+
+<ResponseField name="code" type="integer" required>
+HTTP status code.
+</ResponseField>
+
+<ResponseField name="message" type="string" required>
+Human-readable success message.
+</ResponseField>
+
+<ResponseField name="data.docs" type="array" required>
+List of call logs matching the request.
+</ResponseField>
+
+<ResponseField name="data.page" type="integer">
+Current page number.
+</ResponseField>
+
+<ResponseField name="data.limit" type="integer">
+Maximum number of call logs returned per page.
+</ResponseField>
+
+<ResponseField name="data.totalPages" type="integer">
+Total number of available pages.
+</ResponseField>
+
+<ResponseField name="data.totalDocs" type="integer">
+Total number of call logs available.
+</ResponseField>
+
+## Error Handling
+
+- **400 Bad Request** – Invalid query parameters.
+- **401 Unauthorized** – Missing or invalid Bearer token.
+- **403 Forbidden** – You do not have permission to access call logs.
+- **500 Internal Server Error** – Unexpected server error.
+
+<Note>
+
+Use pagination to retrieve large volumes of call logs efficiently. Filters can be combined to narrow down the results.
+
+</Note>
+
+<Check>
+
+Related endpoints:
+
+- `GET /api/calls/{id}`
+- `GET /api/calls/{id}/recording`
+
+</Check>

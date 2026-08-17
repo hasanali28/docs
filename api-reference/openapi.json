@@ -7,8 +7,8 @@
   },
   "servers": [
     {
-      "url": "https://nexusdev-wjs-api-dev.mangoforest-291de162.swedencentral.azurecontainerapps.io",
-      "description": "Development server"
+      "url": "https://nexus.weya.ai",
+      "description": "Production server"
     }
   ],
   "security": [
