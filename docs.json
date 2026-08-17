@@ -147,7 +147,7 @@
           {
             "group": "Tools",
             "pages": [
-              "api-reference/Tools/createTools",
+              "api-reference/Tools/createTool",
               "api-reference/Tools/getTools",
               "api-reference/Tools/getToolById"
             ]
