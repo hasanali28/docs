@@ -30,7 +30,7 @@ The unique identifier of the campaign.
 <RequestExample>
 
 ```bash cURL
-curl --location '{{baseUrl}}/api/campaigns/6895d6a7d3f7a12345678901' \
+curl --location '{{baseUrl}}/api/campaigns/{id}' \
   --header 'Authorization: Bearer {{authToken}}'
 ```
 
@@ -46,12 +46,12 @@ curl --location '{{baseUrl}}/api/campaigns/6895d6a7d3f7a12345678901' \
   "code": 200,
   "message": "Campaign fetched successfully",
   "data": {
-    "_id": "6895d6a7d3f7a12345678901",
+    "_id": "1234d6a7d3f7a12345678901",
     "campaignName": "Sales Campaign",
     "type": "outbound",
     "status": "active",
-    "agentId": "687b1c2ab7c7d3f123456789",
-    "phoneNumberId": "6889c4ab7c7d3f987654321",
+    "agentId": "123b1c2ab7c7d3f123456789",
+    "phoneNumberId": "1234c4ab7c7d3f987654321",
     "createdAt": "2025-07-15T10:30:00.000Z",
     "updatedAt": "2025-07-16T09:45:00.000Z"
   }

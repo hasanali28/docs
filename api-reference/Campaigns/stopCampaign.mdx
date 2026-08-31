@@ -28,7 +28,7 @@ Unique identifier of the campaign to stop.
 <RequestExample>
 
 ```bash cURL
-curl --location --request POST '{{baseUrl}}/api/campaigns/6895d6a7d3f7a12345678901/stop' \
+curl --location --request POST '{{baseUrl}}/api/campaigns/{id}/stop' \
 --header 'Authorization: Bearer {{authToken}}'
 ```
 
@@ -44,7 +44,7 @@ curl --location --request POST '{{baseUrl}}/api/campaigns/6895d6a7d3f7a123456789
   "code": 200,
   "message": "Campaign stopped successfully",
   "data": {
-    "_id": "6895d6a7d3f7a12345678901",
+    "_id": "1234d6a7d3f7a12345678901",
     "status": "stopped",
     "stoppedAt": "2025-07-20T16:15:30.000Z"
   }

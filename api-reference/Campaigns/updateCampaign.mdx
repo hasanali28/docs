@@ -27,7 +27,7 @@ Unique identifier of the campaign to update.
 <RequestExample>
 
 ```bash cURL
-curl --location --request PATCH '{{baseUrl}}/api/campaigns/6895d6a7d3f7a12345678901' \
+curl --location --request PATCH '{{baseUrl}}/api/campaigns/{id}' \
 --header 'Authorization: Bearer {{authToken}}' \
 --header 'Content-Type: application/json' \
 --data '{
@@ -67,7 +67,7 @@ curl --location --request PATCH '{{baseUrl}}/api/campaigns/6895d6a7d3f7a12345678
   "code": 200,
   "message": "Campaign updated successfully",
   "data": {
-    "_id": "6895d6a7d3f7a12345678901",
+    "_id": "1234d6a7d3f7a12345678901",
     "campaignName": "Updated Sales Campaign",
     "retry": 2,
     "delay": 60,
