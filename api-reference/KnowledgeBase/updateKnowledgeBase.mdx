@@ -39,7 +39,7 @@ One or more new documents to upload. Existing documents are preserved.
 <RequestExample>
 
 ```bash cURL
-curl --location --request PUT '{{baseUrl}}/api/knowledgeBase/687b1c2ab7c7d3f123456789' \
+curl --location --request PUT 'https://api.weya.live/backend/api/knowledgeBase/687b1c2ab7c7d3f123456789' \
   --header 'Authorization: Bearer {{authToken}}' \
   --form 'knowledgeBaseName="Updated Customer Support KB"' \
   --form 'description="Updated support documentation"' \

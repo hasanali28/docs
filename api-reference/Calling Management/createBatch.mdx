@@ -66,7 +66,7 @@ Optional holiday list ID to associate with the batch. Calls scheduled on the hol
 <RequestExample>
 ```bash cURL
 # Using API Key
-curl --location '{{baseUrl}}/api/call/createBatch' \
+curl --location 'https://api.weya.live/backend/api/call/createBatch' \
   --header 'x-api-key: YOUR_API_KEY' \
   --header 'Content-Type: application/json' \
   --data '{
@@ -84,7 +84,7 @@ curl --location '{{baseUrl}}/api/call/createBatch' \
 
 ```bash cURL
 # Using Bearer Token
-curl --location '{{baseUrl}}/api/call/createBatch' \
+curl --location 'https://api.weya.live/backend/api/call/createBatch' \
   --header 'Authorization: Bearer {{authToken}}' \
   --header 'Content-Type: application/json' \
   --data '{

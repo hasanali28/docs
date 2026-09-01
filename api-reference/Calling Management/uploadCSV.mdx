@@ -67,7 +67,7 @@ JSON stringified array of allowed days (0=Sunday, 6=Saturday). Example: `"[1,2,3
 
 <RequestExample>
 ```bash cURL
-curl --location '{{baseUrl}}/api/call/upload' \
+curl --location 'https://api.weya.live/backend/api/call/upload' \
   --header 'Authorization: Bearer {{authToken}}' \
   --form 'file=@"/path/to/contacts.csv"' \
   --form 'userId="64e5f12345abcdef12345678"' \

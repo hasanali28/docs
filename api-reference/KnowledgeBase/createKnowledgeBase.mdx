@@ -35,7 +35,7 @@ One or more files to upload. Supports PDF, DOCX, TXT, CSV and other supported do
 <RequestExample>
 
 ```bash cURL
-curl --location '{{baseUrl}}/api/knowledgeBase/createKnowledgeBase' \
+curl --location 'https://api.weya.live/backend/api/knowledgeBase/createKnowledgeBase' \
   --header 'Authorization: Bearer {{authToken}}' \
   --form 'knowledgeBaseName="Customer Support KB"' \
   --form 'description="Knowledge base for customer support queries"' \

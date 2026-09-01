@@ -241,9 +241,9 @@
     }
   },
   "api": {
-    "baseUrl": "https://nexusdev-wjs-api-dev.mangoforest-291de162.swedencentral.azurecontainerapps.io"
+    "baseUrl": "https://api.weya.live/backend"
   },
-  "openapi": "/api-reference/openapi.json",
+  "openapi": "api-reference/openapi.json",
   "contextual": {
     "options": [
       "copy",
