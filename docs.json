@@ -165,7 +165,7 @@
   ]
 },
 {
-  "group": "Batch Management",
+  "group": "Campaign Management",
   "pages": [
     "api-reference/Calling Management/getBatch",
     "api-reference/Calling Management/getBatchById",
