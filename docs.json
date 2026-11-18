@@ -167,6 +167,7 @@
 {
   "group": "Campaign Management",
   "pages": [
+    "api-reference/Calling Management/createBatch",
     "api-reference/Calling Management/getBatch",
     "api-reference/Calling Management/getBatchById",
     "api-reference/Calling Management/addCallsToBatch",
