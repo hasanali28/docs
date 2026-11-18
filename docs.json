@@ -171,6 +171,7 @@
     "api-reference/Calling Management/getBatchById",
     "api-reference/Calling Management/addCallsToBatch",
     "api-reference/Calling Management/uploadCSV",
+    "api-reference/Calling Management/updateBatch",
     "api-reference/Calling Management/startCalling",
     "api-reference/Calling Management/stopCalling",
     "api-reference/Calling Management/deleteBatch",
