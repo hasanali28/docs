@@ -1,18 +1,22 @@
 ---
 title: "Update Knowledge Base"
-description: "Update the details of an existing Knowledge Base or upload additional documents."
+description: "Rename a knowledge base, change its description, or store more files in it."
 api: "PUT /api/knowledgeBase/{knowledgeBaseId}"
 ---
 
 ## Overview
 
-Update an existing Knowledge Base by modifying its name, description, or uploading additional documents. Existing documents remain unchanged unless explicitly deleted using the Delete Document endpoint.
+Update one of your organization's knowledge bases. Send only the fields you want to change. Existing files are kept.
+
+<Warning>
+  Files uploaded with this endpoint are stored but the knowledge base is **not indexed again**, so agents can't answer from them yet. To add files that agents can use, upload them with [Create Knowledge Base](/api-reference/KnowledgeBase/createKnowledgeBase) using the same `knowledgeBaseName`; that indexes the whole knowledge base again.
+</Warning>
 
 ## Prerequisites
 
 - An API key for your workspace
-- Valid Knowledge Base ID
-- `multipart/form-data` request
+- The knowledge base ID, from [Get Knowledge Bases](/api-reference/KnowledgeBase/getKnowledgeBases)
+- Send the request as `multipart/form-data`
 
 ## Request
 
@@ -21,19 +25,19 @@ Your workspace API key. Create one from the profile menu in the dashboard → **
 </ParamField>
 
 <ParamField path="knowledgeBaseId" type="string" required>
-Unique identifier of the Knowledge Base.
+ID of the knowledge base.
 </ParamField>
 
 <ParamField body="knowledgeBaseName" type="string">
-Updated name of the Knowledge Base.
+New name. An empty value is ignored.
 </ParamField>
 
 <ParamField body="description" type="string">
-Updated description of the Knowledge Base.
+New description.
 </ParamField>
 
 <ParamField body="files" type="file[]">
-One or more new documents to upload. Existing documents are preserved.
+Files to store: up to 50 files of up to 10 MB each. A file with the same name as an existing one replaces it.
 </ParamField>
 
 <RequestExample>
@@ -42,9 +46,7 @@ One or more new documents to upload. Existing documents are preserved.
 curl --location --request PUT 'https://api.weya.live/backend/api/knowledgeBase/687b1c2ab7c7d3f123456789' \
   --header 'x-api-key: YOUR_API_KEY' \
   --form 'knowledgeBaseName="Updated Customer Support KB"' \
-  --form 'description="Updated support documentation"' \
-  --form 'files=@"/Users/john/Documents/RefundPolicy.pdf"' \
-  --form 'files=@"/Users/john/Documents/NewPricing.pdf"'
+  --form 'description="Updated support documentation"'
 ```
 
 </RequestExample>
@@ -57,25 +59,14 @@ curl --location --request PUT 'https://api.weya.live/backend/api/knowledgeBase/6
 {
   "status": true,
   "code": 200,
-  "message": "Knowledge Base updated successfully",
+  "message": "KnowledgeBase updated successfully",
+  "errorMessage": null,
   "data": {
     "_id": "687b1c2ab7c7d3f123456789",
     "knowledgeBaseName": "Updated Customer Support KB",
     "description": "Updated support documentation",
-    "documents": [
-      {
-        "fileName": "FAQ.pdf"
-      },
-      {
-        "fileName": "Pricing.pdf"
-      },
-      {
-        "fileName": "RefundPolicy.pdf"
-      },
-      {
-        "fileName": "NewPricing.pdf"
-      }
-    ],
+    "vectorDbCollection": "kb_customer_support_1a2b3c",
+    "status": "PENDING",
     "updatedAt": "2026-07-20T16:45:18.000Z"
   }
 }
@@ -83,80 +74,16 @@ curl --location --request PUT 'https://api.weya.live/backend/api/knowledgeBase/6
 
 </ResponseExample>
 
-## Request Fields
-
-<RequestField name="knowledgeBaseName" type="string">
-New name of the Knowledge Base.
-</RequestField>
-
-<RequestField name="description" type="string">
-Updated description for the Knowledge Base.
-</RequestField>
-
-<RequestField name="files" type="file[]">
-Additional documents to upload. Multiple files are supported.
-</RequestField>
-
-## Response Fields
-
-<ResponseField name="status" type="boolean">
-Indicates whether the update was successful.
-</ResponseField>
-
-<ResponseField name="code" type="integer">
-HTTP status code.
-</ResponseField>
-
-<ResponseField name="message" type="string">
-Response message.
-</ResponseField>
-
-<ResponseField name="data._id" type="string">
-Unique identifier of the Knowledge Base.
-</ResponseField>
-
-<ResponseField name="data.knowledgeBaseName" type="string">
-Updated Knowledge Base name.
-</ResponseField>
-
-<ResponseField name="data.description" type="string">
-Updated Knowledge Base description.
-</ResponseField>
-
-<ResponseField name="data.documents" type="array">
-Complete list of documents currently stored in the Knowledge Base.
-</ResponseField>
-
-<ResponseField name="data.updatedAt" type="string">
-Timestamp of the latest update.
+<ResponseField name="data" type="object">
+The updated knowledge base record. It doesn't list files; use [List Knowledge Base Documents](/api-reference/KnowledgeBase/listKnowledgeBaseDocuments).
 </ResponseField>
 
 ## Error Handling
 
-| Status Code | Description |
-|-------------|-------------|
-| **400** | Invalid request or Knowledge Base ID |
-| **401** | Unauthorized |
-| **403** | Permission denied |
-| **404** | Knowledge Base not found |
-| **413** | Uploaded file exceeds the maximum allowed size |
-| **415** | Unsupported file format |
-| **500** | Internal Server Error |
+Errors return `status: false`, with the reason in `errorMessage`.
 
-<Note>
-
-Updating a Knowledge Base does not remove existing documents. To remove a document, use the **Delete Knowledge Base Document** endpoint.
-
-</Note>
-
-<Check>
-
-Related endpoints:
-
-- `GET /api/knowledgeBase` — List all Knowledge Bases.
-- `GET /api/knowledgeBase/{knowledgeBaseId}` — Retrieve Knowledge Base details.
-- `GET /api/knowledgeBase/{knowledgeBaseId}/documents` — View uploaded documents.
-- `DELETE /api/knowledgeBase/{knowledgeBaseId}/documents/{fileName}` — Delete a specific document.
-- `DELETE /api/knowledgeBase/{knowledgeBaseId}` — Delete the entire Knowledge Base.
-
-</Check>
+- **400 Bad Request** – `knowledgeBaseId` isn't a valid ID, `File exceeds the 10MB per-file limit`, or `You can upload at most 50 files per request`.
+- **401 Unauthorized** – Missing or invalid API key.
+- **404 Not Found** – `KnowledgeBase not found`: it doesn't exist in your organization.
+- **429 Too Many Requests** – More than 1,000 Knowledge Base requests in 15 minutes from your IP address.
+- **500 Internal Server Error** – Unexpected server error.
