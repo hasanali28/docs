@@ -1,41 +1,85 @@
 ---
 title: "Create Agent"
-description: "Create a new AI voice agent."
+description: "Create a single-prompt or voice blaster AI agent."
 api: "POST /api/agents"
 ---
 
 ## Overview
 
-Create a new AI agent that can be used for voice calls, campaigns, or inbound phone numbers.
+Create an AI agent for the user who owns the API key. Once it has an agent, a phone number can use it for campaigns and inbound calls.
+
+This endpoint creates `single_prompt`, `static_voice_blaster` and `dynamic_voice_blaster` agents. Multi-stage agents can't be created here. Advanced settings such as tools, call analysis metrics and call settings are easiest to configure in the dashboard after the agent is created.
 
 ## Prerequisites
 
 - An API key for your workspace
-- Organization access
-- At least one supported LLM configured
 
 ## Request
 
 <ParamField header="x-api-key" type="string" required>
-Your workspace API key. Create one from the profile menu in the dashboard → **API Keys**.
+  Your workspace API key. Create one from the profile menu in the dashboard → **API Keys**.
 </ParamField>
 
-<ParamField body="agentName" type="string" required>
-Unique name of the agent.
+<ParamField body="agent_name" type="string" required>
+  Name of the agent.
 </ParamField>
 
-<ParamField body="prompt" type="string" required>
-System prompt used by the agent.
+<ParamField body="gender" type="string" required>
+  `Male` or `Female`. Used for the agent's voice and, in some languages, its verb forms.
 </ParamField>
 
-<ParamField body="voiceId" type="string">
-Voice to use.
+<ParamField body="conversationType" type="string" required>
+  - `single_prompt` – a conversational agent driven by `systemMessage`
+  - `static_voice_blaster` – a voice blaster whose `startMessage` is the same for every contact; it can't contain variables
+  - `dynamic_voice_blaster` – a voice blaster whose `startMessage` can contain variables
+</ParamField>
+
+<ParamField body="systemMessage" type="string" required>
+  The agent's instructions (prompt). Write variables as `{variable_name}`; they are filled from each contact's fields. `[condition]` and `[variations]` blocks are checked for valid syntax.
+</ParamField>
+
+<ParamField body="startMessage" type="string">
+  First thing the agent says when the call connects. Can contain `{variable_name}` variables, except for `static_voice_blaster`.
+</ParamField>
+
+<ParamField body="voice" type="string">
+  ID of the voice the agent speaks with, from `GET /api/voices`.
+</ParamField>
+
+<ParamField body="selectedLanguage" default='["en-IN"]' type="array[string]">
+  Language codes the agent speaks, for example `["en-IN", "hi-IN"]`.
+</ParamField>
+
+<ParamField body="knowledgeBase" type="array[string]">
+  IDs of knowledge bases the agent can answer from. See [Get Knowledge Bases](/api-reference/KnowledgeBase/getKnowledgeBases).
+</ParamField>
+
+<ParamField body="description" type="string">
+  Short description of the agent.
+</ParamField>
+
+<ParamField body="tags" type="array[string]">
+  Tags for organizing agents.
+</ParamField>
+
+<ParamField body="channel_type" default="voice" type="string">
+  `voice` or `chat`. A chat agent has no voice and must be `single_prompt`.
 </ParamField>
 
 <RequestExample>
 
-```bash
-curl ...
+```bash cURL
+curl --location 'https://api.weya.live/backend/api/agents' \
+  --header 'x-api-key: YOUR_API_KEY' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "agent_name": "Sales Agent",
+    "gender": "Female",
+    "conversationType": "single_prompt",
+    "systemMessage": "You are a friendly sales assistant calling {customer_name} about their order.",
+    "startMessage": "Hello {customer_name}, this is Asha from Example Store.",
+    "selectedLanguage": ["en-IN"]
+  }'
 ```
 
 </RequestExample>
@@ -44,27 +88,39 @@ curl ...
 
 <ResponseExample>
 
-```json
+```json 201 Created
 {
   "status": true,
+  "code": 201,
   "message": "Agent created successfully",
-  "data": {
-    "_id": "...",
-    "agentName": "Sales Agent"
-  }
+  "errorMessage": null,
+  "data": []
 }
 ```
 
 </ResponseExample>
 
-## Errors
+<ResponseField name="message" type="string" required>
+  `Agent created successfully`.
+</ResponseField>
 
-- 400 Bad Request
-- 401 Unauthorized
-- 500 Internal Server Error
+<ResponseField name="data" type="array" required>
+  Always empty: the response doesn't include the new agent or its ID. Find the agent with [Get Agents](/api-reference/Agents/getAgents) (newest first, or `search` by name).
+</ResponseField>
 
-<Check>
+## Error Handling
 
-Use **GET /api/agents/{id}** to verify the agent was created.
+Errors return `status: false`, with the reason in `errorMessage`.
 
-</Check>
+- **400 Bad Request**
+  - A required field is missing, or `gender` or `conversationType` isn't one of the allowed values.
+  - `Multi-stage agents must be created via /api/msp-agents`.
+  - `Invalid system message syntax — …` – a `[condition]` or `[variations]` block in `systemMessage` is malformed.
+  - `Start message cannot contain variables for static_voice_blaster conversation type.`
+  - `A chat agent must be a single prompt or multi-stage agent`.
+- **401 Unauthorized** – Missing or invalid API key.
+- **500 Internal Server Error** – Unexpected server error.
+
+<Note>
+  The variables used in `systemMessage` and `startMessage` become the agent's variables. When you add contacts to a campaign, include a field with the same name for each one.
+</Note>
