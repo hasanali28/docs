@@ -1,16 +1,19 @@
 ---
 title: "Add Phone Number"
-description: "Add a new phone number to your workspace for outbound or inbound calling."
+description: "Connect a phone number or SIP trunk from your telephony provider."
 api: "POST /api/call/add-phone"
 ---
 
 ## Overview
-Add a phone number to your workspace that can be used for outbound calling campaigns or inbound call handling. The system supports multiple integrations including Plivo, Twilio, and Telnyx. Credentials are validated before the number is saved, and webhooks are automatically configured for the selected integration.
+Connect a phone number from your telephony provider so it can be used in campaigns and for inbound calls. The number is added for the user who owns the API key.
+
+For Plivo, Twilio, Vobiz and Telnyx, your credentials are checked with the provider before the number is saved, and the provider is set up to send call events to Weya. Elisiontec checks the API token only. SIP trunks are saved without a connection check.
+
+Supported providers: `twilio`, `plivo`, `telnyx`, `vobiz`, `elisiontec` and `sip`.
 
 ## Prerequisites
 - An API key for your workspace
-- Valid phone number credentials for your chosen integration provider
-- Phone number must be owned by your integration account
+- An account with the provider, and the number in that account
 
 ## Request
 
@@ -18,56 +21,56 @@ Add a phone number to your workspace that can be used for outbound calling campa
 Your workspace API key. Create one from the profile menu in the dashboard → **API Keys**.
 </ParamField>
 
-<ParamField body="userId" type="string" required>
-ID of the user who will own this phone number.
+<ParamField body="integration" type="string" required>
+Telephony provider: `twilio`, `plivo`, `telnyx`, `vobiz`, `elisiontec` or `sip`. Not case-sensitive.
 </ParamField>
 
 <ParamField body="phoneNumber" type="string">
-Phone number with country code (e.g., "12125551234"). The `+` prefix is optional. Must be owned by your provider account. Required for every provider except `sip`.
-</ParamField>
-
-<ParamField body="integration" type="string" required allowedValues="twilio,plivo,telnyx,sip,exotel,elisiontec,vobiz,jambonz">
-Telephony provider for this phone number: `twilio`, `plivo`, `telnyx`, `sip`, `exotel`, `elisiontec`, `vobiz` or `jambonz`.
+Phone number with country code, for example `+12125551234`. A missing `+` is added. Required for every provider except `sip`.
 </ParamField>
 
 <ParamField body="authToken" type="string">
-Authentication token for your integration provider account. For Plivo, this is the Auth Token. For Twilio, this is the Auth Token. For Telnyx, this is the API Key.
+Provider credential. Required for every provider except `sip`.
+
+- Plivo, Twilio, Vobiz: the Auth Token
+- Telnyx: the API key
+- Elisiontec: the API token
 </ParamField>
 
 <ParamField body="accSId" type="string">
-Account identifier for your integration provider. For Plivo, this is the Auth ID. For Twilio, this is the Account SID. For Telnyx, this is the App ID (automatically configured).
+Account ID. Required for Plivo (Auth ID), Twilio (Account SID) and Vobiz (Auth ID). Not used for Telnyx.
+</ParamField>
+
+<ParamField body="elisiontecListId" type="string">
+Elisiontec only, required: the list ID.
 </ParamField>
 
 <ParamField body="sipHost" type="string">
-SIP only: SIP server host.
-</ParamField>
-
-<ParamField body="sipPort" type="integer">
-SIP only: SIP server port.
+SIP only, required: SIP server host.
 </ParamField>
 
 <ParamField body="sipUsername" type="string">
-SIP only: SIP username.
+SIP only, required: SIP username. A trunk with the same host and username can't be added twice.
 </ParamField>
 
 <ParamField body="sipSecret" type="string">
 SIP only: SIP password.
 </ParamField>
 
+<ParamField body="sipPort" default="5060" type="integer">
+  SIP only: SIP server port.
+</ParamField>
+
 <ParamField body="sipFromUser" type="string">
 SIP only: the "from" user for outgoing calls.
 </ParamField>
 
-<ParamField body="sipTransport" type="string">
+<ParamField body="sipTransport" default="udp" type="string">
 SIP only: `udp`, `tcp` or `tls`.
 </ParamField>
 
-<ParamField body="sipRegister" type="boolean">
+<ParamField body="sipRegister" default="true" type="boolean">
 SIP only: whether to register with the SIP server.
-</ParamField>
-
-<ParamField body="elisiontecListId" type="string">
-Elisiontec only: list ID.
 </ParamField>
 
 <RequestExample>
@@ -76,11 +79,24 @@ curl --location 'https://api.weya.live/backend/api/call/add-phone' \
   --header 'x-api-key: YOUR_API_KEY' \
   --header 'Content-Type: application/json' \
   --data '{
-    "userId": "64e5f12345abcdef12345678",
-    "phoneNumber": "12125551234",
-    "integration": "twilio",
-    "authToken": "your_auth_token",
-    "accSId": "your_account_sid"
+    "integration": "plivo",
+    "phoneNumber": "+12125551234",
+    "accSId": "YOUR_AUTH_ID",
+    "authToken": "YOUR_AUTH_TOKEN"
+  }'
+```
+
+```bash cURL (SIP)
+curl --location 'https://api.weya.live/backend/api/call/add-phone' \
+  --header 'x-api-key: YOUR_API_KEY' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "integration": "sip",
+    "sipHost": "sip.example.com",
+    "sipUsername": "trunk-user",
+    "sipSecret": "YOUR_SIP_PASSWORD",
+    "sipPort": 5060,
+    "sipTransport": "udp"
   }'
 ```
 </RequestExample>
@@ -90,15 +106,15 @@ curl --location 'https://api.weya.live/backend/api/call/add-phone' \
 <ResponseExample>
 ```json 201 Created
 {
-  "message": "Phone number added successfully",
   "status": true,
   "code": 201,
-  "errorMessage": "",
+  "message": "Phone number added successfully",
+  "errorMessage": null,
   "data": {
     "_id": "64e5f12345abcdef87654321",
     "userId": "64e5f12345abcdef12345678",
-    "phoneNumber": "12125551234",
-    "integration": "twilio",
+    "phoneNumber": "+12125551234",
+    "integration": "plivo",
     "createdAt": "2025-05-15T10:30:00.000Z"
   }
 }
@@ -106,37 +122,34 @@ curl --location 'https://api.weya.live/backend/api/call/add-phone' \
 </ResponseExample>
 
 <ResponseField name="data" type="object" required>
-Phone number record that was created.
+The saved phone number record. It also contains the credentials you sent, so don't log the response.
 </ResponseField>
 
 <ResponseField name="data._id" type="string" required>
-Unique identifier for the phone number record.
+Phone number ID. Use it in `callingNumbers` when creating a campaign.
 </ResponseField>
 
-<ResponseField name="data.phoneNumber" type="string" required>
-Phone number that was added (with country code).
+<ResponseField name="data.phoneNumber" type="string">
+The phone number, with `+` and country code.
 </ResponseField>
 
 <ResponseField name="data.integration" type="string" required>
-Integration provider used for this number.
+Telephony provider.
 </ResponseField>
 
 ## Error Handling
 
-- **400 Bad Request** – Invalid User ID format, phone number already exists for this user, or invalid credentials for the integration provider.
-- **404 Not Found** – User not found with the provided `userId`.
-- **500 Internal Server Error** – Failed to set up integration webhooks or other server errors.
+Errors return `status: false`, with the reason in `errorMessage`.
+
+- **400 Bad Request**
+  - `Unknown integration type: …` – `integration` is missing or not supported.
+  - `Phone number is required`, `Auth token is required for telephony integrations`, or `Twilio, Plivo and Vobiz require accSId`.
+  - `Elisiontec API token is required`, `Elisiontec List ID is required` or `Phone Number (DID) is required`.
+  - `Phone number already exists for this user`, or `SIP trunk already exists for host … and username …`.
+  - Invalid credentials, for example `Invalid Plivo SID or Auth Token. Please check your credentials.` For Twilio and Telnyx this also means the number isn't in that account.
+- **401 Unauthorized** – Missing or invalid API key.
+- **500 Internal Server Error** – The credentials were valid but setting up call events with the provider failed, or another server error. A missing `sipHost` or `sipUsername` also returns 500.
 
 <Note>
-**Integration-Specific Behavior:**
-
-- **Plivo:** Validates Auth ID and Auth Token, then creates or reuses a Plivo application for webhook configuration.
-- **Twilio:** Validates Account SID, Auth Token, and phone number ownership, then configures webhooks for the number.
-- **Telnyx:** Validates API Key and phone number, then automatically configures webhooks.
-
-All integrations automatically set up webhook endpoints to receive call status updates and recordings.
+Numbers must be unique per user: the same number can't be added twice by the same user.
 </Note>
-
-<Warning>
-Phone numbers must be unique per user. If you attempt to add a number that already exists for the user, the request will fail with a 400 error.
-</Warning>
