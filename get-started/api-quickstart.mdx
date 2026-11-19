@@ -1,0 +1,189 @@
+---
+title: "API quickstart: run a weya calling campaign"
+sidebarTitle: "Quickstart: API"
+description: "Learn how to launch an outbound calling campaign with the weya API and receive each call's result on your webhook, in five requests from start to finish."
+keywords: ["api quickstart", "outbound campaign api", "upload csv", "start calling", "webhook"]
+icon: "terminal"
+---
+
+This quickstart launches an outbound calling campaign entirely through the weya API. You look up your IDs, register a webhook for call results, upload your contacts as a campaign and start calling. When each call ends, weya posts its result to your webhook.
+
+## Before you start
+
+You need three things, set up once in the dashboard:
+
+- **An outbound voice agent.** Build one with the [dashboard quickstart](/essentials/settings) or [Build a voice agent](/single-prompt/overview).
+- **A phone number with that agent assigned as its outbound agent.** See [Connect a phone number](/phonenumbers/addphonenumber).
+- **An API key**, stored in the `WEYA_API_KEY` environment variable. See [Authentication](/get-started/authentication).
+
+You also need a public HTTPS endpoint that accepts `POST` requests, to receive call results. For testing, a request inspector such as webhook.site works.
+
+<Steps>
+  <Step title="Get your user ID">
+    Some campaign endpoints take the ID of the user that owns the key.
+
+    ```bash
+    curl --location 'https://api.weya.live/backend/api/auth/profile' \
+      --header "x-api-key: $WEYA_API_KEY"
+    ```
+
+    Save `data._id` as `USER_ID`.
+  </Step>
+
+  <Step title="Find the phone number to call from">
+    List your numbers and pick one whose `outboundAgentName` is the agent you want to make the calls.
+
+    ```bash
+    curl --location "https://api.weya.live/backend/api/call/get-phone/$USER_ID?limit=50" \
+      --header "x-api-key: $WEYA_API_KEY"
+    ```
+
+    ```json Response (trimmed)
+    {
+      "status": true,
+      "data": {
+        "phones": [
+          {
+            "_id": "6872d4b5f8d7a91234567890",
+            "phoneNumber": "+919876543210",
+            "integration": "plivo",
+            "outboundAgentName": "Sales Agent"
+          }
+        ]
+      }
+    }
+    ```
+
+    Save that number's `_id` as `PHONE_ID`. The campaign calls from this number, and the outbound agent assigned to it handles every call.
+  </Step>
+
+  <Step title="Register a webhook for call results">
+    ```bash
+    curl --location 'https://api.weya.live/backend/api/webhooks' \
+      --header "x-api-key: $WEYA_API_KEY" \
+      --header 'Content-Type: application/json' \
+      --data '{
+        "name": "Call results",
+        "url": "https://your-domain.com/weya/call-results",
+        "bearerToken": "YOUR_ENDPOINT_TOKEN"
+      }'
+    ```
+
+    Save `data._id` as `WEBHOOK_ID`. If you set `bearerToken`, weya sends it as `Authorization: Bearer <token>` with every delivery, so your endpoint can reject anything else.
+  </Step>
+
+  <Step title="Upload your contacts as a campaign">
+    Create a CSV with a `phoneNumber` column plus one column for each variable your agent's prompt uses:
+
+    ```csv contacts.csv
+    phoneNumber,customer_name,amount_due
+    +919800000001,Asha,4500
+    +919800000002,Rahul,1200
+    ```
+
+    Upload it to create the campaign, with the calling schedule and the webhook attached:
+
+    ```bash
+    curl --location 'https://api.weya.live/backend/api/call/upload' \
+      --header "x-api-key: $WEYA_API_KEY" \
+      --form 'file=@"contacts.csv"' \
+      --form "userId=$USER_ID" \
+      --form 'batchName="API quickstart"' \
+      --form 'batchType="outbound"' \
+      --form "callingNumbers=[\"$PHONE_ID\"]" \
+      --form 'retry="3"' \
+      --form 'delay="30"' \
+      --form 'timezone="Asia/Kolkata"' \
+      --form 'callingHour={"start":"09:00","end":"18:00"}' \
+      --form 'allowedDays=["Monday","Tuesday","Wednesday","Thursday","Friday"]' \
+      --form "pushingCrms=[{\"type\":\"webhook\",\"crmId\":\"$WEBHOOK_ID\",\"schemaId\":\"$WEBHOOK_ID\"}]"
+    ```
+
+    Save `data.batch[0]._id` as `BATCH_ID` and `data.uuid` as `UPLOAD_ID`.
+
+    <Note>
+      If any row is invalid, the whole upload is rejected and the response lists each bad row with its reason. Fix the rows, or add `--form 'type="true"'` to skip invalid rows and upload the rest.
+    </Note>
+  </Step>
+
+  <Step title="Start calling">
+    ```bash
+    curl --location 'https://api.weya.live/backend/api/call/start-calling' \
+      --header "x-api-key: $WEYA_API_KEY" \
+      --header 'Content-Type: application/json' \
+      --data "{
+        \"batchId\": \"$BATCH_ID\",
+        \"userId\": \"$USER_ID\",
+        \"uuid\": \"$UPLOAD_ID\"
+      }"
+    ```
+
+    The campaign is queued straight away. Calls are placed only on the allowed days, inside the calling window, in the campaign's timezone. Outside that window the campaign waits and starts calling when the window opens.
+  </Step>
+
+  <Step title="Receive the results">
+    About five minutes after each call ends, once the recording and the transcript analysis are ready, weya posts the result to your webhook:
+
+    ```json
+    {
+      "call_id": "6a1f0c2e9b8d7a6f5e4d3c2b",
+      "request_uuid": "b0c1d2e3-f4a5-6789-abcd-ef0123456789",
+      "batch_id": "64e5f12345abcdef98765432",
+      "phoneNumber": "+919800000001",
+      "callStatus": "completed",
+      "call_outcome": "Promise to pay",
+      "duration": 94,
+      "recordingUrl": "https://...",
+      "call_analysis": [
+        { "metric_name": "Promise date", "metric_value": "2026-12-05" }
+      ],
+      "lead_data": { "customer_name": "Asha", "amount_due": "4500" }
+    }
+    ```
+
+    Respond with any `2xx` status. See [Call result webhooks](/integration/webhooks) for every field and how retries work.
+  </Step>
+</Steps>
+
+<Check>
+  You now have a campaign that dials your contacts within its calling window, retries unanswered contacts up to three times, and sends every result to your system.
+</Check>
+
+## Add contacts as they arrive
+
+If your contacts come from your own system over time instead of in one file, create the campaign once with [Create Campaign](/api-reference/Campaigns/createBatch) and send contacts to it with [Add Calls to Campaign](/api-reference/Campaigns/addCallsToBatch). Each object needs `phoneNumber`, plus the variables your agent uses. Calling starts automatically after the contacts are added, so you don't call **Start Campaign** for them.
+
+```bash
+curl --location 'https://api.weya.live/backend/api/call/addCallsToBatch' \
+  --header "x-api-key: $WEYA_API_KEY" \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "batchId": "64e5f12345abcdef98765432",
+    "callData": [
+      { "phoneNumber": "+919800000003", "customer_name": "Meera", "amount_due": "800" }
+    ]
+  }'
+```
+
+<Info>
+  [Create Campaign](/api-reference/Campaigns/createBatch) doesn't take a webhook. To attach one to a campaign created this way, pause it and set `pushingCrms` with [Update Campaign](/api-reference/Campaigns/updateBatch). Only calls that end after the update are sent.
+</Info>
+
+## Control a running campaign
+
+| To | Call |
+| --- | --- |
+| Pause calling | `POST /api/call/pause-batch/{batchId}` |
+| Resume calling | `POST /api/call/resume-batch/{batchId}` |
+| Check progress | `GET /api/call/batch-details/{batchId}` |
+
+## Next steps
+
+<Columns cols={2}>
+  <Card title="Core concepts" icon="shapes" href="/get-started/concepts">
+    What happens to a contact between upload and result.
+  </Card>
+  <Card title="Call result webhooks" icon="webhook" href="/integration/webhooks">
+    Payload fields, delivery timing and retries.
+  </Card>
+</Columns>

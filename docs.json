@@ -21,7 +21,8 @@
             "group": "Get Started",
             "pages": [
               "essentials/settings",
-              "get-started/authentication"
+              "get-started/authentication",
+              "get-started/api-quickstart"
             ]
           },
           {
