@@ -1,27 +1,18 @@
 ---
 title: "Get Phone Numbers with Agents"
-description: "Retrieve your phone numbers with their assigned agents and the inbound campaign each one is active on."
+description: "List your phone numbers with their assigned agents and the inbound campaign each one is active on."
 api: "GET /api/call/get-phone-with-agent/{userId}"
 ---
 
 ## Overview
 
-List your phone numbers together with the names of their inbound and outbound agents, and the inbound campaign each number is currently active on. This is the list the dashboard shows when you pick **Calling Numbers** for a campaign.
+List the phone numbers added by the user who owns the API key, with their inbound and outbound agents and the inbound campaign each number is currently active on. Results are paginated and sorted newest first. This is the list the dashboard shows when you pick **Calling Numbers** for a campaign.
+
+Unlike [Get Phone Numbers](/api-reference/PhoneNumbers/getPhoneNumbers), this list also includes deleted jambonz numbers.
 
 ## Prerequisites
 
 - An API key for your workspace
-
-## Endpoint
-
-<ParamField method="GET" path="/api/call/get-phone-with-agent/{userId}" />
-
-<Note>
-
-Put `page` and `limit` after a `?`, as in the example. Without the `?` they are not applied and you always get the first 10 numbers.
-
-</Note>
-
 
 ## Request
 
@@ -30,7 +21,7 @@ Your workspace API key. Create one from the profile menu in the dashboard → **
 </ParamField>
 
 <ParamField path="userId" type="string" required>
-Your user ID. It must be included in the path; phone numbers are always returned for the account that owns the API key.
+Your user ID. The path needs a value, but it isn't used to filter: numbers are always returned for the user who owns the API key.
 </ParamField>
 
 <ParamField query="page" type="integer" default="1">
@@ -38,14 +29,17 @@ Page number.
 </ParamField>
 
 <ParamField query="limit" type="integer" default="10">
-Number of phone numbers per page, from 1 to 10.
+Number of phone numbers per page, from 1 to 1000.
 </ParamField>
 
+<ParamField query="search" type="string">
+  Case-insensitive text to match against the phone number, telephony provider, SIP host, SIP username or SIP from user. Partial matches are returned.
+</ParamField>
 
 <RequestExample>
 
 ```bash cURL
-curl --location 'https://api.weya.live/backend/api/call/get-phone-with-agent/64e5f12345abcdef12345678?page=1&limit=10' \
+curl --location 'https://api.weya.live/backend/api/call/get-phone-with-agent/64e5f12345abcdef12345678?page=1&limit=50' \
   --header 'x-api-key: YOUR_API_KEY'
 ```
 
@@ -59,26 +53,31 @@ curl --location 'https://api.weya.live/backend/api/call/get-phone-with-agent/64e
 {
   "status": true,
   "code": 200,
-  "message": "",
-  "errorMessage": "",
+  "message": "Phones with agent names retrieved successfully",
+  "errorMessage": null,
   "data": {
     "phones": [
       {
         "_id": "6872d4b5f8d7a91234567890",
         "phoneNumber": "+919876543210",
         "integration": "plivo",
+        "inboundAgentId": "686ab1234567890abcdef123",
+        "outboundAgentId": "686ab1234567890abcdef456",
         "inboundAgentName": "Customer Support Agent",
         "outboundAgentName": "Sales Agent",
+        "inboundAgentVersion": 4,
+        "outboundAgentVersion": 2,
+        "inboundAgentRootId": "686ab1234567890abcdef123",
+        "outboundAgentRootId": "686ab1234567890abcdef400",
         "activeInboundBatchId": "6806382f98da85ec32fac955",
         "activeInboundBatchName": "Support Line",
-        "createdAt": "2026-07-20T10:15:30.000Z",
-        "updatedAt": "2026-07-20T10:15:30.000Z"
+        "createdAt": "2026-07-20T10:15:30.000Z"
       }
     ],
     "pagination": {
       "total": 1,
       "page": 1,
-      "limit": 10,
+      "limit": 50,
       "totalPages": 1,
       "hasNextPage": false,
       "hasPrevPage": false
@@ -89,18 +88,10 @@ curl --location 'https://api.weya.live/backend/api/call/get-phone-with-agent/64e
 
 </ResponseExample>
 
-Each phone number has the same fields as in **Get Phone Numbers**, plus:
-
-<ResponseField name="data.phones[].inboundAgentName" type="string">
-Name of the agent that answers incoming calls on this number.
-</ResponseField>
-
-<ResponseField name="data.phones[].outboundAgentName" type="string">
-Name of the agent that places outgoing calls from this number.
-</ResponseField>
+Each phone number has the same fields as in [Get Phone Numbers](/api-reference/PhoneNumbers/getPhoneNumbers) (except `userId`), plus the inbound campaign fields below. Agent fields are left out, rather than `null`, when no agent is assigned.
 
 <ResponseField name="data.phones[].activeInboundBatchId" type="string | null">
-ID of the inbound campaign this number currently receives calls for. `null` if it isn't active on any inbound campaign.
+ID of the inbound campaign this number currently receives calls for. Left out or `null` if it isn't active on any inbound campaign.
 </ResponseField>
 
 <ResponseField name="data.phones[].activeInboundBatchName" type="string | null">
@@ -118,6 +109,6 @@ Pagination details: `total`, `page`, `limit`, `totalPages`, `hasNextPage` and `h
 
 <Note>
 
-A phone number can be active on only one inbound campaign at a time. Creating or updating an inbound campaign with a number that is already active elsewhere returns `409 Conflict` unless you send `confirmReassign: true`.
+A phone number can be active on only one inbound campaign at a time. Creating an inbound campaign with [Upload Campaign CSV](/api-reference/Campaigns/uploadCSV) using a number that is already active elsewhere returns `409 Conflict` unless you send `confirmReassign: "true"`.
 
 </Note>
