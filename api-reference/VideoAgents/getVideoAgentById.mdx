@@ -1,17 +1,17 @@
 ---
 title: "Get Video Agent By ID"
-description: "Retrieve the complete configuration and details of a specific Video Agent."
+description: "Retrieve the full configuration of one of your video agents."
 api: "GET /api/video-agents/{id}"
 ---
 
 ## Overview
 
-Retrieve the complete details of a Video Agent using its unique Video Agent ID. This endpoint returns the agent configuration, including its avatar, voice, language, system prompt, greeting message, and associated Knowledge Bases.
+Retrieve a video agent's full configuration: instructions, greeting, avatar, voice, languages, knowledge base and conversation settings. The agent must have been created by the user who owns the API key.
 
 ## Prerequisites
 
 - An API key for your workspace
-- Valid Video Agent ID
+- The video agent's ID, from [Get Video Agents](/api-reference/VideoAgents/getVideoAgents)
 
 ## Request
 
@@ -20,14 +20,14 @@ Your workspace API key. Create one from the profile menu in the dashboard → **
 </ParamField>
 
 <ParamField path="id" type="string" required>
-Unique identifier of the Video Agent.
+ID of the video agent.
 </ParamField>
 
 <RequestExample>
 
 ```bash cURL
 curl --location 'https://api.weya.live/backend/api/video-agents/6891a23bc456def789123456' \
---header 'x-api-key: YOUR_API_KEY'
+  --header 'x-api-key: YOUR_API_KEY'
 ```
 
 </RequestExample>
@@ -40,18 +40,20 @@ curl --location 'https://api.weya.live/backend/api/video-agents/6891a23bc456def7
 {
   "status": true,
   "code": 200,
-  "message": "Video Agent fetched successfully",
+  "message": "Fetched successfully",
+  "errorMessage": null,
   "data": {
     "_id": "6891a23bc456def789123456",
     "agent_name": "Sales Video Agent",
     "gender": "Female",
-    "avatar": "Business Female",
-    "voice": "en-US-Standard-A",
-    "selectedLanguage": ["en"],
+    "avatar": "6891a23bc456def789aaaaaa",
+    "voice": "6891a23bc456def789bbbbbb",
+    "enable_input_video": false,
+    "selectedLanguage": ["en-IN"],
     "systemMessage": "You are a professional AI sales representative.",
-    "startMessage": "Hello! Welcome to Weya AI. How can I assist you today?",
-    "rag": { "vectorDBCollection": "kb_6891a23bc456def789123456" },
-    "status": "active",
+    "startMessage": "Hello! Welcome to Example Store. How can I help you today?",
+    "rag": { "vectorDBCollection": "kb_sales_1a2b3c" },
+    "callSetting": { "callTimeout": 10, "voiceSpeed": 1 },
     "createdAt": "2026-07-21T09:30:00.000Z",
     "updatedAt": "2026-07-21T10:12:45.000Z"
   }
@@ -60,85 +62,24 @@ curl --location 'https://api.weya.live/backend/api/video-agents/6891a23bc456def7
 
 </ResponseExample>
 
-<ResponseField name="status" type="boolean">
-Indicates whether the request completed successfully.
-</ResponseField>
-
-<ResponseField name="code" type="integer">
-HTTP status code returned by the API.
-</ResponseField>
-
-<ResponseField name="message" type="string">
-Human-readable success message.
-</ResponseField>
-
 <ResponseField name="data" type="object">
-Complete Video Agent configuration.
+The video agent's full configuration. The fields are the ones described in [Create Video Agent](/api-reference/VideoAgents/createVideoAgent).
 </ResponseField>
 
-<ResponseField name="data._id" type="string">
-Unique identifier of the Video Agent.
+<ResponseField name="data.avatar" type="string | null">
+ID of the avatar.
 </ResponseField>
 
-<ResponseField name="data.agent_name" type="string">
-Display name of the Video Agent.
-</ResponseField>
-
-<ResponseField name="data.gender" type="string">
-Configured avatar gender.
-</ResponseField>
-
-<ResponseField name="data.avatar" type="string">
-Avatar assigned to the Video Agent.
-</ResponseField>
-
-<ResponseField name="data.voice" type="string">
-Voice assigned to the Video Agent.
-</ResponseField>
-
-<ResponseField name="data.selectedLanguage" type="array[string]">
-Languages the agent can speak.
-</ResponseField>
-
-<ResponseField name="data.systemMessage" type="string">
-System prompt that defines the Video Agent's behavior.
-</ResponseField>
-
-<ResponseField name="data.startMessage" type="string">
-Greeting message spoken when a conversation starts.
-</ResponseField>
-
-<ResponseField name="data.rag" type="object">
-Knowledge base the agent answers from, as `{ "vectorDBCollection": "..." }`.
-</ResponseField>
-
-<ResponseField name="data.status" type="string">
-Current status of the Video Agent.
-</ResponseField>
-
-<ResponseField name="data.createdAt" type="string">
-Timestamp indicating when the Video Agent was created.
-</ResponseField>
-
-<ResponseField name="data.updatedAt" type="string">
-Timestamp indicating when the Video Agent was last updated.
+<ResponseField name="data.voice" type="string | null">
+ID of the voice.
 </ResponseField>
 
 ## Error Handling
 
-| Status | Description |
-|---------|-------------|
-|400|Invalid Video Agent ID|
-|401|Missing or invalid API key|
-|403|You do not have permission to access this Video Agent|
-|404|Video Agent not found|
-|500|Internal server error|
+Errors return `status: false`, with the reason in `errorMessage`.
 
-<Check>
-
-The returned **Video Agent ID** can be used with:
-
-- `PATCH /api/video-agents/{id}` to update the Video Agent.
-- `DELETE /api/video-agents/{id}` to permanently delete the Video Agent.
-
-</Check>
+- **400 Bad Request** – `Invalid video agent ID format`.
+- **401 Unauthorized** – Missing or invalid API key.
+- **404 Not Found** – `Video agent not found`: it doesn't exist, was deleted, or wasn't created by the user who owns the API key.
+- **429 Too Many Requests** – More than 1,000 video agent requests in 15 minutes from your IP address.
+- **500 Internal Server Error** – Unexpected server error.

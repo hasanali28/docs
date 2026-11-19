@@ -1,12 +1,12 @@
 ---
 title: "Get Available Voices"
-description: "Retrieve the list of voices supported for Video Agents for the selected camera mode and avatar gender."
+description: "List the voices you can give a video agent, for its camera mode and gender."
 api: "GET /api/video-agents/voices"
 ---
 
 ## Overview
 
-Retrieve all available voices that can be used when creating or updating a Video Agent. The response may vary depending on the selected video generation mode, allowing your application to display only compatible voices.
+List the voices you can use for a video agent's `voice`. Agents that see the visitor's camera (`enable_input_video: true`) need a realtime voice, so by default only realtime voices are returned.
 
 ## Prerequisites
 
@@ -18,19 +18,19 @@ Retrieve all available voices that can be used when creating or updating a Video
 Your workspace API key. Create one from the profile menu in the dashboard → **API Keys**.
 </ParamField>
 
-<ParamField query="enableInputVideo" type="boolean" required>
-`true` if the agent will see the visitor's camera (`enable_input_video`). Only voices that work in that mode are returned.
+<ParamField query="enableInputVideo" default="true" type="string">
+`true` returns only realtime voices, for agents with `enable_input_video: true`. `false` returns every voice.
 </ParamField>
 
 <ParamField query="gender" type="string">
-Only return voices for this avatar gender: `Male` or `Female`.
+Only return voices of this gender: `Male` or `Female`.
 </ParamField>
 
 <RequestExample>
 
 ```bash cURL
 curl --location 'https://api.weya.live/backend/api/video-agents/voices?enableInputVideo=false&gender=Female' \
---header 'x-api-key: YOUR_API_KEY'
+  --header 'x-api-key: YOUR_API_KEY'
 ```
 
 </RequestExample>
@@ -43,28 +43,20 @@ curl --location 'https://api.weya.live/backend/api/video-agents/voices?enableInp
 {
   "status": true,
   "code": 200,
-  "message": "Voices fetched successfully",
+  "message": "Fetched successfully",
+  "errorMessage": null,
   "data": [
     {
-      "id": "en-US-Standard-A",
-      "name": "English Female",
-      "selectedLanguage": ["en"],
+      "_id": "6891a23bc456def789bbbbbb",
+      "agent_name": "Asha",
+      "trait": "Warm",
       "gender": "Female",
-      "provider": "Google"
-    },
-    {
-      "id": "en-US-Standard-B",
-      "name": "English Male",
-      "selectedLanguage": ["en"],
-      "gender": "Male",
-      "provider": "Google"
-    },
-    {
-      "id": "hi-IN-Standard-A",
-      "name": "Hindi Female",
-      "selectedLanguage": ["en"],
-      "gender": "Female",
-      "provider": "Google"
+      "languages": ["en-IN", "hi-IN"],
+      "provider": "…",
+      "is_realtime": true,
+      "isPremium": false,
+      "imageUrl": "https://…",
+      "audioUrls": { "en-IN": "https://…" }
     }
   ]
 }
@@ -72,58 +64,42 @@ curl --location 'https://api.weya.live/backend/api/video-agents/voices?enableInp
 
 </ResponseExample>
 
-<ResponseField name="status" type="boolean">
-Indicates whether the request completed successfully.
+<ResponseField name="data" type="array[object]">
+The voices, newest first.
 </ResponseField>
 
-<ResponseField name="code" type="integer">
-HTTP status code returned by the API.
+<ResponseField name="data[]._id" type="string">
+Voice ID. Use it as the video agent's `voice`.
 </ResponseField>
 
-<ResponseField name="message" type="string">
-Success message returned by the API.
-</ResponseField>
-
-<ResponseField name="data" type="array">
-Collection of voices available for the selected video mode.
-</ResponseField>
-
-<ResponseField name="data.id" type="string">
-Unique identifier of the voice.
-</ResponseField>
-
-<ResponseField name="data.name" type="string">
+<ResponseField name="data[].agent_name" type="string">
 Display name of the voice.
 </ResponseField>
 
-<ResponseField name="data.selectedLanguage" type="array[string]">
-Languages the agent can speak.
+<ResponseField name="data[].gender" type="string">
+`Male`, `Female` or `Other`.
 </ResponseField>
 
-<ResponseField name="data.gender" type="string">
-Gender of the voice.
+<ResponseField name="data[].languages" type="array[string]">
+Language codes the voice speaks. `languageOptions` gives display details for each.
 </ResponseField>
 
-<ResponseField name="data.provider" type="string">
-Voice provider used by the platform.
+<ResponseField name="data[].is_realtime" type="boolean">
+`true` for voices that work with `enable_input_video: true`.
+</ResponseField>
+
+<ResponseField name="data[].isPremium" type="boolean">
+Whether the voice is a premium voice.
+</ResponseField>
+
+<ResponseField name="data[].audioUrls" type="object">
+Sample audio for each language.
 </ResponseField>
 
 ## Error Handling
 
-| Status | Description |
-|---------|-------------|
-|400|Missing or invalid `enableInputVideo`|
-|401|Missing or invalid API key|
-|500|Internal server error|
+Errors return `status: false`, with the reason in `errorMessage`.
 
-<Note>
-
-The available voices may differ depending on the selected video generation mode and the configured speech provider.
-
-</Note>
-
-<Check>
-
-Use the returned **Voice ID** when creating or updating a Video Agent.
-
-</Check>
+- **400 Bad Request** – `enableInputVideo` isn't `true` or `false`, or `gender` isn't `Male` or `Female`.
+- **401 Unauthorized** – Missing or invalid API key.
+- **500 Internal Server Error** – Unexpected server error.
