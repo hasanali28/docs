@@ -1,15 +1,15 @@
 ---
 title: "Add to DNC List"
-description: "Add a phone number to the Do Not Call (DNC) list for your organization."
+description: "Add a phone number to your organization's Do Not Call (DNC) list."
 api: "POST /api/dnc/add"
 ---
 
 ## Overview
-Add a phone number to your organization's Do Not Call (DNC) list. Once added, this number will be excluded from future outbound calling campaigns. The system automatically sends a notification email to the organization admin when a number is added to the DNC list.
+Add a phone number to your organization's Do Not Call (DNC) list. Numbers on the list are not called by any campaign in your organization: when a contact's number is on the list, the call is skipped. An email notification is sent to your organization when a number is added.
 
 ## Prerequisites
 - An API key for your workspace
-- If linking to a call: a valid `batchId` and `requestUUID` from that campaign
+- To link the entry to a call: the campaign's `batchId` and the call's `requestUUID`
 
 ## Request
 
@@ -18,7 +18,7 @@ Your workspace API key. Create one from the profile menu in the dashboard → **
 </ParamField>
 
 <ParamField body="phoneNumber" type="string" required>
-Phone number to add to the DNC list with country code (e.g., "12125551234"). The `+` prefix is optional.
+Phone number in E.164 format with the `+` and country code, for example `+12125551234`. The number is stored exactly as sent and must match the contact's number exactly to block calls, so a number without the `+` won't block anything.
 </ParamField>
 
 <ParamField body="type" type="string">
@@ -26,11 +26,11 @@ Channel the number should not be contacted on: `Call`, `Email` or `Whatsapp`.
 </ParamField>
 
 <ParamField body="batchId" type="string">
-Optional. ID of the campaign whose call led to this request. Send it together with `requestUUID` to link the DNC entry to that call.
+ID of the campaign whose call led to this request. Requires `requestUUID`. The call's recording and transcription are saved with the entry.
 </ParamField>
 
 <ParamField body="requestUUID" type="string">
-Optional. ID of the call record the request came from. Send it together with `batchId`.
+ID of the call (`request_uuid`) the request came from. Required when `batchId` is sent.
 </ParamField>
 
 <RequestExample>
@@ -39,7 +39,7 @@ curl --location 'https://api.weya.live/backend/api/dnc/add' \
   --header 'x-api-key: YOUR_API_KEY' \
   --header 'Content-Type: application/json' \
   --data '{
-    "phoneNumber": "12125551234",
+    "phoneNumber": "+12125551234",
     "type": "Call"
   }'
 ```
@@ -50,37 +50,36 @@ curl --location 'https://api.weya.live/backend/api/dnc/add' \
 <ResponseExample>
 ```json 200 OK
 {
-  "message": "Phone number added to DNC successfully",
   "status": true,
   "code": 200,
-  "errorMessage": ""
+  "message": "Phone number added to DNC successfully",
+  "errorMessage": null,
+  "data": []
 }
 ```
 </ResponseExample>
 
-<ResponseField name="message" type="string" required>
-Success message confirming the phone number was added to the DNC list.
-</ResponseField>
-
 <ResponseField name="status" type="boolean" required>
-Indicates whether the operation was successful.
+`true` when the number was added.
 </ResponseField>
 
-<ResponseField name="code" type="integer" required>
-HTTP status code (200 for success).
+<ResponseField name="message" type="string" required>
+`Phone number added to DNC successfully`.
 </ResponseField>
 
 ## Error Handling
 
-- **400 Bad Request** – Missing `phoneNumber`, or the phone number is already on your organization's DNC list.
-- **404 Not Found** – When `batchId` and `requestUUID` are sent: the campaign or the call record was not found.
-- **500 Internal Server Error** – Server error while processing the request.
+Errors return `status: false`, with the reason in `errorMessage`.
+
+- **400 Bad Request**
+  - `phoneNumber is required`.
+  - `requestUUID is required when batchId is provided`.
+  - `Phone number already exists in DNC for this organization`.
+  - `type` is not `Call`, `Email` or `Whatsapp`.
+- **401 Unauthorized** – Missing or invalid API key.
+- **404 Not Found** – `Batch not found`, or `Call record not found for the given batchId and requestUUID`.
+- **500 Internal Server Error** – Unexpected server error.
 
 <Note>
-When a phone number is added to the DNC list, the system automatically:
-- Links the DNC entry to your organization
-- Associates it with the batch and call record
-- Stores call recording and transcription data (if available)
-- Sends an email notification to your organization's admin
+The DNC list applies to every campaign in your organization. A campaign's DNC setting and the organization's DNC switch don't change which numbers are skipped.
 </Note>
-
