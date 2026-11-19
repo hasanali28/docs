@@ -6,16 +6,12 @@ api: "PUT /api/webhooks/{webhookId}"
 
 ## Overview
 
-Update a webhook. Send only the fields you want to change. Campaigns that use the webhook send their call outcomes to the new URL from then on.
+Update a webhook in your organization. Send only the fields you want to change; at least one is required.
 
 ## Prerequisites
 
 - An API key for your workspace
-- The webhook's ID (`_id` from **Get Webhooks**)
-
-## Endpoint
-
-<ParamField method="PUT" path="/api/webhooks/{webhookId}" />
+- The webhook's ID (`_id` from [Get Webhooks](/api-reference/Webhooks/getWebhooks))
 
 ## Request
 
@@ -47,11 +43,15 @@ New name for the webhook.
 </ParamField>
 
 <ParamField body="url" type="string">
-New URL to send call outcomes to.
+New URL to send call outcomes to. Must be a valid `http` or `https` URL.
 </ParamField>
 
 <ParamField body="bearerToken" type="string">
-New token to send as `Authorization: Bearer <token>` with each request.
+New token to send as `Authorization: Bearer <token>`. Send an empty string to stop sending one.
+</ParamField>
+
+<ParamField body="isActive" type="boolean">
+  Stored flag only. Setting it to `false` does **not** stop deliveries. To stop a webhook, remove it from the campaign's `pushingCrms` with [Update Campaign](/api-reference/Campaigns/updateBatch), or delete it.
 </ParamField>
 
 ## Response
@@ -62,8 +62,8 @@ New token to send as `Authorization: Bearer <token>` with each request.
 {
   "status": true,
   "code": 200,
-  "message": "",
-  "errorMessage": "",
+  "message": "Webhook updated successfully",
+  "errorMessage": null,
   "data": {
     "_id": "6890abc123456789abcdef01",
     "name": "Salesforce CRM Sync",
@@ -77,12 +77,14 @@ New token to send as `Authorization: Bearer <token>` with each request.
 </ResponseExample>
 
 <ResponseField name="data" type="object" required>
-The updated webhook.
+The updated webhook, including its `bearerToken`.
 </ResponseField>
 
 ## Error Handling
 
-- **400 Bad Request** – Invalid `url`.
+Errors return `status: false`, with the reason in `errorMessage`.
+
+- **400 Bad Request** – `No updatable fields provided`, `Invalid Webhook URL format`, or `Invalid protocol. Only http and https are allowed.`
 - **401 Unauthorized** – Missing or invalid API key.
-- **404 Not Found** – The webhook does not exist in your organization.
-- **500 Internal Server Error** – Unexpected server error.
+- **404 Not Found** – `Webhook not found or unauthorized`: the webhook doesn't exist in your organization.
+- **500 Internal Server Error** – Unexpected server error, including a `webhookId` that isn't a valid ID.

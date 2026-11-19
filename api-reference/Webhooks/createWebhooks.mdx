@@ -92,7 +92,8 @@ Errors return `status: false`, with the reason in `errorMessage`.
 - Your endpoint has 10 seconds to respond. Redirects are followed.
 - Network errors, `408`, `429` and `5xx` responses are retried, up to 8 attempts in about 22 hours. A `Retry-After` header is respected. Other `4xx` responses are not retried.
 - A completed call is sent only once its call analysis is ready. If the analysis isn't ready within 30 minutes, the call is not sent.
-- Calls that were never connected to the provider, and calls that are still being retried, are not sent.
+- Each finished call attempt is sent separately, so a contact that is called again can be sent more than once.
+- Attempts that never reached the telephony provider, attempts the provider dropped because it was at capacity, and expired contacts are not sent.
 - If a recording arrives after the first request, the call is sent again.
 
 <Check>
