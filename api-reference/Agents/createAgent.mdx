@@ -30,8 +30,8 @@ This endpoint creates `single_prompt`, `static_voice_blaster` and `dynamic_voice
 
 <ParamField body="conversationType" type="string" required>
   - `single_prompt` – a conversational agent driven by `systemMessage`
-  - `static_voice_blaster` – plays `startMessage` as a recorded message; it can't contain variables
-  - `dynamic_voice_blaster` – plays `startMessage` with variables filled in per contact
+  - `static_voice_blaster` – a voice blaster whose `startMessage` is the same for every contact; it can't contain variables
+  - `dynamic_voice_blaster` – a voice blaster whose `startMessage` can contain variables
 </ParamField>
 
 <ParamField body="systemMessage" type="string" required>
