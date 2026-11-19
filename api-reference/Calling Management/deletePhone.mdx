@@ -1,24 +1,27 @@
 ---
 title: "Delete Phone Number"
-description: "Remove an outbound phone number and detach it from future campaigns."
+description: "Permanently remove a phone number from your workspace."
 api: "DELETE /api/call/delete-phone/{phoneId}"
 ---
 
 ## Overview
-Delete phone numbers that you no longer pay for or that have been reassigned. The number is removed from the workspace and no longer appears in batch or agent pickers.
+Permanently delete a phone number you no longer use. It is removed from your phone number lists and can't be selected for new campaigns.
+
+The number is not removed from campaigns that already use it, and the API doesn't check for them. Campaigns that call from a deleted number can't place calls or retries from it.
 
 ## Prerequisites
 - An API key for your workspace
-- The `phoneId` of the record you want to remove.
-- Confirm that no active batches rely on the number.
+- The phone number's ID (`_id` from [Get Phone Numbers](/api-reference/PhoneNumbers/getPhoneNumbers)). The number must have been added by the user who owns the API key.
+- Remove the number from any running campaign first with [Update Campaign](/api-reference/Campaigns/updateBatch).
 
 ## Request
-<ParamField path="phoneId" type="string" required>
-Identifier of the phone record to delete.
-</ParamField>
 
 <ParamField header="x-api-key" type="string" required>
 Your workspace API key. Create one from the profile menu in the dashboard → **API Keys**.
+</ParamField>
+
+<ParamField path="phoneId" type="string" required>
+  ID of the phone number to delete.
 </ParamField>
 
 <RequestExample>
@@ -32,21 +35,30 @@ curl --location --request DELETE 'https://api.weya.live/backend/api/call/delete-
 <ResponseExample>
 ```json 200 OK
 {
-  "success": true,
-  "deletedId": "64e5f12345abcdef87654321"
+  "status": true,
+  "code": 200,
+  "message": "Phone deleted successfully",
+  "errorMessage": null,
+  "data": {
+    "deletedId": "64e5f12345abcdef87654321"
+  }
 }
 ```
 </ResponseExample>
 
-<ResponseField name="deletedId" type="string" required>
-Confirms which phone record was removed.
+<ResponseField name="data.deletedId" type="string" required>
+ID of the deleted phone number.
 </ResponseField>
 
 ## Error Handling
-- **400 Bad Request** – `phoneId` missing or invalid.
-- **404 Not Found** – Phone already deleted or does not belong to the workspace.
-- **500 Internal Server Error** – Deletion failed; retry or contact support with the `phoneId`.
+
+Errors return `status: false`, with the reason in `errorMessage`.
+
+- **400 Bad Request** – `Invalid Phone ID`.
+- **401 Unauthorized** – Missing or invalid API key.
+- **404 Not Found** – `Phone not found`: the number doesn't exist, is already deleted, or wasn't added by the user who owns the API key.
+- **500 Internal Server Error** – Unexpected server error.
 
 <Warning>
-Deleting a number clears it from existing batches. Update those batches first to avoid dialer failures.
+Deletion can't be undone. To use the number again, add it again with **Add Phone Number**; it gets a new ID.
 </Warning>

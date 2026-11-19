@@ -6,16 +6,16 @@ api: "PUT /api/call/update-phone/{phoneId}"
 
 ## Overview
 
-Update the details of a phone number connected to your workspace, such as its provider credentials or SIP connection settings. To change which agent handles a number, assign the agent from the dashboard's **Phone Numbers** page.
+Update the details of one of your phone numbers, such as its provider credentials or SIP connection settings. Send only the fields you want to change; the values are saved as sent.
+
+Unlike **Add Phone Number**, this endpoint doesn't check credentials with the provider or set up call events again. Make sure new credentials are correct before you save them.
+
+To change which agent handles a number, assign the agent from the dashboard's **Phone Numbers** page.
 
 ## Prerequisites
 
 - An API key for your workspace
-- The phone number's ID (`_id` from **Get Phone Numbers**)
-
-## Endpoint
-
-<ParamField method="PUT" path="/api/call/update-phone/{phoneId}" />
+- The phone number's ID (`_id` from [Get Phone Numbers](/api-reference/PhoneNumbers/getPhoneNumbers)). The number must have been added by the user who owns the API key.
 
 ## Request
 
@@ -34,9 +34,6 @@ curl --location --request PUT 'https://api.weya.live/backend/api/call/update-pho
   --header 'x-api-key: YOUR_API_KEY' \
   --header 'Content-Type: application/json' \
   --data '{
-    "userId": "64e5f12345abcdef12345678",
-    "integration": "plivo",
-    "phoneNumber": "+919876543210",
     "accSId": "YOUR_PROVIDER_ACCOUNT_ID",
     "authToken": "YOUR_PROVIDER_AUTH_TOKEN"
 }'
@@ -46,16 +43,10 @@ curl --location --request PUT 'https://api.weya.live/backend/api/call/update-pho
 
 ### Request Parameters
 
-<ParamField body="userId" type="string" required>
-Your user ID.
-</ParamField>
-
-<ParamField body="integration" type="string" required>
-Telephony provider: `twilio`, `plivo`, `telnyx`, `sip`, `exotel`, `elisiontec`, `vobiz` or `jambonz`.
-</ParamField>
+All fields are optional. `_id`, `userId`, `organization`, `createdAt` and `updatedAt` are ignored if sent.
 
 <ParamField body="phoneNumber" type="string">
-The phone number, with country code. Not used for SIP connections.
+The phone number, with `+` and country code. Not used for SIP connections.
 </ParamField>
 
 <ParamField body="accSId" type="string">
@@ -63,7 +54,7 @@ Account ID from your telephony provider.
 </ParamField>
 
 <ParamField body="authToken" type="string">
-Auth token from your telephony provider.
+Auth token or API key from your telephony provider.
 </ParamField>
 
 <ParamField body="sipHost" type="string">
@@ -106,9 +97,9 @@ Elisiontec only: list ID.
 {
   "status": true,
   "code": 200,
-  "message": "",
-  "errorMessage": "",
-  "phoneNumber": {
+  "message": "Phone updated successfully",
+  "errorMessage": null,
+  "data": {
     "_id": "6872d4b5f8d7a91234567890",
     "phoneNumber": "+919876543210",
     "integration": "plivo",
@@ -121,17 +112,15 @@ Elisiontec only: list ID.
 
 </ResponseExample>
 
-<ResponseField name="status" type="boolean" required>
-Indicates whether the phone number was updated.
-</ResponseField>
-
-<ResponseField name="phoneNumber" type="object">
-The updated phone number.
+<ResponseField name="data" type="object">
+The updated phone number record. It also contains the stored credentials, so don't log the response.
 </ResponseField>
 
 ## Error Handling
 
-- **400 Bad Request** – Invalid or missing fields.
+Errors return `status: false`, with the reason in `errorMessage`.
+
+- **400 Bad Request** – `Invalid Phone ID`.
 - **401 Unauthorized** – Missing or invalid API key.
-- **404 Not Found** – The phone number does not exist in your workspace.
+- **404 Not Found** – `Phone not found`: the number doesn't exist or wasn't added by the user who owns the API key.
 - **500 Internal Server Error** – Unexpected server error.
