@@ -62,9 +62,10 @@ curl --location --request DELETE 'https://api.weya.live/backend/api/webhooks/689
 
 Errors return `status: false`, with the reason in `errorMessage`.
 
+- **400 Bad Request** – `webhookId` isn't a valid ID.
 - **401 Unauthorized** – Missing or invalid API key.
 - **404 Not Found** – `Webhook not found or unauthorized`: the webhook doesn't exist in your organization.
-- **500 Internal Server Error** – Unexpected server error, including a `webhookId` that isn't a valid ID.
+- **500 Internal Server Error** – Unexpected server error.
 
 <Warning>
 
