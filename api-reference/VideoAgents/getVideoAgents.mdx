@@ -1,12 +1,12 @@
 ---
 title: "Get Video Agents"
-description: "Retrieve all Video Agents available in your workspace."
+description: "List your video agents with pagination and search."
 api: "GET /api/video-agents"
 ---
 
 ## Overview
 
-Retrieve a paginated list of all Video Agents in your workspace. This endpoint returns the video agent configuration along with search and pagination support, making it easy to manage large numbers of agents.
+List the video agents created by the user who owns the API key, with summary fields. Use [Get Video Agent By ID](/api-reference/VideoAgents/getVideoAgentById) for an agent's full configuration.
 
 ## Prerequisites
 
@@ -18,23 +18,23 @@ Retrieve a paginated list of all Video Agents in your workspace. This endpoint r
 Your workspace API key. Create one from the profile menu in the dashboard → **API Keys**.
 </ParamField>
 
-<ParamField query="page" type="integer">
-Page number to retrieve. Default is **1**.
+<ParamField query="page" default="1" type="integer">
+Page number.
 </ParamField>
 
-<ParamField query="limit" type="integer">
-Number of Video Agents returned per page.
+<ParamField query="limit" default="10" type="integer">
+Number of video agents per page, up to 1000.
 </ParamField>
 
 <ParamField query="search" type="string">
-Search Video Agents by name.
+Case-insensitive text matched against the agent name.
 </ParamField>
 
 <RequestExample>
 
 ```bash cURL
 curl --location 'https://api.weya.live/backend/api/video-agents?page=1&limit=10&search=sales' \
---header 'x-api-key: YOUR_API_KEY'
+  --header 'x-api-key: YOUR_API_KEY'
 ```
 
 </RequestExample>
@@ -47,26 +47,25 @@ curl --location 'https://api.weya.live/backend/api/video-agents?page=1&limit=10&
 {
   "status": true,
   "code": 200,
-  "message": "",
-  "errorMessage": "",
+  "message": "Fetched successfully",
+  "errorMessage": null,
   "data": {
     "agents": [
       {
         "_id": "6891a23bc456def789123456",
         "agent_name": "Sales Video Agent",
-        "avatar": "6891a23bc456def789aaaaaa",
-        "voice": "6891a23bc456def789bbbbbb",
-        "gender": "Female",
-        "selectedLanguage": ["en"],
         "enable_input_video": false,
-        "createdAt": "2026-07-21T09:15:00.000Z"
+        "createdAt": "2026-07-21T09:15:00.000Z",
+        "updatedAt": "2026-07-21T09:15:00.000Z"
       }
     ],
     "pagination": {
       "total": 1,
       "page": 1,
       "limit": 10,
-      "totalPages": 1
+      "totalPages": 1,
+      "hasNextPage": false,
+      "hasPrevPage": false
     }
   }
 }
@@ -75,47 +74,19 @@ curl --location 'https://api.weya.live/backend/api/video-agents?page=1&limit=10&
 </ResponseExample>
 
 <ResponseField name="data.agents" type="array[object]" required>
-The video agents on this page.
+The video agents on this page: `_id`, `agent_name`, `enable_input_video`, `createdAt` and `updatedAt`.
 </ResponseField>
 
 <ResponseField name="data.agents[]._id" type="string">
 Video agent ID. Use it as `videoAgentId` when creating a video campaign.
 </ResponseField>
 
-<ResponseField name="data.agents[].agent_name" type="string">
-Name of the video agent.
-</ResponseField>
-
-<ResponseField name="data.agents[].avatar" type="string">
-ID of the avatar.
-</ResponseField>
-
-<ResponseField name="data.agents[].voice" type="string">
-ID of the voice.
-</ResponseField>
-
-<ResponseField name="data.agents[].selectedLanguage" type="array[string]">
-Languages the agent can speak.
-</ResponseField>
-
 <ResponseField name="data.pagination" type="object" required>
-Pagination details: `total`, `page`, `limit` and `totalPages`.
+Pagination details: `total`, `page`, `limit`, `totalPages`, `hasNextPage` and `hasPrevPage`.
 </ResponseField>
 
 ## Error Handling
 
-| Status | Description |
-|---------|-------------|
-|400|Invalid request parameters|
-|401|Missing or invalid API key|
-|500|Internal server error|
-
-<Check>
-
-Use the returned **Video Agent ID** with:
-
-- `GET /api/video-agents/{id}` to retrieve a specific Video Agent.
-- `PATCH /api/video-agents/{id}` to update a Video Agent.
-- `DELETE /api/video-agents/{id}` to remove a Video Agent.
-
-</Check>
+- **401 Unauthorized** – Missing or invalid API key.
+- **429 Too Many Requests** – More than 1,000 video agent requests in 15 minutes from your IP address.
+- **500 Internal Server Error** – Unexpected server error.

@@ -1,17 +1,23 @@
 ---
 title: "Delete Video Agent"
-description: "Permanently delete a Video Agent from your workspace."
+description: "Delete one of your video agents."
 api: "DELETE /api/video-agents/{id}"
 ---
 
 ## Overview
 
-Delete an existing Video Agent using its unique Video Agent ID. Once deleted, the Video Agent can no longer be used for video conversations or assigned to future workflows.
+Delete a video agent created by the user who owns the API key. It no longer appears in your lists and can't be retrieved or updated through the API.
+
+The API doesn't check whether video campaigns still use the agent. Revoke or stop using those campaigns' links first.
+
+<Warning>
+  This can't be undone through the API.
+</Warning>
 
 ## Prerequisites
 
 - An API key for your workspace
-- Valid Video Agent ID
+- The video agent's ID, from [Get Video Agents](/api-reference/VideoAgents/getVideoAgents)
 
 ## Request
 
@@ -20,14 +26,14 @@ Your workspace API key. Create one from the profile menu in the dashboard → **
 </ParamField>
 
 <ParamField path="id" type="string" required>
-Unique identifier of the Video Agent to delete.
+ID of the video agent to delete.
 </ParamField>
 
 <RequestExample>
 
 ```bash cURL
 curl --location --request DELETE 'https://api.weya.live/backend/api/video-agents/6891a23bc456def789123456' \
---header 'x-api-key: YOUR_API_KEY'
+  --header 'x-api-key: YOUR_API_KEY'
 ```
 
 </RequestExample>
@@ -40,46 +46,24 @@ curl --location --request DELETE 'https://api.weya.live/backend/api/video-agents
 {
   "status": true,
   "code": 200,
-  "message": "Video Agent deleted successfully"
+  "message": "Video agent deleted successfully",
+  "errorMessage": null,
+  "data": []
 }
 ```
 
 </ResponseExample>
 
-<ResponseField name="status" type="boolean">
-Indicates whether the request completed successfully.
-</ResponseField>
-
-<ResponseField name="code" type="integer">
-HTTP status code returned by the API.
-</ResponseField>
-
 <ResponseField name="message" type="string">
-Confirmation message indicating that the Video Agent was deleted successfully.
+`Video agent deleted successfully`.
 </ResponseField>
 
 ## Error Handling
 
-| Status | Description |
-|---------|-------------|
-|400|Invalid Video Agent ID|
-|401|Missing or invalid API key|
-|403|You do not have permission to delete this Video Agent|
-|404|Video Agent not found|
-|500|Internal server error|
+Errors return `status: false`, with the reason in `errorMessage`.
 
-<Warning>
-
-Deleting a Video Agent is **permanent** and cannot be undone. Any workflows or applications using this Video Agent should be updated before deletion.
-
-</Warning>
-
-<Check>
-
-Before deleting a Video Agent, you may want to:
-
-- Retrieve its configuration using `GET /api/video-agents/{id}`.
-- Export or save any configuration you may need later.
-- Ensure it is no longer assigned to any active workflows or applications.
-
-</Check>
+- **400 Bad Request** – `id` isn't a valid ID.
+- **401 Unauthorized** – Missing or invalid API key.
+- **404 Not Found** – `Video agent not found`: it doesn't exist, is already deleted, or wasn't created by the user who owns the API key.
+- **429 Too Many Requests** – More than 1,000 video agent requests in 15 minutes from your IP address.
+- **500 Internal Server Error** – Unexpected server error.

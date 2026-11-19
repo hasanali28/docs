@@ -1,17 +1,17 @@
 ---
 title: "Update Video Agent"
-description: "Update the configuration of an existing Video Agent."
+description: "Update the configuration of one of your video agents."
 api: "PATCH /api/video-agents/{id}"
 ---
 
 ## Overview
 
-Update the configuration of an existing Video Agent. Send only the fields you want to change; other settings stay as they are.
+Update a video agent created by the user who owns the API key. Send only the fields you want to change; other settings keep their values. Nested objects such as `callSetting` are merged, not replaced. Fields not listed below are ignored.
 
 ## Prerequisites
 
 - An API key for your workspace
-- Valid Video Agent ID
+- The video agent's ID, from [Get Video Agents](/api-reference/VideoAgents/getVideoAgents)
 
 ## Request
 
@@ -20,69 +20,40 @@ Your workspace API key. Create one from the profile menu in the dashboard → **
 </ParamField>
 
 <ParamField path="id" type="string" required>
-Unique identifier of the Video Agent.
+ID of the video agent.
 </ParamField>
 
 <RequestExample>
 
 ```bash cURL
 curl --location --request PATCH 'https://api.weya.live/backend/api/video-agents/6891a23bc456def789123456' \
---header 'x-api-key: YOUR_API_KEY' \
---header 'Content-Type: application/json' \
---data '{
-  "agent_name": "Updated Sales Video Agent",
-  "startMessage": "Hello! Welcome back. How may I assist you today?",
-  "systemMessage": "You are an experienced AI sales consultant."
-}'
+  --header 'x-api-key: YOUR_API_KEY' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "agent_name": "Updated Sales Video Agent",
+    "startMessage": "Hello! Welcome back. How may I assist you today?"
+  }'
 ```
 
 </RequestExample>
 
 ### Request Parameters
 
-<ParamField body="agent_name" type="string">
-New name for the video agent.
-</ParamField>
+All fields are optional. They are described in [Create Video Agent](/api-reference/VideoAgents/createVideoAgent).
 
-<ParamField body="avatar" type="string">
-ID of the avatar shown on screen.
-</ParamField>
-
-<ParamField body="gender" type="string">
-Avatar gender: `Male` or `Female`. Used to pick matching voices.
-</ParamField>
-
-<ParamField body="voice" type="string">
-ID of the voice the agent speaks with. Get the options from `GET /api/video-agents/voices`.
-</ParamField>
-
-<ParamField body="enable_input_video" type="boolean">
-Set to `true` to let the agent see the visitor's camera.
-</ParamField>
-
-<ParamField body="selectedLanguage" type="array[string]">
-Languages the agent can speak. At least one.
-</ParamField>
-
-<ParamField body="startMessage" type="string">
-Greeting spoken when the conversation begins.
-</ParamField>
-
-<ParamField body="systemMessage" type="string">
-Instructions that define the agent's behavior.
-</ParamField>
-
-<ParamField body="rag" type="object">
-Knowledge base to answer from: `{ "vectorDBCollection": "<knowledge base vectorDbCollection>" }`. Use the `vectorDbCollection` value from **Get Knowledge Bases**.
-</ParamField>
-
-<ParamField body="call_metrics" type="array[object]">
-Data to extract after each conversation. Each item has `metric_name`, `type`, an optional `description` and optional `call_outcome_ids`.
-</ParamField>
-
-<ParamField body="callSetting" type="object">
-Conversation settings, including `callTimeout` (2–60 minutes), `voiceSpeed` (0.7–1.2), `vocabulary` (array of words), `auto_detect_language` and `llmConfigs` (`temperature`, `top_p`, `max_tokens`, `frequency_penalty`, `presence_penalty`).
-</ParamField>
+| Field | Description |
+| --- | --- |
+| `agent_name` | Name. Can't be empty |
+| `systemMessage` | Instructions. Can't be empty |
+| `startMessage` | Greeting |
+| `gender` | `Male` or `Female` |
+| `avatar` | Avatar ID |
+| `voice` | Voice ID, from [Get Available Voices](/api-reference/VideoAgents/getModeAwareVoices) |
+| `enable_input_video` | `true` to see the visitor's camera |
+| `selectedLanguage` | Language codes |
+| `rag` | `{ "vectorDBCollection": "…" }` |
+| `call_metrics` | Data to extract after each conversation |
+| `callSetting` | Conversation settings |
 
 ## Response
 
@@ -92,14 +63,12 @@ Conversation settings, including `callTimeout` (2–60 minutes), `voiceSpeed` (0
 {
   "status": true,
   "code": 200,
-  "message": "Video Agent updated successfully",
+  "message": "Video agent updated successfully",
+  "errorMessage": null,
   "data": {
     "_id": "6891a23bc456def789123456",
     "agent_name": "Updated Sales Video Agent",
-    "avatar": "Professional Female",
-    "voice": "en-US-Standard-B",
-    "selectedLanguage": ["en"],
-    "status": "active",
+    "startMessage": "Hello! Welcome back. How may I assist you today?",
     "updatedAt": "2026-07-21T11:45:18.000Z"
   }
 }
@@ -107,70 +76,16 @@ Conversation settings, including `callTimeout` (2–60 minutes), `voiceSpeed` (0
 
 </ResponseExample>
 
-<ResponseField name="status" type="boolean">
-Indicates whether the request completed successfully.
-</ResponseField>
-
-<ResponseField name="code" type="integer">
-HTTP status code returned by the API.
-</ResponseField>
-
-<ResponseField name="message" type="string">
-Confirmation message indicating the Video Agent was updated successfully.
-</ResponseField>
-
 <ResponseField name="data" type="object">
-Updated Video Agent information.
-</ResponseField>
-
-<ResponseField name="data._id" type="string">
-Unique identifier of the Video Agent.
-</ResponseField>
-
-<ResponseField name="data.agent_name" type="string">
-Updated display name.
-</ResponseField>
-
-<ResponseField name="data.avatar" type="string">
-Updated avatar.
-</ResponseField>
-
-<ResponseField name="data.voice" type="string">
-Updated voice.
-</ResponseField>
-
-<ResponseField name="data.selectedLanguage" type="array[string]">
-Languages the agent can speak.
-</ResponseField>
-
-<ResponseField name="data.status" type="string">
-Current status of the Video Agent.
-</ResponseField>
-
-<ResponseField name="data.updatedAt" type="string">
-Timestamp indicating when the Video Agent was last updated.
+The updated video agent with its full configuration.
 </ResponseField>
 
 ## Error Handling
 
-| Status | Description |
-|---------|-------------|
-|400|Invalid request body or Video Agent ID|
-|401|Missing or invalid API key|
-|403|You do not have permission to update this Video Agent|
-|404|Video Agent not found|
-|500|Internal server error|
+Errors return `status: false`, with the reason in `errorMessage`.
 
-<Note>
-
-Only the fields included in the request body are updated. Any omitted fields retain their existing values.
-
-</Note>
-
-<Check>
-
-After updating the Video Agent, you can retrieve the latest configuration using:
-
-- `GET /api/video-agents/{id}`
-
-</Check>
+- **400 Bad Request** – `agent_name` or `systemMessage` is empty, a field has an invalid value, or `id` isn't a valid ID.
+- **401 Unauthorized** – Missing or invalid API key.
+- **404 Not Found** – `Video agent not found`: it doesn't exist, was deleted, or wasn't created by the user who owns the API key.
+- **429 Too Many Requests** – More than 1,000 video agent requests in 15 minutes from your IP address.
+- **500 Internal Server Error** – Unexpected server error.
