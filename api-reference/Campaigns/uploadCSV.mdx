@@ -5,24 +5,23 @@ api: "POST /api/call/upload"
 ---
 
 ## Overview
-The CSV upload endpoint lets you bootstrap a campaign directly from a spreadsheet. Nexus validates the file, creates a campaign, normalises the columns based on the agent’s variable schema, and inserts the calls in a single transaction.
+
+Create a campaign and add its contacts from a CSV or Excel file in one request. The file is validated, the campaign is created, and each row becomes a contact. Calling starts when you call [Start Campaign](/api-reference/Campaigns/startCalling).
+
+An `inbound` campaign takes no file: it only links the calling numbers to the new campaign so incoming calls are recorded on it.
 
 ## Prerequisites
 - An API key for your workspace
-- CSV file containing the columns required by the agent.
-- At least one provisioned phone number to associate with the campaign.
+- A CSV or Excel file with a `phoneNumber` column and any variables the agent needs (not needed for `inbound`).
+- At least one phone number with an outbound agent assigned. All numbers must use agents of the same conversation type.
 
 ## Request
 <ParamField header="x-api-key" type="string" required>
 Your workspace API key. Create one from the profile menu in the dashboard → **API Keys**.
 </ParamField>
 
-<ParamField formData="file" type="file" required>
-CSV file to import. Use UTF-8 encoding and include headers.
-</ParamField>
-
-<ParamField formData="userId" type="string" required>
-Workspace user who should own the campaign.
+<ParamField type="file" formData="file">
+CSV (`.csv`) or Excel (`.xls`, `.xlsx`) file of contacts, with a header row. Required unless `batchType` is `inbound`.
 </ParamField>
 
 <ParamField formData="batchName" type="string" required>
@@ -30,7 +29,7 @@ Display name for the new campaign.
 </ParamField>
 
 <ParamField formData="callingNumbers" type="string" required>
-JSON stringified array of phone number IDs that the dialer will use when calling. Example: `"[\"64e5f12345abcdef87654321\"]"`.
+JSON stringified array of phone number IDs, from [Get Phone Numbers](/api-reference/PhoneNumbers/getPhoneNumbers). At least one. Example: `"[\"64e5f12345abcdef87654321\"]"`.
 </ParamField>
 
 <ParamField formData="batchType" type="string" required allowedValues="outbound,mixed,inbound">
@@ -38,7 +37,7 @@ Type of campaign: `outbound` for outbound-only campaigns, `mixed` for outbound c
 </ParamField>
 
 <ParamField formData="enableDNC" type="string">
-Set to `"true"` to enable DNC checking for this campaign. Must match your organization's DNC setting.
+Set to `"true"` to skip numbers on your Do Not Call list. Allowed only when DNC is enabled for your organization.
 </ParamField>
 
 <ParamField formData="type" type="string">
@@ -50,11 +49,11 @@ JSON stringified array of variables every row must have a value for. Example: `"
 </ParamField>
 
 <ParamField formData="retry" type="number">
-Maximum attempts per contact. Allowed range: 1–10.
+Maximum attempts per contact. Use a value from 1 to 10, the range the dashboard allows. The API does not check the range.
 </ParamField>
 
 <ParamField formData="delay" type="number">
-Time to wait between attempts to the same contact, in **minutes**. Allowed range: 5–1440.
+Time to wait between attempts to the same contact, in **minutes**. Use a value from 5 to 1440, the range the dashboard allows. The API does not check the range.
 </ParamField>
 
 <ParamField formData="timezone" type="string">
@@ -62,7 +61,7 @@ Timezone for the campaign (e.g., "America/New_York", "Asia/Kolkata").
 </ParamField>
 
 <ParamField formData="callingHour" type="string">
-JSON stringified object defining calling hours. Example: `"{\"start\":\"09:00\",\"end\":\"17:00\"}"`.
+JSON stringified daily calling window, with `start` and `end` in 24-hour `HH:MM` format. Required unless `batchType` is `inbound`. Example: `"{\"start\":\"09:00\",\"end\":\"17:00\"}"`.
 </ParamField>
 
 <ParamField formData="allowedDays" type="string">
@@ -74,15 +73,15 @@ Optional date and time (ISO 8601) to start calling. Leave out to start straight 
 </ParamField>
 
 <ParamField formData="holidayListId" type="string">
-ID of a holiday list. No calls are placed on the dates in that list.
+ID of a holiday list in your organization. No calls are placed on the dates in that list.
 </ParamField>
 
 <ParamField formData="pushingCrms" type="string">
-JSON stringified array of destinations to send call outcomes to. Each item has `type` (`standard`, `custom`, `webhook` or `gsheet`), `schemaId` and `crmId`. Example: `"[]"`.
+JSON stringified array of destinations to send call outcomes to. Each item has `type` (`standard`, `custom`, `webhook` or `gsheet`), `schemaId` and `crmId`. For `custom` and `gsheet`, `crmId` is set to `schemaId`. At most one Google Sheet per campaign. Example: `"[]"`.
 </ParamField>
 
 <ParamField formData="confirmReassign" type="string">
-Inbound and mixed campaigns only. Set to `"true"` to move calling numbers that are already active on another inbound campaign to this one. See the `409` error below.
+`inbound` campaigns only. Set to `"true"` to move calling numbers that are already active on another inbound campaign to this one. See the `409` error below.
 </ParamField>
 
 <RequestExample>
@@ -90,7 +89,6 @@ Inbound and mixed campaigns only. Set to `"true"` to move calling numbers that a
 curl --location 'https://api.weya.live/backend/api/call/upload' \
   --header 'x-api-key: YOUR_API_KEY' \
   --form 'file=@"/path/to/contacts.csv"' \
-  --form 'userId="64e5f12345abcdef12345678"' \
   --form 'batchName="Marketing Campaign May 2025"' \
   --form 'batchType="outbound"' \
   --form 'callingNumbers="[\"64e5f12345abcdef87654321\"]"' \
@@ -107,7 +105,7 @@ curl --location 'https://api.weya.live/backend/api/call/upload' \
 - Supported formats: CSV (.csv) or Excel (.xls, .xlsx)
 - Must include a header row
 - Must include `phoneNumber` column (required)
-- Must include all mandatory variables defined by the agent
+- Every row must have a value for each variable listed in `mandatoryVariables`
 - CSV headers should match agent variable keys (e.g., `phoneNumber`, `name`, `account_id`, `custom_field_1`)
 - The `phoneNumber` column is required; all other columns are flexible based on your agent's needs
 - Extra columns are stored and forwarded to the agent state machine
@@ -121,16 +119,17 @@ curl --location 'https://api.weya.live/backend/api/call/upload' \
 - Invalid rows are identified and reported (unless `type="true"`)
 - Data is normalized and validated against agent requirements
 - Phone numbers are deduplicated (only the first occurrence is kept)
+- A file with no valid rows is always rejected
 </Note>
 
 ## Response
 <ResponseExample>
-```json 200 OK
+```json 201 Created
 {
-  "message": "",
+  "message": "Batch created successfully",
   "status": true,
-  "code": 200,
-  "errorMessage": "",
+  "code": 201,
+  "errorMessage": null,
   "data": {
     "batch": [
       {
@@ -151,16 +150,26 @@ The created campaign. The campaign ID is `data.batch[0]._id`.
 </ResponseField>
 
 <ResponseField name="data.uuid" type="string" required>
-ID of this upload. Pass it as `uuid` to **Start Campaign** to start calling these contacts.
+ID of this upload. Pass it as `uuid` to [Start Campaign](/api-reference/Campaigns/startCalling) to start calling these contacts. For `inbound` campaigns there are no contacts to start.
 </ResponseField>
 
 ## Error Handling
 
-- **400 Bad Request** – Missing file, empty CSV, invalid `batchType`, invalid User ID format, missing required fields, or unsupported file type.
-- **404 Not Found** – User not found, organization not found, no agent found for calling numbers, or no language configured for agent.
+Errors return `status: false`, with the reason in `errorMessage`.
+
+- **400 Bad Request**
+  - `Batch name required`, `Invalid batch type`, `callingNumbers required`, `CSV file required` or `Unsupported file type`.
+  - `callHours required` or `Invalid callHours format` – `callingHour` is missing or not in `HH:MM` format.
+  - `Invalid input format` – `callingHour`, `callingNumbers`, `allowedDays` or `mandatoryVariables` is not valid JSON.
+  - `Invalid pushingCrms format`, or a `pushingCrms` entry fails validation.
+  - `DNC not enabled for organization`.
+  - `Invalid holidayListId` or `Holiday list not found`.
+  - `All phoneNumbers must have same agent type` – the numbers' outbound agents have different conversation types.
+  - The file is empty or has no valid rows.
+- **404 Not Found** – `Phone(s) not found: …` or `No agent linked to phone …`: a calling number doesn't exist or has no outbound agent.
 - **400 Bad Request (invalid rows)** – The file has invalid rows and `type` is `"false"`. `data` contains `code: "INVALID_CSV_ROWS"`, `totalInvalidRows`, `validRows`, `truncated` and `invalidRows` (each `{ rowNumber, phoneNumber, reason }`). Fix the rows, or resend with `type="true"` to skip them.
 - **401 Unauthorized** – Missing or invalid API key.
-- **409 Conflict** – Inbound and mixed campaigns only. A calling number is already active on another inbound campaign. `data.conflicts` lists each number. Resend with `confirmReassign="true"` to move it.
+- **409 Conflict** – `inbound` campaigns only. A calling number is already active on another inbound campaign. `data.requiresConfirmation` is `true` and `data.conflicts` lists each number as `{ phoneId, phoneNumber, currentBatchId, currentBatchName }`. Resend with `confirmReassign="true"` to move them.
 - **500 Internal Server Error** – File parsing failed, database error, or other server errors.
 
 <Check>
