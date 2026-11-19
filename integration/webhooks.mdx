@@ -242,7 +242,7 @@ export const RetrySchedule = () => {
         ))}
       </div>
       <div style={{ fontSize: 13, opacity: 0.8 }}>
-        {opt.ok ? "Delivered on the first try. weya sends nothing more for this attempt." : opt.retry ? "8 deliveries over about " + fmt(total) + " after the first. If all fail, weya gives up on this result." : "weya stops after the first delivery. Fix the endpoint; this result will not be retried."}
+        {opt.ok ? "Delivered on the first try. weya sends nothing more for this attempt." : opt.retry ? "8 deliveries in total, the last about " + fmt(total) + " after the first. If all fail, weya gives up on this result." : "weya stops after the first delivery. Fix the endpoint; this result will not be retried."}
       </div>
     </div>
   );
