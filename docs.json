@@ -45,10 +45,10 @@
               {
                 "group": "WhatsApp Agents",
                 "pages": [
-                  "whatsapp/create-whatsapp-agent",
-                  "whatsapp/connect-whatsapp-number",
-                  "whatsapp/templates",
-                  "whatsapp/deploy"
+                  "Whatsapp/create-whatsapp-agent",
+                  "Whatsapp/connect-whatsapp-number",
+                  "Whatsapp/templates",
+                  "Whatsapp/deploy"
                 ]
               },
               {
@@ -157,26 +157,27 @@
     "api-reference/PhoneNumbers/getPhoneNumbers",
     "api-reference/PhoneNumbers/getPhoneNumbersWithAgent",
     "api-reference/PhoneNumbers/updatePhoneNumber",
-    "api-reference/PhoneNumbers/deletePhoneNumber",
+    "api-reference/Calling Management/deletePhone",
     "api-reference/WhatsApp/validateWhatsAppNumber",
     "api-reference/WhatsApp/getWhatsAppNumbers",
     "api-reference/WhatsApp/deleteWhatsAppNumber",
+    "api-reference/WhatsApp/assignAgentToWhatsAppNumber",
     "api-reference/WhatsApp/removeAgentFromWhatsAppNumber"
   ]
 },
 {
   "group": "Campaign Management",
   "pages": [
-    "api-reference/Calling Management/createBatch",
-    "api-reference/Calling Management/getBatch",
-    "api-reference/Calling Management/getBatchById",
-    "api-reference/Calling Management/addCallsToBatch",
-    "api-reference/Calling Management/uploadCSV",
-    "api-reference/Calling Management/updateBatch",
-    "api-reference/Calling Management/startCalling",
-    "api-reference/Calling Management/stopCalling",
-    "api-reference/Calling Management/deleteBatch",
-    "api-reference/WhatsApp/assignAgentToWhatsAppNumber"
+    "api-reference/Campaigns/getBatch",
+    "api-reference/Campaigns/getBatchById",
+    "api-reference/Campaigns/createBatch",
+    "api-reference/Campaigns/uploadCSV",
+    "api-reference/Campaigns/addCallsToBatch",
+    "api-reference/Campaigns/startCalling",
+    "api-reference/Campaigns/pauseBatch",
+    "api-reference/Campaigns/resumeBatch",
+    "api-reference/Campaigns/updateBatch",
+    "api-reference/Campaigns/deleteBatch"
   ]
 },
         {
@@ -245,7 +246,6 @@
   "api": {
     "baseUrl": "https://api.weya.live/backend"
   },
-  "openapi": "api-reference/openapi.json",
   "contextual": {
     "options": [
       "copy",
