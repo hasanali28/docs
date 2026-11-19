@@ -6,18 +6,12 @@ api: "POST /api/webhooks"
 
 ## Overview
 
-Create a webhook. Once it's added to a campaign under **Track Call Outcomes** (`pushingCrms` with `type: "webhook"`), the results of each call in that campaign are sent to its URL as a JSON `POST` request.
-
-Each organization can have up to 5 webhooks.
+Create a webhook in your organization. Once it's added to a campaign under **Track Call Outcomes** (`pushingCrms` with `type: "webhook"`), the result of each finished call in that campaign is sent to its URL as a JSON `POST` request.
 
 ## Prerequisites
 
 - An API key for your workspace
-- A public HTTPS URL that accepts `POST` requests
-
-## Endpoint
-
-<ParamField method="POST" path="/api/webhooks" />
+- A public `https` (or `http`) URL that accepts `POST` requests
 
 ## Request
 
@@ -42,16 +36,16 @@ curl --location 'https://api.weya.live/backend/api/webhooks' \
 
 ### Request Parameters
 
-<ParamField body="name" type="string">
-A friendly name to identify the webhook.
+<ParamField body="url" type="string" required>
+URL that call outcomes are sent to. Must be a valid `http` or `https` URL.
 </ParamField>
 
-<ParamField body="url" type="string" required>
-URL that call outcomes are sent to, as a JSON `POST` request.
+<ParamField body="name" type="string">
+A name to identify the webhook.
 </ParamField>
 
 <ParamField body="bearerToken" type="string">
-Optional. If your endpoint requires authentication, set its token here. It is sent as `Authorization: Bearer <token>` with each request.
+If your endpoint requires authentication, its token. It is sent as `Authorization: Bearer <token>` with each request (the `Bearer ` prefix is added if missing).
 </ParamField>
 
 ## Response
@@ -62,12 +56,15 @@ Optional. If your endpoint requires authentication, set its token here. It is se
 {
   "status": true,
   "code": 201,
-  "message": "",
-  "errorMessage": "",
+  "message": "Webhook created successfully",
+  "errorMessage": null,
   "data": {
     "_id": "6890abc123456789abcdef01",
     "name": "Salesforce CRM Sync",
     "url": "https://your-domain.com/webhook",
+    "bearerToken": "YOUR_ENDPOINT_TOKEN",
+    "userId": "64e5f12345abcdef12345678",
+    "organizationId": "64e5f12345abcdef00000001",
     "isActive": true,
     "createdAt": "2026-07-20T12:45:00.000Z",
     "updatedAt": "2026-07-20T12:45:00.000Z"
@@ -78,17 +75,28 @@ Optional. If your endpoint requires authentication, set its token here. It is se
 </ResponseExample>
 
 <ResponseField name="data" type="object" required>
-The new webhook. `data._id` is the ID to use as `crmId` in a campaign's `pushingCrms`.
+The new webhook. `data._id` is the ID to use as `crmId` and `schemaId` in a campaign's `pushingCrms`.
 </ResponseField>
 
 ## Error Handling
 
-- **400 Bad Request** – Missing or invalid `url`, or your organization already has 5 webhooks.
+Errors return `status: false`, with the reason in `errorMessage`.
+
+- **400 Bad Request** – `Webhook URL is required`, `Invalid Webhook URL format`, or `Invalid protocol. Only http and https are allowed.`
 - **401 Unauthorized** – Missing or invalid API key.
 - **500 Internal Server Error** – Unexpected server error.
 
+## Delivery
+
+- The first request is sent about 5 minutes after the call ends, so the recording and call analysis can be included.
+- Your endpoint has 10 seconds to respond. Redirects are followed.
+- Network errors, `408`, `429` and `5xx` responses are retried, up to 8 attempts in about 22 hours. A `Retry-After` header is respected. Other `4xx` responses are not retried.
+- A completed call is sent only once its call analysis is ready. If the analysis isn't ready within 30 minutes, the call is not sent.
+- Calls that were never connected to the provider, and calls that are still being retried, are not sent.
+- If a recording arrives after the first request, the call is sent again.
+
 <Check>
 
-After creating a webhook, add it to a campaign with `pushingCrms: [{ "type": "webhook", "crmId": "<webhook _id>", "schemaId": "<webhook _id>" }]` when creating or updating the campaign.
+After creating a webhook, add it to a campaign with `pushingCrms: [{ "type": "webhook", "crmId": "<webhook _id>", "schemaId": "<webhook _id>" }]` when creating or updating the campaign. Calls that ended before the webhook was added are not sent.
 
 </Check>
