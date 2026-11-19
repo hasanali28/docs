@@ -97,7 +97,8 @@ Errors return `status: false`, with the reason in `errorMessage`.
 - **400 Bad Request** – `knowledgeBaseName is required`, `No files uploaded`, `File exceeds the 10MB per-file limit`, or `You can upload at most 50 files per request`.
 - **401 Unauthorized** – Missing or invalid API key.
 - **429 Too Many Requests** – More than 1,000 Knowledge Base requests in 15 minutes from your IP address. The response body is `{ "message": "Too many requests. Please try again after 15 minutes." }`.
-- **500 Internal Server Error** – Unexpected server error, or indexing failed (`Invalid response from external API`). The files may already be stored; send the request again with the same name.
+- **500 Internal Server Error** – Unexpected server error.
+- **502 Bad Gateway** – Indexing failed (`Invalid response from external API`). The files are already stored; send the request again with the same name.
 
 <Check>
   After creating a knowledge base, you can:
