@@ -1,7 +1,7 @@
 ---
 title: "Delete Agent"
 description: "Permanently delete an AI agent from your workspace."
-openapi: "DELETE /api/agents/{id}"
+api: "DELETE /api/agents/{id}"
 ---
 
 ## Overview
@@ -16,7 +16,7 @@ Deleting an AI agent is permanent and cannot be undone.
 
 ## Prerequisites
 
-- Bearer token for an authenticated workspace
+- An API key for your workspace
 - Valid Agent ID
 
 <Tip>
@@ -33,15 +33,15 @@ Unique identifier of the AI agent to delete.
 
 ## Request
 
-<ParamField header="Authorization" type="string" required>
-Bearer token for authenticated workspace access.
+<ParamField header="x-api-key" type="string" required>
+Your workspace API key. Create one from the profile menu in the dashboard → **API Keys**.
 </ParamField>
 
 <RequestExample>
 
 ```bash cURL
 curl --location --request DELETE 'https://api.weya.live/backend/api/agents/{id}' \
---header 'Authorization: Bearer {{authToken}}'
+--header 'x-api-key: YOUR_API_KEY'
 ```
 
 </RequestExample>
@@ -86,7 +86,7 @@ Confirmation that the AI agent has been deleted.
 ## Error Handling
 
 - **400 Bad Request** – Invalid Agent ID format.
-- **401 Unauthorized** – Missing or invalid Bearer token.
+- **401 Unauthorized** – Missing or invalid API key.
 - **403 Forbidden** – You do not have permission to delete this agent.
 - **404 Not Found** – No AI agent exists with the provided ID.
 - **500 Internal Server Error** – Unexpected server error.

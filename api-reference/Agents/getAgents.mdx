@@ -1,7 +1,7 @@
 ---
 title: "Get Agents"
 description: "Retrieve all AI agents available in your workspace with pagination and search support."
-openapi: "GET /api/agents"
+api: "GET /api/agents"
 ---
 
 ## Overview
@@ -10,13 +10,13 @@ Retrieve a paginated list of all AI agents in your workspace. This endpoint supp
 
 ## Prerequisites
 
-- Bearer token for an authenticated workspace
+- An API key for your workspace
 - Permission to access Agents
 
 ## Request
 
-<ParamField header="Authorization" type="string" required>
-Bearer token for authenticated workspace access.
+<ParamField header="x-api-key" type="string" required>
+Your workspace API key. Create one from the profile menu in the dashboard → **API Keys**.
 </ParamField>
 
 <ParamField query="page" type="integer">
@@ -35,7 +35,7 @@ Optional search term to filter agents by name.
 
 ```bash cURL
 curl --location 'https://api.weya.live/backend/api/agents?page=1&limit=10&search=sales' \
-  --header 'Authorization: Bearer {{authToken}}'
+  --header 'x-api-key: YOUR_API_KEY'
 ```
 
 </RequestExample>
@@ -111,7 +111,7 @@ Total number of AI agents in the workspace.
 ## Error Handling
 
 - **400 Bad Request** – Invalid query parameters.
-- **401 Unauthorized** – Missing or invalid Bearer token.
+- **401 Unauthorized** – Missing or invalid API key.
 - **403 Forbidden** – You do not have permission to access agents.
 - **500 Internal Server Error** – Unexpected server error.
 

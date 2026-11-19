@@ -1,7 +1,7 @@
 ---
 title: "Delete Knowledge Base"
 description: "Permanently delete a Knowledge Base and all of its associated documents."
-openapi: "DELETE /api/knowledgeBase/{knowledgeBaseId}"
+api: "DELETE /api/knowledgeBase/{knowledgeBaseId}"
 ---
 
 ## Overview
@@ -12,13 +12,13 @@ Delete an existing Knowledge Base along with all of its associated documents. On
 
 ## Prerequisites
 
-- Bearer token for an authenticated workspace
+- An API key for your workspace
 - Valid Knowledge Base ID
 
 ## Request
 
-<ParamField header="Authorization" type="string" required>
-Bearer token for authenticated workspace access.
+<ParamField header="x-api-key" type="string" required>
+Your workspace API key. Create one from the profile menu in the dashboard → **API Keys**.
 </ParamField>
 
 <ParamField path="knowledgeBaseId" type="string" required>
@@ -29,7 +29,7 @@ Unique identifier of the Knowledge Base to delete.
 
 ```bash cURL
 curl --location --request DELETE 'https://api.weya.live/backend/api/knowledgeBase/687b1c2ab7c7d3f123456789' \
-  --header 'Authorization: Bearer {{authToken}}'
+  --header 'x-api-key: YOUR_API_KEY'
 ```
 
 </RequestExample>

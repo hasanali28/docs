@@ -1,12 +1,12 @@
 ---
-title: "Update Batch"
-description: "Edit an existing calling batch's settings, and optionally add more calls to it from a CSV file."
+title: "Update Campaign"
+description: "Edit an existing calling campaign's settings, and optionally add more calls to it from a CSV file."
 api: "PUT /api/call/update-batch/{batchId}"
 ---
 
 ## Overview
 
-Update an existing batch (campaign) to change its name, calling numbers, calling schedule, retry settings, holiday list or call outcome tracking. You can also add more calls to the batch in the same request by attaching a CSV file.
+Update an existing campaign to change its name, calling numbers, calling schedule, retry settings, holiday list or call outcome tracking. You can also add more calls to the campaign in the same request by attaching a CSV file.
 
 The request can be sent in two ways:
 
@@ -15,9 +15,9 @@ The request can be sent in two ways:
 
 ## Prerequisites
 
-- API key (recommended), OR Bearer token for an authenticated workspace
-- An existing batch and its `batchId`
-- The batch must be **paused** or **completed**. Pause a running batch before updating it.
+- An API key for your workspace
+- An existing campaign and its `batchId`
+- The campaign must be **paused** or **completed**. Pause a running campaign before updating it.
 - Calling numbers you pass must belong to the same workspace
 
 ## Endpoint
@@ -26,29 +26,19 @@ The request can be sent in two ways:
 
 ## Request
 
-<ParamField header="x-api-key" type="string">
-Workspace API key. Create one on the **API Keys** page in the dashboard. Either `x-api-key` or `Authorization` header is required.
+<ParamField header="x-api-key" type="string" required>
+Your workspace API key. Create one from the profile menu in the dashboard → **API Keys**.
 </ParamField>
-
-<ParamField header="Authorization" type="string">
-Bearer token for authenticated workspace access. Either `x-api-key` or `Authorization` header is required.
-</ParamField>
-
-<Note>
-
-If both headers are sent, `x-api-key` is used. Bearer tokens expire and only work on the environment that issued them, so an API key is the more reliable option for integrations.
-
-</Note>
 
 <ParamField path="batchId" type="string" required>
-Unique identifier of the batch to update.
+Unique identifier of the campaign to update.
 </ParamField>
 
 <RequestExample>
 
 ```bash cURL (settings only)
-curl --location --request PUT '{{baseUrl}}/api/call/update-batch/{{batchId}}' \
-  --header 'x-api-key: {{apiKey}}' \
+curl --location --request PUT 'https://api.weya.live/backend/api/call/update-batch/6806382f98da85ec32fac955' \
+  --header 'x-api-key: YOUR_API_KEY' \
   --header 'Content-Type: application/json' \
   --data '{
     "batchName": "Sales Campaign - July",
@@ -62,8 +52,8 @@ curl --location --request PUT '{{baseUrl}}/api/call/update-batch/{{batchId}}' \
 ```
 
 ```bash cURL (settings + CSV)
-curl --location --request PUT '{{baseUrl}}/api/call/update-batch/{{batchId}}' \
-  --header 'x-api-key: {{apiKey}}' \
+curl --location --request PUT 'https://api.weya.live/backend/api/call/update-batch/6806382f98da85ec32fac955' \
+  --header 'x-api-key: YOUR_API_KEY' \
   --form 'batchName="Sales Campaign - July"' \
   --form 'callingNumbers="[\"6889c4ab7c7d3f9876543210\"]"' \
   --form 'retry="3"' \
@@ -103,7 +93,7 @@ curl --location --request PUT '{{baseUrl}}/api/call/update-batch/{{batchId}}' \
 All settings are optional. Send only the fields you want to change.
 
 <ParamField body="batchName" type="string">
-Name of the batch.
+Name of the campaign.
 </ParamField>
 
 <ParamField body="callingNumbers" type="array[string]">
@@ -143,15 +133,15 @@ Destinations call outcomes are sent to after each call. Send an empty array to s
 </ParamField>
 
 <ParamField body="confirmReassign" type="boolean">
-Inbound batches only. Set to `true` to move calling numbers that are already active on another inbound batch to this batch. See the `409` error below.
+Inbound campaigns only. Set to `true` to move calling numbers that are already active on another inbound campaign to this campaign. See the `409` error below.
 </ParamField>
 
 ### CSV Upload Parameters
 
-Send these as `multipart/form-data` to add calls to the batch. When using form data, send object and array fields (`callingNumbers`, `callingHour`, `allowedDays`, `pushingCrms`) as JSON strings.
+Send these as `multipart/form-data` to add calls to the campaign. When using form data, send object and array fields (`callingNumbers`, `callingHour`, `allowedDays`, `pushingCrms`) as JSON strings.
 
 <ParamField body="file" type="file">
-CSV file of contacts to add. `.csv` only, up to 50 MB. Existing calls in the batch are not removed. Not supported for inbound batches.
+CSV file of contacts to add. `.csv` only, up to 50 MB. Existing calls in the campaign are not removed. Not supported for inbound campaigns.
 </ParamField>
 
 <ParamField body="countryCode" type="string">
@@ -208,19 +198,19 @@ Human-readable success message.
 </ResponseField>
 
 <ResponseField name="data" type="object" required>
-The updated batch.
+The updated campaign.
 </ResponseField>
 
 <ResponseField name="data._id" type="string">
-Unique identifier of the batch.
+Unique identifier of the campaign.
 </ResponseField>
 
 <ResponseField name="data.batchName" type="string">
-Name of the batch.
+Name of the campaign.
 </ResponseField>
 
 <ResponseField name="data.type" type="string">
-Batch type: `outbound`, `inbound` or `mixed`.
+Campaign type: `outbound`, `inbound` or `mixed`.
 </ResponseField>
 
 <ResponseField name="data.callingNumbers" type="array[string]">
@@ -244,12 +234,12 @@ Minutes between attempts.
 </ResponseField>
 
 <ResponseField name="data.queue_status" type="string">
-Current batch status after the update.
+Current campaign status after the update.
 </ResponseField>
 
 ## Error Handling
 
-- **400 Bad Request** – Invalid field values, the batch is still running (pause it first), or the CSV has invalid rows. For invalid rows, `data` contains:
+- **400 Bad Request** – Invalid field values, the campaign is still running (pause it first), or the CSV has invalid rows. For invalid rows, `data` contains:
   - `code` – `INVALID_CSV_ROWS`
   - `totalInvalidRows` – number of invalid rows
   - `validRows` – rows that would be uploaded if invalid rows are skipped
@@ -257,33 +247,32 @@ Current batch status after the update.
   - `invalidRows` – list of `{ rowNumber, phoneNumber, reason }`
 
   Fix the rows, or resend with `type` set to `"true"` to skip them.
-- **401 Unauthorized** – Missing or invalid credentials.
-  - `Unauthorized: Invalid API Key` – the `x-api-key` value is wrong or the key was deleted.
-  - `Unauthorized: Invalid token` – the Bearer token is malformed, expired, or from a different environment. Sign in again, or use `x-api-key` instead.
-  - `Unauthorized: No API Key OR Token Provided` – neither header was sent.
-- **404 Not Found** – The batch does not exist in your workspace.
-- **409 Conflict** – Inbound batches only. One or more calling numbers are already active on another inbound batch. `data.requiresConfirmation` is `true` and `data.conflicts` lists each number as `{ phoneId, phoneNumber, currentBatchId, currentBatchName }`. Resend with `confirmReassign: true` to move them to this batch.
+- **401 Unauthorized** – Missing or invalid API key.
+  - `Unauthorized: Invalid API Key` – the `x-api-key` value is wrong, the key was deleted, or it was created in a different environment (for example the dev dashboard).
+  - `Unauthorized: No API Key OR Token Provided` – the `x-api-key` header was not sent.
+- **404 Not Found** – The campaign does not exist in your workspace.
+- **409 Conflict** – Inbound campaigns only. One or more calling numbers are already active on another inbound campaign. `data.requiresConfirmation` is `true` and `data.conflicts` lists each number as `{ phoneId, phoneNumber, currentBatchId, currentBatchName }`. Resend with `confirmReassign: true` to move them to this campaign.
 - **500 Internal Server Error** – Unexpected server error.
 
 <Note>
 
-A batch that was **paused** resumes automatically after a successful update. You do not need to call the resume endpoint.
+A campaign that was **paused** resumes automatically after a successful update. You do not need to call the resume endpoint.
 
 </Note>
 
 <Note>
 
-The batch type (outbound, inbound or mixed), DNC setting and scheduled start date are set when the batch is created and cannot be changed with this endpoint.
+The campaign type (outbound, inbound or mixed), DNC setting and scheduled start date are set when the campaign is created and cannot be changed with this endpoint.
 
 </Note>
 
 <Check>
 
-After updating a batch, you can:
+After updating a campaign, you can:
 
-- `GET /api/call/batch-details/{id}` to retrieve the updated batch details.
+- `GET /api/call/batch-details/{batchId}` to retrieve the updated campaign details.
 - `POST /api/call/addCallsToBatch` to add more calls without changing settings.
 - `POST /api/call/start-calling` to start calling.
-- `DELETE /api/call/delete-batch/{batchId}` to delete the batch.
+- `DELETE /api/call/delete-batch/{batchId}` to delete the campaign.
 
 </Check>

@@ -1,20 +1,20 @@
 ---
-title: "Add Calls to Batch"
-description: "Queue one or more contacts in an existing batch before launching the dialer."
-openapi: "POST /api/call/addCallsToBatch"
+title: "Add Calls to Campaign"
+description: "Queue one or more contacts in an existing campaign before launching the dialer."
+api: "POST /api/call/addCallsToBatch"
 ---
 
 ## Overview
-After creating a batch you can enqueue contact records that the dialer should process. Each record can include any custom fields your agent definition expects. Validation runs against the agent’s variable schema so you catch missing data before the dialer starts.
+After creating a campaign you can enqueue contact records that the dialer should process. Each record can include any custom fields your agent definition expects. Validation runs against the agent’s variable schema so you catch missing data before the dialer starts.
 
 ## Prerequisites
-- You created the batch and captured its `batchId`.
+- You created the campaign and captured its `batchId`.
 - All required agent variables are present in every contact.
-- The API key you use owns the batch.
+- The API key you use owns the campaign.
 
 ## Request
 <ParamField header="x-api-key" type="string" required>
-Workspace API key. Must match the owner of the target batch.
+Your workspace API key. Create one from the profile menu in the dashboard → **API Keys**.
 </ParamField>
 
 <ParamField body="batchId" type="string" required>
@@ -22,7 +22,7 @@ Identifier returned by `POST /api/call/createBatch`.
 </ParamField>
 
 <ParamField body="callData" type="array[object]" required>
-Array of call records to be added to the batch. Each object MUST include `phoneNumber`. All other fields are flexible and determined by your agent's configuration. The system automatically chunks large arrays (1000 records per chunk) for efficient processing.
+Array of call records to be added to the campaign. Each object MUST include `phoneNumber`. All other fields are flexible and determined by your agent's configuration. The system automatically chunks large arrays (1000 records per chunk) for efficient processing.
 </ParamField>
 
 <RequestExample>
@@ -36,7 +36,7 @@ curl -X POST 'https://api.weya.live/backend/api/call/addCallsToBatch' \
       {
         "phoneNumber": "+918800000000",
         "name": "Hasan Ali",
-        "amount": "500.00",
+        "amount": "500.00"
       },
       {
         "phoneNumber": "+919900000000",
@@ -107,7 +107,7 @@ Contains details about the operation.
 </ResponseField>
 
 <ResponseField name="data.added" type="integer" required>
-Total number of call records successfully added to the batch across all chunks.
+Total number of call records successfully added to the campaign across all chunks.
 </ResponseField>
 
 <ResponseField name="data.callIds" type="array[string]" required>
@@ -121,8 +121,8 @@ Present when `status` is `false` and `code` is 207. Array of chunk processing fa
 ## Error Handling
 
 - **400 Bad Request** – Missing `batchId`, empty `callData` array, or validation failure.
-- **403 Forbidden** – Invalid or missing API key, or API key doesn't own the batch.
-- **404 Not Found** – Batch not found, or no agent found for the batch's calling numbers.
+- **403 Forbidden** – Invalid or missing API key, or API key doesn't own the campaign.
+- **404 Not Found** – Campaign not found, or no agent found for the campaign's calling numbers.
 - **207 Partial Content** – Some chunks processed successfully while others failed. Check `failedChunks` for details.
 - **500 Internal Server Error** – Server error during processing; retry with exponential backoff.
 
@@ -142,7 +142,7 @@ The `callData` array accepts any custom key-value pairs beyond the required `pho
 <Note>
 **Processing Details:**
 
-- Large arrays are automatically chunked into batches of 1000 records for efficient processing
+- Large arrays are automatically chunked into campaigns of 1000 records for efficient processing
 - Each call record is validated against the agent's required variables
 - Existing calls with the same phone number are updated if they have a "pending" status
 - Completed calls create new phone log entries

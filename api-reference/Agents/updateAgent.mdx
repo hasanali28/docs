@@ -1,7 +1,7 @@
 ---
 title: "Update Agent"
 description: "Update the configuration of an existing AI agent."
-openapi: "PATCH /api/agents/{id}"
+api: "PATCH /api/agents/{id}"
 ---
 
 ## Overview
@@ -10,7 +10,7 @@ Update an existing AI agent by providing its unique Agent ID. You can modify the
 
 ## Prerequisites
 
-- Bearer token for an authenticated workspace
+- An API key for your workspace
 - Valid Agent ID
 
 <Tip>
@@ -27,15 +27,15 @@ Unique identifier of the AI agent to update.
 
 ## Request
 
-<ParamField header="Authorization" type="string" required>
-Bearer token for authenticated workspace access.
+<ParamField header="x-api-key" type="string" required>
+Your workspace API key. Create one from the profile menu in the dashboard → **API Keys**.
 </ParamField>
 
 <RequestExample>
 
 ```bash cURL
 curl --location --request PATCH 'https://api.weya.live/backend/api/agents/{id}' \
---header 'Authorization: Bearer {{authToken}}' \
+--header 'x-api-key: YOUR_API_KEY' \
 --header 'Content-Type: application/json' \
 --data '{
   "agent_name": "Updated Sales Agent",
@@ -122,7 +122,7 @@ The following fields can be updated:
 ## Error Handling
 
 - **400 Bad Request** – Invalid request body or Agent ID.
-- **401 Unauthorized** – Missing or invalid Bearer token.
+- **401 Unauthorized** – Missing or invalid API key.
 - **403 Forbidden** – You do not have permission to update this agent.
 - **404 Not Found** – Agent does not exist.
 - **500 Internal Server Error** – Unexpected server error.

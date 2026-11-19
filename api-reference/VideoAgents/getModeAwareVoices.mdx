@@ -1,7 +1,7 @@
 ---
 title: "Get Available Voices"
-description: "Retrieve the list of voices supported for Video Agents based on the selected mode."
-openapi: "GET /api/video-agent/voices"
+description: "Retrieve the list of voices supported for Video Agents for the selected camera mode and avatar gender."
+api: "GET /api/video-agents/voices"
 ---
 
 ## Overview
@@ -10,23 +10,27 @@ Retrieve all available voices that can be used when creating or updating a Video
 
 ## Prerequisites
 
-- Bearer Token authentication
+- An API key for your workspace
 
 ## Request
 
-<ParamField header="Authorization" type="string" required>
-Bearer token for authenticated workspace access.
+<ParamField header="x-api-key" type="string" required>
+Your workspace API key. Create one from the profile menu in the dashboard → **API Keys**.
 </ParamField>
 
-<ParamField query="mode" type="string">
-(Optional) Video generation mode used to filter compatible voices.
+<ParamField query="enableInputVideo" type="boolean" required>
+`true` if the agent will see the visitor's camera (`enable_input_video`). Only voices that work in that mode are returned.
+</ParamField>
+
+<ParamField query="gender" type="string">
+Only return voices for this avatar gender: `Male` or `Female`.
 </ParamField>
 
 <RequestExample>
 
 ```bash cURL
-curl --location 'https://api.weya.live/backend/api/video-agent/voices?mode=avatar' \
---header 'Authorization: Bearer {{authToken}}'
+curl --location 'https://api.weya.live/backend/api/video-agents/voices?enableInputVideo=false&gender=Female' \
+--header 'x-api-key: YOUR_API_KEY'
 ```
 
 </RequestExample>
@@ -44,21 +48,21 @@ curl --location 'https://api.weya.live/backend/api/video-agent/voices?mode=avata
     {
       "id": "en-US-Standard-A",
       "name": "English Female",
-      "language": "English",
+      "selectedLanguage": ["en"],
       "gender": "Female",
       "provider": "Google"
     },
     {
       "id": "en-US-Standard-B",
       "name": "English Male",
-      "language": "English",
+      "selectedLanguage": ["en"],
       "gender": "Male",
       "provider": "Google"
     },
     {
       "id": "hi-IN-Standard-A",
       "name": "Hindi Female",
-      "language": "Hindi",
+      "selectedLanguage": ["en"],
       "gender": "Female",
       "provider": "Google"
     }
@@ -92,8 +96,8 @@ Unique identifier of the voice.
 Display name of the voice.
 </ResponseField>
 
-<ResponseField name="data.language" type="string">
-Language supported by the voice.
+<ResponseField name="data.selectedLanguage" type="array[string]">
+Languages the agent can speak.
 </ResponseField>
 
 <ResponseField name="data.gender" type="string">
@@ -108,8 +112,8 @@ Voice provider used by the platform.
 
 | Status | Description |
 |---------|-------------|
-|400|Invalid mode specified|
-|401|Unauthorized or invalid Bearer token|
+|400|Missing or invalid `enableInputVideo`|
+|401|Missing or invalid API key|
 |500|Internal server error|
 
 <Note>

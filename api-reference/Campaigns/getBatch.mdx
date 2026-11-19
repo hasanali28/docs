@@ -1,24 +1,24 @@
 ---
-title: "Get All Batches"
-description: "Retrieve a paginated list of all batches for an authenticated user with search capabilities."
-openapi: "GET /api/call/batches/{userId}"
+title: "Get Campaigns"
+description: "Retrieve a paginated list of all campaigns for an authenticated user with search capabilities."
+api: "GET /api/call/batches/{userId}"
 ---
 
 ## Overview
-This endpoint lists every batch created by the authenticated user with pagination and search support. Only non-deleted batches are returned by default. Use this to monitor active campaigns, view batch summaries, and track campaign statistics.
+This endpoint lists every campaign created by the authenticated user with pagination and search support. Only non-deleted campaigns are returned by default. Use this to monitor active campaigns, view campaign summaries, and track campaign statistics.
 
 ## Prerequisites
-- Bearer token for an authenticated user.
-- The user must own the batches being retrieved.
+- An API key for your workspace
+- The user must own the campaigns being retrieved.
 
 ## Request
 
-<ParamField header="Authorization" type="string" required>
-Bearer token for the authenticated user.
+<ParamField header="x-api-key" type="string" required>
+Your workspace API key. Create one from the profile menu in the dashboard → **API Keys**.
 </ParamField>
 
 <ParamField path="userId" type="string" required>
-User identifier. The authenticated user must match this ID.
+Your user ID. Campaigns are always returned for the account that owns the API key.
 </ParamField>
 
 <ParamField query="page" type="integer" default="1">
@@ -26,17 +26,29 @@ Page number for pagination.
 </ParamField>
 
 <ParamField query="limit" type="integer" default="10">
-Number of batches to return per page (default: 10).
+Number of campaigns to return per page (default: 10).
+</ParamField>
+
+<ParamField query="statusFilter" type="string">
+Filter by status. Voice campaigns: `active`, `inactive`, `completed` or `all`. Video and WhatsApp campaigns: `active` or `inactive`.
+</ParamField>
+
+<ParamField query="channel_type" type="string">
+Only return campaigns of this type: `voice`, `video`, `whatsapp` or `web_chat`. If omitted, campaigns of every type are returned.
+</ParamField>
+
+<ParamField query="includeDeleted" type="boolean" default="false">
+Set to `true` to also return deleted campaigns.
 </ParamField>
 
 <ParamField query="search" type="string">
-Search term to filter batches by `batchName` or `queue_status`.
+Search term to filter campaigns by `batchName` or `queue_status`.
 </ParamField>
 
 <RequestExample>
 ```bash cURL
 curl --location 'https://api.weya.live/backend/api/call/batches/64e5f12345abcdef12345678?page=1&limit=10&search=Marketing' \
-  --header 'Authorization: Bearer {{authToken}}'
+  --header 'x-api-key: YOUR_API_KEY'
 ```
 </RequestExample>
 
@@ -84,23 +96,23 @@ curl --location 'https://api.weya.live/backend/api/call/batches/64e5f12345abcdef
 </ResponseExample>
 
 <ResponseField name="data" type="object" required>
-Contains the batches array and pagination metadata.
+Contains the campaigns array and pagination metadata.
 </ResponseField>
 
 <ResponseField name="data.batches" type="array[object]" required>
-Array of batch records with summary statistics.
+Array of campaign records with summary statistics.
 </ResponseField>
 
 <ResponseField name="data.batches[]._id" type="string" required>
-Unique identifier for the batch.
+Unique identifier for the campaign.
 </ResponseField>
 
 <ResponseField name="data.batches[].batchName" type="string" required>
-Display name for the batch.
+Display name for the campaign.
 </ResponseField>
 
 <ResponseField name="data.batches[].totalCalls" type="integer" required>
-Total number of calls in the batch.
+Total number of calls in the campaign.
 </ResponseField>
 
 <ResponseField name="data.batches[].callsPicked" type="integer" required>
@@ -112,15 +124,15 @@ Number of calls that completed successfully.
 </ResponseField>
 
 <ResponseField name="data.batches[].queue_status" type="string" required>
-Current status of the batch queue (e.g., "active", "paused", "completed").
+Current status of the campaign queue (e.g., "active", "paused", "completed").
 </ResponseField>
 
 <ResponseField name="data.batches[].createdAt" type="string" required>
-Timestamp when the batch was created (ISO 8601 format).
+Timestamp when the campaign was created (ISO 8601 format).
 </ResponseField>
 
 <ResponseField name="data.batches[].updatedAt" type="string" required>
-Timestamp when the batch was last updated (ISO 8601 format).
+Timestamp when the campaign was last updated (ISO 8601 format).
 </ResponseField>
 
 <ResponseField name="data.pagination" type="object" required>
@@ -128,7 +140,7 @@ Pagination metadata.
 </ResponseField>
 
 <ResponseField name="data.pagination.total" type="integer" required>
-Total number of batches matching the search criteria.
+Total number of campaigns matching the search criteria.
 </ResponseField>
 
 <ResponseField name="data.pagination.page" type="integer" required>
@@ -146,18 +158,18 @@ Total number of pages available.
 ## Error Handling
 
 - **400 Bad Request** – Invalid `userId` format or invalid query parameters.
-- **404 Not Found** – No batches found for the authenticated user.
-- **500 Internal Server Error** – Failed to fetch batch data; retry or contact support.
+- **404 Not Found** – No campaigns found for the authenticated user.
+- **500 Internal Server Error** – Failed to fetch campaign data; retry or contact support.
 
 <Note>
 **Filtering Behavior:**
 
-- Only non-deleted batches are returned (`isDeleted: false`)
-- Use the `search` parameter to filter by batch name or queue status
+- Deleted campaigns are left out unless you pass `includeDeleted=true`
+- Use the `search` parameter to filter by campaign name or queue status
 - Results are sorted by creation date in descending order (newest first)
-- Pagination helps manage large lists of batches efficiently
+- Pagination helps manage large lists of campaigns efficiently
 </Note>
 
 <Tip>
-Combine this endpoint with `GET /api/call/batch-details/{id}` to first get an overview of all batches, then drill down into specific batch details.
+Combine this endpoint with `GET /api/call/batch-details/{batchId}` to first get an overview of all campaigns, then drill down into specific campaign details.
 </Tip>

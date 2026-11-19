@@ -5,20 +5,40 @@ description: 'Welcome to the Weya AI API documentation'
 
 ## Welcome
 
-Welcome to the Weya AI API documentation. This documentation covers the public APIs available for integrating with the Weya AI platform. The APIs are organized into two main categories:
+Welcome to the Weya AI API documentation. These APIs let you manage everything you can do in the Weya AI dashboard from your own applications:
 
-- **Call Management APIs** - Manage phone numbers, batches, and outbound calling campaigns
-- **DNC (Do Not Call) APIs** - Manage your organization's Do Not Call list
+- **Agents** – voice, video and WhatsApp agents
+- **Campaigns** – create campaigns, add contacts, start, pause, resume and update them
+- **Phone Numbers** – connect and manage the numbers your agents call from
+- **Knowledge Bases** – documents your agents answer from
+- **Webhooks** – receive call outcomes in your own systems
+- **DNC (Do Not Call)** and **Holiday Lists** – control who and when your campaigns call
 
 ## Base URL
 
 All API requests should be made to:
 
 ```
-https://nexusdev-wjs-api-dev.mangoforest-291de162.swedencentral.azurecontainerapps.io
+https://api.weya.live/backend
 ```
 
-The base URL is automatically used in all code examples throughout this documentation via the `https://api.weya.live/backend` variable.
+## Authentication
+
+Every endpoint is authenticated with an API key, sent in the `x-api-key` header:
+
+```bash
+x-api-key: YOUR_API_KEY
+```
+
+To create an API key, open the profile menu at the bottom of the dashboard sidebar and choose **API Keys**. Copy the key with the copy button next to it; the list itself only shows a masked version.
+
+<Note>
+An API key works only in the environment it was created in. A key created in a development dashboard is rejected by the production API with `401 Unauthorized: Invalid API Key`.
+</Note>
+
+<Warning>
+Keep your API key secret. Anyone with it can act on your workspace. If a key is exposed, delete it from **API Keys** and create a new one.
+</Warning>
 
 ## Phone Number Format
 
@@ -36,31 +56,9 @@ All phone numbers in API requests must include the country code. The `+` prefix 
 The country code is required for all phone numbers. You may include or omit the `+` prefix - both formats are accepted.
 </Note>
 
-## Authentication
+## Campaign IDs
 
-API endpoints support two authentication methods:
-
-### Bearer Token Authentication
-
-Most endpoints require a Bearer token in the `Authorization` header:
-
-```bash
-Authorization: Bearer YOUR_TOKEN_HERE
-```
-
-### API Key Authentication
-
-Some endpoints (like batch creation) also support API key authentication via the `x-api-key` header:
-
-```bash
-x-api-key: YOUR_API_KEY_HERE
-```
-
-You can find your API key in your workspace settings under **Settings → API access**.
-
-<Note>
-When both authentication methods are available for an endpoint, the API key takes precedence if both are provided. Check individual endpoint documentation for specific authentication requirements.
-</Note>
+Campaigns were previously called *batches*. The API still uses the original names in paths and fields, so a campaign's ID is sent as `batchId` and its name as `batchName`, and campaign endpoints live under `/api/call/...` (for example `/api/call/delete-batch/{batchId}`).
 
 ## Response Format
 
@@ -86,11 +84,11 @@ All API responses follow a consistent format:
 
 API errors are returned with appropriate HTTP status codes:
 
-- **400 Bad Request** - Invalid request parameters or missing required fields
-- **401 Unauthorized** - Missing or invalid authentication token
-- **403 Forbidden** - Insufficient permissions or invalid API key
+- **400 Bad Request** - Invalid request parameters or missing required fields, including CSV files with invalid rows
+- **401 Unauthorized** - Missing or invalid API key
+- **403 Forbidden** - Insufficient permissions
 - **404 Not Found** - Resource not found
-- **422 Unprocessable Entity** - Validation errors (e.g., invalid CSV rows)
+- **409 Conflict** - The request conflicts with existing data, for example a phone number already active on another inbound campaign
 - **500 Internal Server Error** - Server error; retry or contact support
 
 ## Rate Limiting
@@ -99,7 +97,7 @@ API requests are subject to rate limiting to ensure fair usage. If you exceed th
 
 ## Getting Started
 
-1. **Obtain Authentication Credentials** - Get your Bearer token or API key from your workspace settings
+1. **Create an API key** - From the profile menu in the dashboard → **API Keys**
 2. **Review API Endpoints** - Explore the available endpoints in the navigation menu
 3. **Test with Examples** - Use the provided cURL examples to test API calls
 4. **Integrate** - Implement the APIs in your application

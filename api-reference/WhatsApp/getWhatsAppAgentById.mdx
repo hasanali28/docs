@@ -1,7 +1,7 @@
 ---
 title: "Get WhatsApp Agent By ID"
 description: "Retrieve the complete configuration and details of a specific WhatsApp AI Agent."
-openapi: "GET /api/whatsapp/get-whatsapp-agent/{agentId}"
+api: "GET /api/whatsapp/get-whatsapp-agent/{agentId}"
 ---
 
 ## Overview
@@ -10,13 +10,13 @@ Retrieve the complete details of a WhatsApp AI Agent using its unique Agent ID. 
 
 ## Prerequisites
 
-- Bearer Token authentication
+- An API key for your workspace
 - Valid WhatsApp Agent ID
 
 ## Request
 
-<ParamField header="Authorization" type="string" required>
-Bearer token for authenticated workspace access.
+<ParamField header="x-api-key" type="string" required>
+Your workspace API key. Create one from the profile menu in the dashboard → **API Keys**.
 </ParamField>
 
 <ParamField path="agentId" type="string" required>
@@ -27,7 +27,7 @@ Unique identifier of the WhatsApp AI Agent.
 
 ```bash cURL
 curl --location 'https://api.weya.live/backend/api/whatsapp/get-whatsapp-agent/6894a98a7fcde123456789ab' \
---header 'Authorization: Bearer {{authToken}}'
+--header 'x-api-key: YOUR_API_KEY'
 ```
 
 </RequestExample>
@@ -126,7 +126,7 @@ Timestamp when the agent was last updated.
 | Status | Description |
 |---------|-------------|
 |400|Invalid Agent ID format|
-|401|Unauthorized or invalid Bearer token|
+|401|Missing or invalid API key|
 |403|You do not have permission to access this WhatsApp Agent|
 |404|WhatsApp Agent not found|
 |500|Internal server error|

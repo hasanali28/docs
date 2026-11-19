@@ -1,7 +1,7 @@
 ---
 title: "Get Video Agents"
 description: "Retrieve all Video Agents available in your workspace."
-openapi: "GET /api/video-agent"
+api: "GET /api/video-agents"
 ---
 
 ## Overview
@@ -10,12 +10,12 @@ Retrieve a paginated list of all Video Agents in your workspace. This endpoint r
 
 ## Prerequisites
 
-- Bearer Token authentication
+- An API key for your workspace
 
 ## Request
 
-<ParamField header="Authorization" type="string" required>
-Bearer token for authenticated workspace access.
+<ParamField header="x-api-key" type="string" required>
+Your workspace API key. Create one from the profile menu in the dashboard → **API Keys**.
 </ParamField>
 
 <ParamField query="page" type="integer">
@@ -33,8 +33,8 @@ Search Video Agents by name.
 <RequestExample>
 
 ```bash cURL
-curl --location 'https://api.weya.live/backend/api/video-agent?page=1&limit=10&search=sales' \
---header 'Authorization: Bearer {{authToken}}'
+curl --location 'https://api.weya.live/backend/api/video-agents?page=1&limit=10&search=sales' \
+--header 'x-api-key: YOUR_API_KEY'
 ```
 
 </RequestExample>
@@ -47,96 +47,59 @@ curl --location 'https://api.weya.live/backend/api/video-agent?page=1&limit=10&s
 {
   "status": true,
   "code": 200,
-  "message": "Video Agents fetched successfully",
-  "data": [
-    {
-      "_id": "6891a23bc456def789123456",
-      "agent_name": "Sales Video Agent",
-      "avatar": "Business Female",
-      "voice": "en-US-Standard-A",
-      "language": "English",
-      "status": "active",
-      "createdAt": "2026-07-21T09:15:00.000Z"
-    },
-    {
-      "_id": "6891a23bc456def789123457",
-      "agent_name": "Support Video Agent",
-      "avatar": "Customer Support",
-      "voice": "en-US-Standard-B",
-      "language": "English",
-      "status": "active",
-      "createdAt": "2026-07-20T15:42:10.000Z"
+  "message": "",
+  "errorMessage": "",
+  "data": {
+    "agents": [
+      {
+        "_id": "6891a23bc456def789123456",
+        "agent_name": "Sales Video Agent",
+        "avatar": "6891a23bc456def789aaaaaa",
+        "voice": "6891a23bc456def789bbbbbb",
+        "gender": "Female",
+        "selectedLanguage": ["en"],
+        "enable_input_video": false,
+        "createdAt": "2026-07-21T09:15:00.000Z"
+      }
+    ],
+    "pagination": {
+      "total": 1,
+      "page": 1,
+      "limit": 10,
+      "totalPages": 1
     }
-  ],
-  "pagination": {
-    "page": 1,
-    "limit": 10,
-    "total": 2,
-    "totalPages": 1
   }
 }
 ```
 
 </ResponseExample>
 
-<ResponseField name="status" type="boolean">
-Indicates whether the request completed successfully.
+<ResponseField name="data.agents" type="array[object]" required>
+The video agents on this page.
 </ResponseField>
 
-<ResponseField name="code" type="integer">
-HTTP status code returned by the API.
+<ResponseField name="data.agents[]._id" type="string">
+Video agent ID. Use it as `videoAgentId` when creating a video campaign.
 </ResponseField>
 
-<ResponseField name="message" type="string">
-Success message returned by the API.
+<ResponseField name="data.agents[].agent_name" type="string">
+Name of the video agent.
 </ResponseField>
 
-<ResponseField name="data" type="array">
-List of Video Agents available in the authenticated workspace.
+<ResponseField name="data.agents[].avatar" type="string">
+ID of the avatar.
 </ResponseField>
 
-<ResponseField name="data._id" type="string">
-Unique identifier of the Video Agent.
+<ResponseField name="data.agents[].voice" type="string">
+ID of the voice.
 </ResponseField>
 
-<ResponseField name="data.agent_name" type="string">
-Display name of the Video Agent.
+<ResponseField name="data.agents[].selectedLanguage" type="array[string]">
+Languages the agent can speak.
 </ResponseField>
 
-<ResponseField name="data.avatar" type="string">
-Avatar selected for the Video Agent.
-</ResponseField>
-
-<ResponseField name="data.voice" type="string">
-Voice assigned to the Video Agent.
-</ResponseField>
-
-<ResponseField name="data.language" type="string">
-Primary language configured for the Video Agent.
-</ResponseField>
-
-<ResponseField name="data.status" type="string">
-Current status of the Video Agent.
-</ResponseField>
-
-<ResponseField name="data.createdAt" type="string">
-Timestamp indicating when the Video Agent was created.
-</ResponseField>
-
-<ResponseField name="pagination.page" type="integer">
-Current page number.
-</ResponseField>
-
-<ResponseField name="pagination.limit" type="integer">
-Maximum number of records returned per page.
-</ResponseField>
-
-<ResponseField name="pagination.total" type="integer">
-Total number of Video Agents.
-</ResponseField>
-
-<ResponseField name="pagination.totalPages" type="integer">
-Total number of available pages.
+<ResponseField name="data.pagination" type="object" required>
+Pagination details: `total`, `page`, `limit` and `totalPages`.
 </ResponseField>
 
 ## Error Handling
@@ -144,15 +107,15 @@ Total number of available pages.
 | Status | Description |
 |---------|-------------|
 |400|Invalid request parameters|
-|401|Unauthorized or invalid Bearer token|
+|401|Missing or invalid API key|
 |500|Internal server error|
 
 <Check>
 
 Use the returned **Video Agent ID** with:
 
-- `GET /api/video-agent/{id}` to retrieve a specific Video Agent.
-- `PATCH /api/video-agent/{id}` to update a Video Agent.
-- `DELETE /api/video-agent/{id}` to remove a Video Agent.
+- `GET /api/video-agents/{id}` to retrieve a specific Video Agent.
+- `PATCH /api/video-agents/{id}` to update a Video Agent.
+- `DELETE /api/video-agents/{id}` to remove a Video Agent.
 
 </Check>
