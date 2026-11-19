@@ -1,41 +1,59 @@
 ---
-title: "Step 4: Post Call Metrics"
-description: "Detailed guide to configure and track post call performance metrics for your AI Agent."
+title: "Define post-call metrics for a voice agent"
+sidebarTitle: "Post-call metrics"
+description: "Choose the data weya extracts from every call, such as outcomes, dates and scores, and receive it in call_analysis on your webhook or in your CRM."
+keywords:
+  - "post-call metrics"
+  - "call analysis"
+  - "data extraction"
+  - "call_analysis"
+  - "call outcome"
 ---
 
-## How to Set Up a Post Call Metric
-Step-by-step guide:
+Post-call metrics are the structured results weya extracts from every conversation after it ends, such as whether the issue was resolved, a promised payment date or a satisfaction score. They appear in the dashboard for each call and in the `call_analysis` field of your [call result webhook](/integration/webhooks), one entry per metric with its `metric_name` and `metric_value`.
 
-### **Metric Name**  
-Enter a unique, descriptive metric name (e.g., "Customer Satisfaction", "Order Status", "Follow-up Required").  
-This helps you quickly identify what data you're tracking for each call.
+## Add a metric
 
-### **Data Type**  
-Choose from several data types to fit your tracking needs:  
+For each metric, set three fields.
 
-- **Text** – Free-form summaries or notes from the call.  
-- **Single Extract** – Extract one specific item of information (like the customer's answer or score).  
-- **Boolean (Yes/No)** – Track simple outcomes: was the order placed? Did the issue get resolved?  
-- **Timestamp** – Store the exact time something happened on the call.  
-- **Date** – Save calendar-based dates, such as appointment dates.  
-- **Numeric** – Store quantities, ratings, codes (for example, feedback scores).  
-- **Multi Extract** – Collect multiple pieces of data from the same call for richer reporting.
+### Metric name
 
-### **Description**  
-Document what each metric tracks and how it’s calculated.  
-Clearly explain how the agent should use or interpret this field.
+A unique, descriptive name, for example `Customer Satisfaction`, `Order Status` or `Follow-up Required`. It is sent as `metric_name`, so pick a name your systems can map.
 
-### Example: Custom Post Call Metric
+### Data type
+
+| Type | Use it for |
+| --- | --- |
+| **Text** | Free-form summaries or notes |
+| **Single Extract** | One specific value, such as the customer's answer to a question |
+| **Boolean** | Yes or no outcomes: was the order placed, was the issue resolved |
+| **Timestamp** | The exact time something happened in the call |
+| **Date** | Calendar dates, such as an appointment date |
+| **Numeric** | Quantities, ratings or scores |
+| **Multi Extract** | Several values from the same call |
+
+### Description
+
+Tell the AI exactly what to extract and in what format. This is the instruction it follows, so be specific.
+
+```text Example
+Metric name: Customer Satisfaction Score
+Data type: Numeric
+Description: Extract a rating from 0 to 10 based on how satisfied the customer sounds.
+If the customer gives a rating directly, use that value. Otherwise, estimate it from
+the conversation.
 ```
-Suppose you want to track how satisfied customers are after a call.
 
-- Metric Name: Customer Satisfaction Score  
-- Data Type: Numeric  
-- Description: "Extract a rating from 0 to 10 based on how satisfied the customer sounds during the call. If the customer directly provides a rating, use that value. Otherwise, estimate based on conversation sentiment."
-```
+## Tips
 
-### 💡Tip
-- Use meaningful metric names so everyone on your team understands what’s being tracked.  
-- Pick the most suitable data type to make reporting and analysis easy.  
-- Clearly describe each metric for consistent agent use and accurate data.
+- Give each metric a name your team and your integrations will recognise.  
+- Choose the narrowest data type that fits, so values are easy to filter and report on.  
+- State the format you want for dates and numbers in the description.
 
+<Warning>
+  A completed call is sent to your webhook only once its analysis is ready. If analysis isn't ready within 30 minutes of the call, the result is not sent. See [When results are sent](/integration/webhooks#when-results-are-sent).
+</Warning>
+
+## Next
+
+Connect the agent to a phone number in [Connect a phone number](/phonenumbers/addphonenumber).

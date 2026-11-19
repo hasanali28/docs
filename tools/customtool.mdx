@@ -1,9 +1,10 @@
 ---
-title: "Custom Tool"
-description: "Extend your AI agent's capabilities by integrating any REST API as a custom tool."
+title: "Connect your API to an agent as a custom tool"
+description: "Let a weya voice agent call any REST API during a conversation: set the endpoint, headers, body and variables, and write descriptions the agent can follow."
+sidebarTitle: "Custom tools"
 ---
 
-Custom Tools allow you to connect **any HTTP REST API** to your voice agent. When a user asks a question or makes a request that requires external data or an action, the agent automatically calls your configured API and delivers the result — all in real time.
+Custom tools connect **any HTTP REST API** to your weya voice agent. When a user asks a question or makes a request that requires external data or an action, the agent automatically calls your configured API and delivers the result — all in real time.
 
 ---
 
@@ -49,7 +50,7 @@ Fill in the top section of the form:
 | **Tool Name** | A `snake_case` identifier for the tool | `emi_calculation` |
 | **Description** | What the tool does and when to trigger it. Keep it concise — include the action and the trigger condition. | `Calculates EMI details including down payment and monthly installments for a given course fee.` |
 | **HTTP Method** | The HTTP method for the API | `POST` |
-| **Endpoint URL** | The full API endpoint URL | `https://dev.api.weya.live/ai/tools/emi-calculation` |
+| **Endpoint URL** | The full API endpoint URL | `https://api.your-domain.com/tools/emi-calculation` |
 
 <Frame>
   <img src="/images/custom-tool-basic-info.png" alt="Custom tool basic info" />
@@ -148,5 +149,14 @@ Understanding the difference is key to configuring tools correctly:
 
 ---
 
-💡 **Tip**
-After adding the tool, make a test call to your agent to verify the tool is triggered correctly and returns the expected results.
+## Reliability
+
+Your API is called live, during the conversation, so the person on the call waits for it.
+
+- Respond quickly, and return a short, clear result the agent can read out.
+- Return a meaningful error message instead of an empty response, so the agent can tell the person what happened.
+- Calls to your API come from weya's servers. If your API only accepts known IP addresses, ask weya for the address to allow.
+
+<Check>
+  After adding the tool, make a test call and check that the agent calls the tool at the right moment and reads back the result correctly.
+</Check>

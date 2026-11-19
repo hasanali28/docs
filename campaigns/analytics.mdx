@@ -1,8 +1,10 @@
 ---
-title: "Campaign Analytics & Monitoring"
+title: "Monitor campaign progress and call outcomes"
+sidebarTitle: "Campaign analytics"
+description: "Read weya campaign analytics: call totals, per-call status, duration and retries, success rate and duration charts, and the actions to manage a campaign."
 ---
 
-The **Campaign Analytics** dashboard allows users to measure and monitor the performance of call campaigns. It provides a detailed view of campaign performance, including call success rate, duration, and status updates all in real time.
+weya's campaign analytics show how a calling campaign is performing while it runs: how many calls were picked up and completed, each call's status, duration and retries, and how call outcomes and durations are distributed. To receive the same data in your own systems, use a [call result webhook](/integration/webhooks).
 
 ---
 
@@ -10,7 +12,7 @@ The **Campaign Analytics** dashboard allows users to measure and monitor the per
 
 In the main campaign list, each campaign displays the following:
 
-- **Campaign Name** – The name of the campaign (e.g., “mm”).
+- **Campaign Name** – The name of the campaign.
 - **Call Statistics** – A quick summary showing:
   - **Total Calls:** The total number of attempted calls under the campaign.
   - **Picked:** Calls that were successfully answered.
@@ -18,7 +20,8 @@ In the main campaign list, each campaign displays the following:
 - **Status:** Indicates the current progress, such as *Completed*, *Pending*, or *Unknown*.
 - **Created:** Displays when the campaign was created.
 - **Actions:** Options to view analytics, delete, or manage the campaign.
-```
+
+```text
 Example:
 A campaign named Testing Campaign might show:
 - Total: 200 
@@ -26,6 +29,7 @@ A campaign named Testing Campaign might show:
 - Completed: 75  
 - Status: Unknown  
 ```
+
 Older campaigns may appear as *Completed* once all calls finish.
 
 ---
@@ -99,5 +103,6 @@ Each campaign includes administrative actions:
 
 ---
 
-💡 **Tip:**  
-Regularly monitor both *Call Success Rate* and *Call Duration Distribution* to identify technical issues or optimize staff efficiency. Export reports after each campaign for performance tracking and compliance audits.
+<Tip>
+  Check both the call success rate and the duration distribution regularly: they surface telephony issues early. Export reports after each campaign for performance tracking and audits. For what each call status means, see [call statuses](/get-started/concepts#call-statuses).
+</Tip>

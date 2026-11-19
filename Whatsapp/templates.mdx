@@ -1,11 +1,10 @@
 ---
-title: "WhatsApp Templates"
-description: "Learn how to manage WhatsApp message templates for automated conversations, notifications, and customer engagement."
+title: "Use approved WhatsApp templates"
+description: "View your approved WhatsApp templates in weya, understand template categories, and use templates with variables in automated messages and agents."
+sidebarTitle: "Templates"
 ---
 
-# WhatsApp Templates
-
-WhatsApp Templates are pre-approved message formats used to initiate conversations with customers or send notifications outside the standard customer service window.
+WhatsApp templates are pre-approved message formats used to initiate conversations with customers or send notifications outside the standard customer service window.
 
 Templates ensure that your business communications comply with WhatsApp Business Platform policies while enabling automated messaging through your AI agents.
 
@@ -52,7 +51,7 @@ The available template categories may vary depending on your WhatsApp Business c
 
 To view your templates:
 
-1. Sign in to the Weya AI Dashboard.
+1. Sign in to the weya dashboard.
 2. Navigate to **WhatsApp**.
 3. Open the **Templates** section.
 4. Select the connected WhatsApp number.
@@ -86,13 +85,7 @@ WhatsApp Agents can use approved templates to:
 - Notify customers about order status
 - Trigger workflow notifications
 
-Templates are automatically populated with customer-specific information using template variables.
-
-<Card
-title="Learn About Template Variables"
-icon="brackets-curly"
-href="/whatsapp/template-variables"
-/>
+Templates are automatically populated with customer-specific information using template variables. To see which variables a template needs, use [Get Template Variables](/api-reference/WhatsApp/getTemplateVariables).
 
 ---
 
@@ -121,28 +114,14 @@ Keeping your templates organized makes automation easier to manage.
 
 ## Next Steps
 
-After selecting the appropriate templates, configure the variables that will be dynamically inserted into each message.
-
 <CardGroup cols={2}>
 
-<Card
-title="Template Variables"
-icon="brackets-curly"
-href="/whatsapp/template-variables"
->
-
-Learn how to use dynamic variables to personalize WhatsApp template messages.
-
+<Card title="Deploy your WhatsApp agent" icon="rocket" href="/Whatsapp/deploy">
+  Assign the agent to your number and go live.
 </Card>
 
-<Card
-title="Create a WhatsApp Agent"
-icon="robot"
-href="/whatsapp/create-whatsapp-agent"
->
-
-Connect your templates to an AI-powered WhatsApp Agent.
-
+<Card title="Post-call WhatsApp" icon="message" href="/tools/postcallwhatsapp">
+  Send a template automatically after a voice call ends.
 </Card>
 
 </CardGroup>

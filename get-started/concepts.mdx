@@ -1,0 +1,137 @@
+---
+title: "How weya works: agents, campaigns, contacts and attempts"
+sidebarTitle: "Core concepts"
+description: "The building blocks of weya (agents, channels, campaigns, contacts and attempts) and what happens to a contact from upload to the final call result."
+keywords: ["concepts", "campaign lifecycle", "call status", "retries", "calling window", "concurrency"]
+icon: "shapes"
+---
+
+weya has five building blocks. An **agent** holds the conversation, a **channel** connects it to people, a **campaign** decides who to reach and when, each **contact** in the campaign gets one or more **attempts**, and every attempt ends with a **result**. Knowing how they connect makes the dashboard, the API and the webhook payload much easier to read.
+
+## Building blocks
+
+| Concept | What it is | In the API |
+| --- | --- | --- |
+| **Agent** | The AI that holds the conversation: prompt, voice, language, knowledge bases, tools and post-call metrics. Voice, video and WhatsApp agents are separate types. | Agent `_id` |
+| **Channel** | Where the agent meets people. For voice, a phone number with an **outbound agent** (places calls) and an **inbound agent** (answers calls) assigned. For WhatsApp, a WhatsApp Business number. For video, the join link of a video campaign. | Phone number `_id` |
+| **Campaign** | A set of contacts plus the rules for reaching them: calling numbers, allowed days, calling hours, timezone, holiday list, retries and where results go. | `batchId` |
+| **Contact** | One person in a campaign, with their phone number and the variables your agent uses (for example `customer_name`). | `call_id`, `lead_data` |
+| **Attempt** | One call to a contact. A contact can have several attempts, up to the campaign's retry limit. | `request_uuid` |
+
+<Info>
+  The API and the webhook payload use the older word **batch** for a campaign, so a campaign's ID is `batchId` or `batch_id`.
+</Info>
+
+### Campaign types
+
+| Type | Behaviour |
+| --- | --- |
+| `outbound` | weya calls the contacts you upload |
+| `inbound` | The campaign only receives calls on its numbers. No contact list is needed |
+| `mixed` | An outbound campaign whose numbers also accept call-backs |
+
+## The life of a contact
+
+From the moment you add a contact until its final result, a contact moves through the same stages. Step through them below.
+
+<ContactLifecycle />
+
+<Visibility for="agents">
+1. Added: the contact is saved with status `pending`.
+2. Queued: the contact is placed in the campaign's calling queue (`queued`).
+3. Dialled: inside the calling window and when a line is free, weya dials from one of the campaign's calling numbers. The agent assigned to that number holds the conversation.
+4. Attempt ends: the provider reports how the call ended (`completed`, `no-answer`, `busy`, `voicemail` and so on).
+5. Retry or finish: if another attempt is needed and the contact has attempts left, weya schedules it after the campaign's delay. Otherwise the contact is finished.
+6. Result delivered: weya analyses the conversation into your post-call metrics and sends the result to your webhook or CRM about five minutes after the call ends.
+</Visibility>
+
+### When calls are placed
+
+Calls are placed only when all of these are true:
+
+- Today is one of the campaign's **allowed days** and not on its **holiday list**.
+- The current time, in the campaign's **timezone**, is inside its **calling hours**.
+- The campaign isn't paused.
+- A line is free. Your account has a **concurrency limit**: the number of calls that can be live at the same time. weya sets it for your account. Contacts beyond it wait until a call ends.
+
+Outside the calling window nothing is dialled, and the campaign carries on when the window next opens.
+
+### Retries
+
+A campaign's `retry` setting is the maximum number of attempts per contact (1 to 10), and `delay` is the wait between attempts in minutes (5 to 1440). When an attempt ends without the outcome you need, for example no answer, weya schedules the next attempt for `delay` minutes later, still inside the calling window. The webhook's `next_attempt_after` field tells you when it is due.
+
+While a retry is waiting, the contact's latest attempt still shows the previous call's status. Agents with **Retry on voicemail** turned on also retry calls that reach voicemail.
+
+## Call statuses
+
+Every attempt ends with one of these statuses, sent as `callStatus` in the webhook:
+
+| Status | Meaning |
+| --- | --- |
+| `completed` | The call connected and the conversation ended normally |
+| `no-answer` | The call rang but nobody picked up |
+| `busy` | The line was busy |
+| `voicemail` | The call reached voicemail |
+| `ivr` | The call reached an automated phone menu |
+| `failed` | The call couldn't be connected, for example an invalid number |
+| `canceled` | The call was cancelled before it connected |
+| `timeout` | The call didn't connect in time |
+| `aborted` | The call was never placed, for example because the number is on your Do Not Call list or the account ran out of credit |
+
+## Results
+
+When a call ends, weya analyses the conversation using the agent's [post-call metrics](/single-prompt/step4) and sends a result to every destination attached to the campaign: a [webhook](/integration/webhooks), a [CRM](/integration/crmintegration) or a Google Sheet. The result includes the status, duration, recording, the metric values in `call_analysis`, the contact's variables in `lead_data`, and `call_outcome`.
+
+## Next steps
+
+<Columns cols={2}>
+  <Card title="Create a campaign" icon="megaphone" href="/campaigns/createcampaign">
+    Set up calling days, hours and retries in the dashboard.
+  </Card>
+  <Card title="Call result webhooks" icon="webhook" href="/integration/webhooks">
+    Receive each result in your own system.
+  </Card>
+</Columns>
+
+export const ContactLifecycle = () => {
+  const steps = [
+    { label: "Added", status: "pending", detail: "You add the contact by CSV upload, the API or a CRM. weya saves it with its variables and creates its first attempt with status pending." },
+    { label: "Queued", status: "queued", detail: "The contact is placed in the campaign's calling queue. From here it waits for the calling window and a free line." },
+    { label: "Dialled", status: "in-progress", detail: "Inside the calling window, and when your account has a free line, weya dials from one of the campaign's calling numbers. The outbound agent assigned to that number holds the conversation." },
+    { label: "Attempt ends", status: "completed, no-answer, busy...", detail: "The telephony provider reports how the call ended. This is the attempt's final status." },
+    { label: "Retry or finish", status: "next_attempt_after", detail: "If another attempt is needed and the contact has attempts left, weya schedules it for the campaign's delay later, inside the calling window. Otherwise the contact is finished." },
+    { label: "Result delivered", status: "webhook / CRM", detail: "weya analyses the conversation into your post-call metrics, then sends the result to the campaign's webhook or CRM about five minutes after the call ends, once the recording and analysis are ready." },
+  ];
+  const [active, setActive] = useState(0);
+  const nav = { padding: "6px 14px", borderRadius: 8, border: "1px solid rgba(127,127,127,.35)", background: "transparent", color: "inherit", font: "inherit", cursor: "pointer" };
+  return (
+    <div className="not-prose" style={{ border: "1px solid rgba(127,127,127,.25)", borderRadius: 12, padding: 16 }}>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 6, alignItems: "center" }}>
+        {steps.map((s, i) => (
+          <React.Fragment key={i}>
+            <button
+              type="button"
+              onClick={() => setActive(i)}
+              aria-pressed={i === active}
+              style={{
+                padding: "6px 10px", borderRadius: 999, font: "inherit", fontSize: 13, color: "inherit", cursor: "pointer",
+                border: i === active ? "2px solid #4F1AD6" : "1px solid rgba(127,127,127,.3)",
+                background: i === active ? "rgba(79,26,214,.12)" : "transparent",
+                opacity: i > active ? 0.6 : 1,
+              }}
+            >
+              {i + 1}. {s.label}
+            </button>
+            {i < steps.length - 1 ? <span aria-hidden="true" style={{ opacity: 0.4 }}>{"→"}</span> : null}
+          </React.Fragment>
+        ))}
+      </div>
+      <div style={{ marginTop: 14, fontSize: 12, opacity: 0.7 }}>Status: <code>{steps[active].status}</code></div>
+      <p style={{ margin: "6px 0 14px", lineHeight: 1.55 }}>{steps[active].detail}</p>
+      <div style={{ display: "flex", gap: 8 }}>
+        <button type="button" style={nav} disabled={active === 0} onClick={() => setActive(active - 1)}>Back</button>
+        <button type="button" style={nav} disabled={active === steps.length - 1} onClick={() => setActive(active + 1)}>Next</button>
+      </div>
+    </div>
+  );
+};

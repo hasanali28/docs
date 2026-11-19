@@ -1,51 +1,41 @@
 ---
-title: "Step 3: Call Settings"
-description: "Detailed voice and call configuration for your AI Agent."
+title: "Configure call settings for a voice agent"
+sidebarTitle: "Call settings"
+description: "Set language detection, voicemail retries, background noise, custom vocabulary, maximum call length and speaking speed for a weya voice agent."
+keywords:
+  - "call settings"
+  - "auto detect language"
+  - "retry on voicemail"
+  - "ambient noise"
+  - "vocabulary"
+  - "max timeout"
+  - "voice speed"
 ---
 
+Call settings control how a weya voice agent behaves on the line: which language it speaks, what happens at voicemail, how it sounds and how long a call can last.  
 
-### 1. Auto Detect Language
-Enables automatic detection of the caller’s language.  
+| Setting | What it does | When to change it |
+| --- | --- | --- |
+| **Auto Detect Language** | Detects the caller's language and switches to it | Turn on for multilingual audiences |
+| **Retry on Voicemail** | Retries the contact when the call reaches voicemail | Turn on for important or time-sensitive outreach |
+| **Ambient Noise** | Plays background sound to make the call feel more natural | Use quiet options for support, busier ones for informal calls |
+| **Vocabulary** | Words the speech recognition should expect | Add names, product terms and company jargon |
+| **Max Timeout** | The maximum length of a call, up to 30 minutes | Lower it to limit cost and unattended calls |
+| **Voice Speed** | How fast the agent speaks. 1x is normal | Slow it down for clarity and accessibility |
 
-Useful for multilingual audiences; the agent adapts without manual intervention.  
-Keeps conversations natural and reduces errors caused by language mismatches.
+## Ambient noise
 
-### 2. Retry on Voicemail
-Automatically retries calls when voicemail is detected.  
+- **Noise Type**: the background sound, for example `office-with-telephone`.
+- **Noise Volume**: from 0 to 1. Keep it low so it doesn't distract.
 
-Helps ensure your call connects with a real person.  
-Ideal for important, time-sensitive outreach.
+## Retry on voicemail
 
-### 3. Ambient Noise
-Adds background sound to simulate realistic environments.
+When this is on, a call that reaches voicemail is retried like an unanswered call, using the campaign's retry limit and delay. See [Retries](/get-started/concepts#retries).
 
-**Noise Type:**  
-Selects the background (e.g., "office-with-telephone").  
-Use quieter options for support calls; busier for informal calls.
+## Vocabulary
 
-**Noise Volume:**  
-Adjusts loudness of ambient sound (0 to 1).  
-Set low for minimal distraction; higher for immersive experiences.
+Enter each word separately. Add the terms speech recognition is most likely to get wrong: people's and place names, product names and abbreviations.  
 
-### 4. Vocabulary
-Lets you specify custom or frequently used words.  
+## Next
 
-Boosts speech recognition accuracy for names, technical terms, and company-specific lingo.  
-Enter multiple words for broader coverage.
-
-### 5. Max Timeout
-Limits the length of each call.  
-
-Adjust with slider (up to 30 minutes).  
-Prevents long, unmonitored calls—recommended for compliance and resource management.
-
-### 6. Voice Speed
-Controls how fast the agent speaks.  
-
-1x is normal; increase for quicker responses, decrease for clarity.  
-Great for accessibility—match caller needs and preferences.
-
----
-
-### 💡 Tip
-Use these settings to create natural, clear, and professional-sounding calls that match your brand’s style.
+Define what weya extracts from every call in [Post-call metrics](/single-prompt/step4).

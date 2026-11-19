@@ -1,17 +1,35 @@
 ---
-title: "Step 2: Add Tools & Knowledge Base"
-description: "Customize your agent’s tone, responsiveness, and base behavior."
+title: "Add knowledge bases and tools to a voice agent"
+sidebarTitle: "Knowledge and tools"
+description: "Give a weya voice agent your documents to answer from, and tools to act during a call: call transfer, post-call WhatsApp, Google Calendar and your own APIs."
+keywords:
+  - "knowledge base"
+  - "tools"
+  - "call transfer"
+  - "whatsapp notifier"
+  - "google calendar"
+  - "custom tool"
 ---
 
-- **Knowledge Base:** Provide contexts to your agent using documents, URLs, or text snippets. Learn more in the [Knowledge Base Guide](../knowledgebase/knowledgebase).  
-- **Tools & Integrations:**  
-  - **WhatsApp:** Send a post-call message automatically after a call ends.  
-  - **Google Calendar:** Sync schedules and keep your agent updated.  
-  - **Call Transfer:** Automatically route calls to the right person.  
-  - **Custom Tools:** Add and configure your own custom tool.  
-  
-  Learn more about these in detail in [Tools & Integrations](/tools/postcallwhatsapp).  
+A voice agent answers from two sources: what its prompt says, and the knowledge bases you attach. Tools let it go further and act during or after the call. You add both in the agent's **Knowledge Base & Tools** settings.
 
----
+## Knowledge bases
 
+Attach one or more knowledge bases so the agent can answer from your documents, URLs or text, for example product details, policies or FAQs. See [Knowledge bases](/knowledgebase/knowledgebase) to create one.
 
+## Tools
+
+| Tool | What it does | Guide |
+| --- | --- | --- |
+| **Call transfer** | Transfers the call to a person at a number you set | [Call transfer](/tools/calltransfer) |
+| **WhatsApp notifier** | Sends a WhatsApp template message automatically after the call ends | [Post-call WhatsApp](/tools/postcallwhatsapp) |
+| **Google Calendar** | Keeps the agent in sync with a calendar, for example to book appointments |  |
+| **Custom tools** | Calls your own REST API during the conversation, for example to look up an account or calculate an EMI | [Custom tools](/tools/customtool) |
+
+<Tip>
+  Mention each tool in the system prompt, with when to use it. The agent decides when to call a tool from its description and your prompt.
+</Tip>
+
+## Next
+
+Tune how calls behave in [Call settings](/single-prompt/step3).

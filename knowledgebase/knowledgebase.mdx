@@ -1,29 +1,42 @@
 ---
-title: "Add and Use Knowledge Base"
-description: "Learn how to create a knowledge base and connect it to your Weya agent."
+title: "Create a knowledge base and connect it to an agent"
+sidebarTitle: "Knowledge bases"
+description: "Upload documents to a weya knowledge base and attach it to voice, video or WhatsApp agents so they answer from your own policies, products and FAQs."
+keywords:
+  - "knowledge base"
+  - "documents"
+  - "rag"
+  - "faq"
+  - "attach knowledge base"
+icon: "book-open"
 ---
 
-import Image from '@theme/IdealImage';
+A weya knowledge base is a collection of your documents that an agent answers from, such as product details, policies and FAQs. One knowledge base can be attached to many agents, and one agent can use several knowledge bases.
 
-## Step 1: Create a Knowledge Base
+<Steps>
+  <Step title="Create a knowledge base">
+    1. Go to **Knowledge Base** in the dashboard.
+    2. Click **Add KB**.
+    3. Enter a name and description, and attach your files.
+    4. Click **Create**.
+  </Step>
+  <Step title="Attach it to an agent">
+    1. Go to **Agents** and open the agent.
+    2. Open its **Knowledge Base & Tools** settings.
+    3. Select the knowledge bases the agent should use.
+  </Step>
+</Steps>
 
-1. Navigate to the **Knowledge Base** tab in your Weya dashboard.  
-2. Click **Add KB**.  
-3. Enter the details (name, description) and attach any relevant files.  
-4. Click **Create** to save your knowledge base.
+<Check>
+  The agent now answers questions from the documents in the knowledge base.
+</Check>
 
----
+## Tips
 
-## Step 2: Connect Knowledge Base to an Agent
+- Split unrelated topics into separate knowledge bases, for example pricing and support, so each agent gets only what it needs.
+- Keep documents current, and remove outdated or duplicate files that could lead to conflicting answers.
+- Tell the agent in its system prompt when to rely on the knowledge base and what to say when the answer isn't there.
 
-1. Go to the **Agents** section in your dashboard.  
-2. Open the **Knowledge Base & Tools** settings for the agent where you want to add a knowledge source.  
-3. Choose from the available knowledge bases (e.g., `"KB-1"` or `"KB-2"`) to select which source your agent will use.  
+## Manage knowledge bases with the API
 
-
-
----
-
-### 💡 Tip
-
-Connecting the right knowledge base ensures your agent can answer questions accurately and efficiently. Keep your knowledge bases updated with relevant documents for best results.
+Create, update and list knowledge bases and their documents with the [Knowledge Base API](/api-reference/KnowledgeBase/getKnowledgeBases).
