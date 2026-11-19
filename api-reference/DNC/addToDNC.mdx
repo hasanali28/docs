@@ -22,7 +22,7 @@ Phone number in E.164 format with the `+` and country code, for example `+121255
 </ParamField>
 
 <ParamField body="type" type="string">
-Channel the number should not be contacted on: `Call`, `Email` or `Whatsapp`.
+Label for the entry: `Call`, `Email` or `Whatsapp`. Calls are skipped for every entry whatever its `type`.
 </ParamField>
 
 <ParamField body="batchId" type="string">
@@ -75,7 +75,6 @@ Errors return `status: false`, with the reason in `errorMessage`.
   - `phoneNumber is required`.
   - `requestUUID is required when batchId is provided`.
   - `Phone number already exists in DNC for this organization`.
-  - `type` is not `Call`, `Email` or `Whatsapp`.
 - **401 Unauthorized** – Missing or invalid API key.
 - **404 Not Found** – `Batch not found`, or `Call record not found for the given batchId and requestUUID`.
 - **500 Internal Server Error** – Unexpected server error.
