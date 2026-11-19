@@ -1,12 +1,12 @@
 ---
 title: "Get Knowledge Bases"
-description: "Retrieve all Knowledge Bases available in your workspace."
+description: "Retrieve the knowledge bases in your organization."
 api: "GET /api/knowledgeBase"
 ---
 
 ## Overview
 
-Retrieve a paginated list of all Knowledge Bases available in your workspace. This endpoint supports pagination and search, making it easy to browse or locate specific Knowledge Bases.
+List the knowledge bases in your organization, newest first, with pagination and search.
 
 ## Prerequisites
 
@@ -18,23 +18,23 @@ Retrieve a paginated list of all Knowledge Bases available in your workspace. Th
 Your workspace API key. Create one from the profile menu in the dashboard → **API Keys**.
 </ParamField>
 
-<ParamField query="page" type="integer">
-Page number to retrieve. Defaults to the first page if omitted.
+<ParamField query="page" default="1" type="integer">
+Page number.
 </ParamField>
 
-<ParamField query="pageSize" type="integer">
-Number of knowledge bases per page.
+<ParamField query="limit" default="10" type="integer">
+Number of knowledge bases per page, up to 100.
 </ParamField>
 
-<ParamField query="searchKb" type="string">
-Only return knowledge bases whose name contains this text.
+<ParamField query="search" type="string">
+Case-insensitive text matched against the name, description and status. Partial matches are returned.
 </ParamField>
 
 <RequestExample>
 
 ```bash cURL
-curl --location 'https://api.weya.live/backend/api/knowledgeBase?page=1&pageSize=10&searchKb=sales' \
---header 'x-api-key: YOUR_API_KEY'
+curl --location 'https://api.weya.live/backend/api/knowledgeBase?page=1&limit=10&search=sales' \
+  --header 'x-api-key: YOUR_API_KEY'
 ```
 
 </RequestExample>
@@ -47,23 +47,26 @@ curl --location 'https://api.weya.live/backend/api/knowledgeBase?page=1&pageSize
 {
   "status": true,
   "code": 200,
-  "message": "Knowledge Bases fetched successfully",
-  "errorMessage": "",
+  "message": "Fetched successfully",
+  "errorMessage": null,
   "data": {
     "knowledgeBases": [
       {
         "_id": "687b1c2ab7c7d3f123456789",
         "knowledgeBaseName": "Sales Knowledge Base",
         "description": "Contains sales documents and FAQs.",
-        "status": "PROCESSED",
-        "vectorDbCollection": "kb_687b1c2ab7c7d3f123456789",
+        "status": "PENDING",
+        "vectorDbCollection": "kb_sales_1a2b3c",
         "createdAt": "2026-07-20T10:00:00.000Z"
       }
     ],
     "pagination": {
       "total": 1,
-      "currentPage": 1,
-      "pageSize": 10
+      "page": 1,
+      "limit": 10,
+      "totalPages": 1,
+      "hasNextPage": false,
+      "hasPrevPage": false
     }
   }
 }
@@ -71,24 +74,12 @@ curl --location 'https://api.weya.live/backend/api/knowledgeBase?page=1&pageSize
 
 </ResponseExample>
 
-<ResponseField name="status" type="boolean" required>
-Indicates whether the request completed successfully.
-</ResponseField>
-
-<ResponseField name="code" type="integer" required>
-HTTP status code returned by the API.
-</ResponseField>
-
-<ResponseField name="message" type="string" required>
-Human-readable success message.
-</ResponseField>
-
 <ResponseField name="data.knowledgeBases" type="array[object]" required>
 The knowledge bases on this page.
 </ResponseField>
 
 <ResponseField name="data.knowledgeBases[]._id" type="string">
-Knowledge base ID.
+Knowledge base ID. Use it in an agent's `knowledgeBase`.
 </ResponseField>
 
 <ResponseField name="data.knowledgeBases[].knowledgeBaseName" type="string">
@@ -100,43 +91,22 @@ Description of the knowledge base.
 </ResponseField>
 
 <ResponseField name="data.knowledgeBases[].status" type="string">
-Processing status of the uploaded documents: `PENDING`, `PROCESSING`, `PROCESSED` or `FAILED`.
+Always `PENDING`; it isn't updated after creation. A knowledge base with a `vectorDbCollection` has been indexed.
 </ResponseField>
 
 <ResponseField name="data.knowledgeBases[].vectorDbCollection" type="string">
-Collection name. Use it as `rag.vectorDBCollection` to connect the knowledge base to a video agent.
+Name of the search index. A video agent uses it as `rag.vectorDBCollection`. Empty if indexing failed.
 </ResponseField>
 
 <ResponseField name="data.pagination" type="object" required>
-Pagination details: `total`, `currentPage` and `pageSize`.
+Pagination details: `total`, `page`, `limit`, `totalPages`, `hasNextPage` and `hasPrevPage`.
 </ResponseField>
-
-## Response Codes
-
-| Code | Description |
-|------|-------------|
-| 200 | Knowledge Bases fetched successfully |
-| 401 | Unauthorized |
-| 500 | Internal Server Error |
 
 ## Error Handling
 
+Errors return `status: false`, with the reason in `errorMessage`.
+
 - **401 Unauthorized** – Missing or invalid API key.
-- **500 Internal Server Error** – Unexpected server error while retrieving Knowledge Bases.
-
-<Note>
-
-Use the **search** parameter to quickly locate a specific Knowledge Base by its name.
-
-</Note>
-
-<Check>
-
-The returned **Knowledge Base ID** can be used with:
-
-- `GET /api/knowledgeBase/{knowledgeBaseId}`
-- `PUT /api/knowledgeBase/{knowledgeBaseId}`
-- `DELETE /api/knowledgeBase/{knowledgeBaseId}`
-- `GET /api/knowledgeBase/{knowledgeBaseId}/documents`
-
-</Check>
+- **404 Not Found** – `No KnowledgeBases found`: no knowledge base matches, including when your organization has none or the page is past the end.
+- **429 Too Many Requests** – More than 1,000 Knowledge Base requests in 15 minutes from your IP address.
+- **500 Internal Server Error** – Unexpected server error.

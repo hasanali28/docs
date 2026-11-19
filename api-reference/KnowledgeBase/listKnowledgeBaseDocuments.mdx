@@ -1,17 +1,17 @@
 ---
 title: "List Knowledge Base Documents"
-description: "Retrieve all documents that belong to a specific Knowledge Base."
+description: "List the files stored in a knowledge base."
 api: "GET /api/knowledgeBase/{knowledgeBaseId}/documents"
 ---
 
 ## Overview
 
-Retrieve the list of all documents uploaded to a specific Knowledge Base. This endpoint allows you to inspect the files available for an AI agent before updating or deleting them.
+List the files stored in one of your organization's knowledge bases, with their size and last-modified time.
 
 ## Prerequisites
 
 - An API key for your workspace
-- Valid Knowledge Base ID
+- The knowledge base ID, from [Get Knowledge Bases](/api-reference/KnowledgeBase/getKnowledgeBases)
 
 ## Request
 
@@ -20,7 +20,7 @@ Your workspace API key. Create one from the profile menu in the dashboard → **
 </ParamField>
 
 <ParamField path="knowledgeBaseId" type="string" required>
-Unique identifier of the Knowledge Base.
+ID of the knowledge base.
 </ParamField>
 
 <RequestExample>
@@ -40,21 +40,18 @@ curl --location 'https://api.weya.live/backend/api/knowledgeBase/687b1c2ab7c7d3f
 {
   "status": true,
   "code": 200,
-  "message": "Documents fetched successfully",
+  "message": "Documents listed successfully",
+  "errorMessage": null,
   "data": [
     {
       "fileName": "FAQ.pdf",
-      "fileType": "application/pdf",
-      "fileSize": 245760,
-      "fileUrl": "https://storage.weya.ai/files/FAQ.pdf",
-      "uploadedAt": "2026-07-20T10:30:00.000Z"
+      "size": 245760,
+      "lastModified": "2026-07-20T10:30:00.000Z"
     },
     {
       "fileName": "Pricing.docx",
-      "fileType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-      "fileSize": 185430,
-      "fileUrl": "https://storage.weya.ai/files/Pricing.docx",
-      "uploadedAt": "2026-07-20T10:35:00.000Z"
+      "size": 185430,
+      "lastModified": "2026-07-20T10:35:00.000Z"
     }
   ]
 }
@@ -62,67 +59,28 @@ curl --location 'https://api.weya.live/backend/api/knowledgeBase/687b1c2ab7c7d3f
 
 </ResponseExample>
 
-## Response Fields
-
-<ResponseField name="status" type="boolean">
-Indicates whether the request completed successfully.
-</ResponseField>
-
-<ResponseField name="code" type="integer">
-HTTP status code.
-</ResponseField>
-
-<ResponseField name="message" type="string">
-Response message.
-</ResponseField>
-
-<ResponseField name="data" type="array">
-Array containing all documents associated with the Knowledge Base.
+<ResponseField name="data" type="array[object]">
+The files in the knowledge base.
 </ResponseField>
 
 <ResponseField name="data[].fileName" type="string">
-Name of the uploaded document.
+File name.
 </ResponseField>
 
-<ResponseField name="data[].fileType" type="string">
-MIME type of the uploaded file.
+<ResponseField name="data[].size" type="integer">
+File size in bytes.
 </ResponseField>
 
-<ResponseField name="data[].fileSize" type="integer">
-Size of the document in bytes.
-</ResponseField>
-
-<ResponseField name="data[].fileUrl" type="string">
-URL of the uploaded document.
-</ResponseField>
-
-<ResponseField name="data[].uploadedAt" type="string">
-Timestamp when the document was uploaded.
+<ResponseField name="data[].lastModified" type="string">
+When the file was last uploaded (ISO 8601).
 </ResponseField>
 
 ## Error Handling
 
-| Status Code | Description |
-|------------|-------------|
-| **400** | Invalid Knowledge Base ID |
-| **401** | Unauthorized |
-| **403** | Access denied |
-| **404** | Knowledge Base not found |
-| **500** | Internal Server Error |
+Errors return `status: false`, with the reason in `errorMessage`.
 
-<Note>
-
-This endpoint only lists the documents attached to a Knowledge Base. It does not return the Knowledge Base metadata itself.
-
-</Note>
-
-<Check>
-
-Related endpoints:
-
-- `GET /api/knowledgeBase/{knowledgeBaseId}` — Retrieve Knowledge Base details.
-- `PUT /api/knowledgeBase/{knowledgeBaseId}` — Update the Knowledge Base or upload additional documents.
-- `DELETE /api/knowledgeBase/{knowledgeBaseId}/documents/{fileName}` — Delete a specific document.
-- `DELETE /api/knowledgeBase/{knowledgeBaseId}` — Delete the entire Knowledge Base.
-
-</Check>
+- **400 Bad Request** – `knowledgeBaseId` isn't a valid ID.
+- **401 Unauthorized** – Missing or invalid API key.
+- **404 Not Found** – `KnowledgeBase not found`: it doesn't exist in your organization.
+- **429 Too Many Requests** – More than 1,000 Knowledge Base requests in 15 minutes from your IP address.
+- **500 Internal Server Error** – Unexpected server error.

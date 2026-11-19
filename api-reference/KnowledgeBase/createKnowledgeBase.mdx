@@ -1,35 +1,38 @@
 ---
 title: "Create Knowledge Base"
-description: "Create a new Knowledge Base by uploading one or more documents for your AI agents."
+description: "Create a knowledge base from uploaded documents, or add documents to an existing one."
 api: "POST /api/knowledgeBase/createKnowledgeBase"
 ---
 
 ## Overview
 
-Create a new Knowledge Base by uploading documents that your AI agents can use during conversations. A Knowledge Base can contain PDFs, Word documents, text files, and other supported formats.
+Upload documents that your agents can answer questions from. The files are stored and indexed for search before the response is returned.
+
+If your organization already has a knowledge base with the same `knowledgeBaseName`, the files are added to it and the whole knowledge base is indexed again, instead of creating a second one. This is also the way to add files so that agents can use them; files added with [Update Knowledge Base](/api-reference/KnowledgeBase/updateKnowledgeBase) are not indexed.
+
+To use a knowledge base, add its ID to an agent's `knowledgeBase` with [Create Agent](/api-reference/Agents/createAgent) or [Update Agent](/api-reference/Agents/updateAgent).
 
 ## Prerequisites
 
 - An API key for your workspace
-- One or more supported documents
-- `multipart/form-data` request
+- One or more documents, sent as `multipart/form-data`
 
 ## Request
 
 <ParamField header="x-api-key" type="string" required>
-Your workspace API key. Create one from the profile menu in the dashboard → **API Keys**.
+  Your workspace API key. Create one from the profile menu in the dashboard → **API Keys**.
 </ParamField>
 
 <ParamField body="knowledgeBaseName" type="string" required>
-Unique name of the Knowledge Base.
+  Name of the knowledge base. Reusing an existing name adds the files to that knowledge base.
 </ParamField>
 
 <ParamField body="description" type="string">
-Description of the Knowledge Base.
+  Description of the knowledge base.
 </ParamField>
 
 <ParamField body="files" type="file[]" required>
-One or more files to upload. Supports PDF, DOCX, TXT, CSV and other supported document formats.
+  Documents to upload: up to 50 files of up to 10 MB each. Send each file as its own `files` (or `files[]`) field. A file with the same name as an existing one replaces it.
 </ParamField>
 
 <RequestExample>
@@ -39,8 +42,8 @@ curl --location 'https://api.weya.live/backend/api/knowledgeBase/createKnowledge
   --header 'x-api-key: YOUR_API_KEY' \
   --form 'knowledgeBaseName="Customer Support KB"' \
   --form 'description="Knowledge base for customer support queries"' \
-  --form 'files=@"/Users/john/Documents/FAQ.pdf"' \
-  --form 'files=@"/Users/john/Documents/Pricing.pdf"'
+  --form 'files=@"/path/to/FAQ.pdf"' \
+  --form 'files=@"/path/to/Pricing.pdf"'
 ```
 
 </RequestExample>
@@ -49,102 +52,58 @@ curl --location 'https://api.weya.live/backend/api/knowledgeBase/createKnowledge
 
 <ResponseExample>
 
-```json 201 Created
+```json 200 OK
 {
   "status": true,
-  "code": 201,
-  "message": "Knowledge Base created successfully",
+  "code": 200,
+  "message": "Files uploaded successfully, vectorDbCollection updated",
+  "errorMessage": null,
   "data": {
     "_id": "687b1c2ab7c7d3f123456789",
+    "organizationId": "64e5f12345abcdef00000001",
     "knowledgeBaseName": "Customer Support KB",
     "description": "Knowledge base for customer support queries",
-    "documents": [
-      {
-        "fileName": "FAQ.pdf"
-      },
-      {
-        "fileName": "Pricing.pdf"
-      }
-    ],
-    "createdAt": "2026-07-20T10:35:00.000Z"
+    "bucketUrl": "https://…/",
+    "vectorDbCollection": "kb_customer_support_1a2b3c",
+    "status": "PENDING",
+    "createdAt": "2026-07-20T10:35:00.000Z",
+    "updatedAt": "2026-07-20T10:35:05.000Z"
   }
 }
 ```
 
 </ResponseExample>
 
-## Request Fields
-
-<RequestField name="knowledgeBaseName" type="string" required>
-Name of the Knowledge Base.
-</RequestField>
-
-<RequestField name="description" type="string">
-Optional description for the Knowledge Base.
-</RequestField>
-
-<RequestField name="files" type="file[]" required>
-One or more documents to upload into the Knowledge Base.
-</RequestField>
-
-## Response Fields
-
-<ResponseField name="status" type="boolean">
-Indicates whether the request was successful.
-</ResponseField>
-
-<ResponseField name="code" type="integer">
-HTTP status code.
-</ResponseField>
-
-<ResponseField name="message" type="string">
-Response message.
-</ResponseField>
-
 <ResponseField name="data._id" type="string">
-Unique identifier of the Knowledge Base.
+  Knowledge base ID. Use it in an agent's `knowledgeBase`.
 </ResponseField>
 
 <ResponseField name="data.knowledgeBaseName" type="string">
-Name of the Knowledge Base.
+  Name of the knowledge base.
 </ResponseField>
 
-<ResponseField name="data.description" type="string">
-Description of the Knowledge Base.
+<ResponseField name="data.vectorDbCollection" type="string">
+  Name of the search index built from the files. A video agent uses it as `rag.vectorDBCollection`.
 </ResponseField>
 
-<ResponseField name="data.documents" type="array">
-Documents uploaded to the Knowledge Base.
-</ResponseField>
-
-<ResponseField name="data.createdAt" type="string">
-Timestamp when the Knowledge Base was created.
+<ResponseField name="data.status" type="string">
+  Always `PENDING`; it isn't updated. A successful response with a `vectorDbCollection` means the files were indexed.
 </ResponseField>
 
 ## Error Handling
 
-| Status Code | Description |
-|-------------|-------------|
-| **400** | Missing required fields or invalid request |
-| **401** | Unauthorized |
-| **413** | Uploaded file is too large |
-| **415** | Unsupported file type |
-| **500** | Internal Server Error |
+Errors return `status: false`, with the reason in `errorMessage`.
 
-<Note>
-
-Large Knowledge Bases may take a few moments to finish processing before they become available for AI agents.
-
-</Note>
+- **400 Bad Request** – `knowledgeBaseName is required`, `No files uploaded`, `File exceeds the 10MB per-file limit`, or `You can upload at most 50 files per request`.
+- **401 Unauthorized** – Missing or invalid API key.
+- **429 Too Many Requests** – More than 1,000 Knowledge Base requests in 15 minutes from your IP address. The response body is `{ "message": "Too many requests. Please try again after 15 minutes." }`.
+- **500 Internal Server Error** – Unexpected server error.
+- **502 Bad Gateway** – Indexing failed (`Invalid response from external API`). The files are already stored; send the request again with the same name.
 
 <Check>
+  After creating a knowledge base, you can:
 
-After creating a Knowledge Base, you can:
-
-- `GET /api/knowledgeBase` — View all Knowledge Bases.
-- `GET /api/knowledgeBase/{knowledgeBaseId}` — Retrieve Knowledge Base details.
-- `GET /api/knowledgeBase/{knowledgeBaseId}/documents` — View uploaded documents.
-- `PUT /api/knowledgeBase/{knowledgeBaseId}` — Upload additional documents or update metadata.
-- Attach the Knowledge Base to an AI Agent during agent creation or update.
-
+  - `GET /api/knowledgeBase` – list your knowledge bases.
+  - `GET /api/knowledgeBase/{knowledgeBaseId}/documents` – list its files.
+  - Add it to an agent with `PATCH /api/agents/{id}` and `knowledgeBase: ["<knowledge base _id>"]`.
 </Check>
