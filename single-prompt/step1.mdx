@@ -1,40 +1,57 @@
 ---
-title: "Step 1: Write the Prompt & Configure Voice"
-description: "Set your assistant’s first message, system prompt, and select its voice for a natural, friendly experience."
+title: "Write a voice agent's prompt and choose its voice"
+sidebarTitle: "Prompt and voice"
+description: "Write the first message and system prompt that shape every call your weya voice agent makes, and pick a voice that fits your brand and audience."
+keywords:
+  - "first message"
+  - "system prompt"
+  - "voice selection"
+  - "prompt writing"
 ---
 
----
-## Step-1
-### 1. Write First Message and System Propmt 
+The first message and the system prompt decide how your weya voice agent sounds and behaves on every call. The first message is the opening line the agent speaks; the system prompt tells it who it is, what it is trying to achieve and how to speak.
 
-- **First Message** - This is the first line your assistant speaks when a call or chat begins.  
-Keep it warm, friendly, and aligned with your brand’s tone.
+## First message
 
-**Example:**
+The first line the agent speaks when a call connects. Keep it short, say who is calling and why, and match your brand's tone.
 
 ```text
-Hi there, this is Alex from TechSolutions customer support.  
-How can I help you today?
+Hi, this is Alex from TechSolutions customer support. How can I help you today?
 ```
 
-- **System Prompt** - This defines how your assistant behaves and what kind of tone or knowledge it uses during interactions.
+For outbound calls, use your contact list's variables so the opening is personal, for example the customer's name.
 
-```text
-**Example:**
-> You are Alex, a customer service voice assistant for TechSolutions. Your primary purpose is to help customers resolve issues with their products, answer questions about services, and ensure a satisfying support experience.  
-> - Sound friendly, patient, and knowledgeable without being condescending  
-> - Use a conversational tone with natural speech patterns  
-> - Speak with confidence but remain humble when you don't know something  
-> - Demonstrate genuine concern for customer issues  
+## System prompt
+
+The system prompt defines the agent's role, goal, tone and limits. A good prompt covers:
+
+- **Who the agent is** and who it works for.
+- **The goal of the call**, ideally the same outcome your post-call metrics measure.
+- **How it should speak**: tone, pace, formality.
+- **What it must not do**, and when to hand over to a person.
+
+```text Example system prompt
+You are Alex, a customer service voice assistant for TechSolutions. Your purpose is to help
+customers resolve issues with their products, answer questions about services and make sure
+they leave satisfied.
+
+- Sound friendly, patient and knowledgeable, never condescending.
+- Use a conversational tone with natural speech patterns.
+- Speak with confidence, and say so when you don't know something.
+- Show genuine concern for the customer's issue.
 ```
----
 
-## Step-2
-#### 2. Configure Voice Settings
-- Open the **Voice Selection** dropdown.  
-- Preview and choose your preferred voice.
+<Tip>
+  Phone conversations are spoken, not read. Ask the agent for short sentences and one question at a time, and avoid lists, symbols and abbreviations it would have to read aloud.
+</Tip>
 
----
+## Voice
 
-### 💡 Tip
-Keep your first message warm and welcoming, and choose a voice that aligns with your brand personality. Test both together to ensure clarity, naturalness, and the right tone for your audience.
+1. Open the **Voice Selection** dropdown.
+2. Preview the voices and choose one.
+
+Test the voice together with your first message. Check that it sounds natural and clear in the agent's language, and that it fits the people you are calling.
+
+## Next
+
+Give the agent the information and actions it needs in [Knowledge and tools](/single-prompt/step2).

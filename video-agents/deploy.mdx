@@ -3,11 +3,7 @@ title: "Deploy Your Video Agent"
 description: "Learn how to deploy your Video Agent and make it available for real-time customer interactions."
 ---
 
-# Deploy Your Video Agent
-
-Once your Video Agent has been configured with an avatar, voice, system prompt, and optional Knowledge Base, it's ready to be deployed.
-
-Deploying a Video Agent makes it available for customer interactions through your selected channels or applications.
+Once your weya video agent has an avatar, a voice, a system prompt and any knowledge bases it needs, deploy it so people can talk to it. People reach a video agent through the join link of a video campaign: create one in **Campaigns**, or with [Create Campaign](/api-reference/Campaigns/createBatch) and `channel_type: "video"`, and share the link the response returns.
 
 ---
 
@@ -133,30 +129,8 @@ Provide your Video Agent with accurate business information using Knowledge Base
 
 <Note>
 
-Deploying a Video Agent publishes its current configuration. Any future changes should be tested before being deployed again to ensure a consistent user experience.
-
-<CardGroup cols={2}>
-
-<Card
-title="Previous"
-icon="arrow-left"
-href="/video-agents/knowledge-base"
->
-
-Review or update your Knowledge Base.
-
-</Card>
-
-<Card
-title="API Reference"
-icon="code"
-href="/api-reference/VideoAgents/getVideoAgents"
->
-
-Learn how to manage Video Agents programmatically using the API.
-
-</Card>
-
-</CardGroup>
+Deploying publishes the agent's current configuration. Test any later changes before you deploy again.
 
 </Note>
+
+Manage video agents from your own systems with the [Video Agents API](/api-reference/VideoAgents/getVideoAgents).

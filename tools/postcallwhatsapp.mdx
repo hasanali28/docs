@@ -2,14 +2,20 @@
 title: "Post-Call WhatsApp Notifier"
 description: "Set up a WhatsApp notifier to be sent automatically after a call ends."
 ---
-### Configure Post Call Notifier
-1. Navigate to **Tools & Knowledge Base**. 
-2. Select **Whatsapp Notifier**.
-3. If the user doesn’t have a WhatsApp number added
-4. Go to the Phone Number section and click **Add WhatsApp Number**.  
-5. Add the WhatsApp phone number and auth token provided by our WhatsApp service provider, **AI Sensy**.  
 
-Once added, head back to **Tools & Knowledge Base**. The number will now appear in the dropdown for notifications.
+The WhatsApp notifier sends a WhatsApp template message automatically when a weya voice call ends, for example a payment link, a confirmation or a summary of what was agreed.
+
+### Add a WhatsApp number
+
+If you haven't added a WhatsApp number yet:
+
+1. Go to **Phone Numbers** and click **Add WhatsApp Number**.
+2. Enter the WhatsApp phone number and the auth token from our WhatsApp service provider, **AI Sensy**.
+
+### Turn on the notifier
+
+1. Open the agent's **Tools & Knowledge Base** settings.
+2. Select **Whatsapp Notifier**. Your WhatsApp number now appears in the dropdown.
 
 ---
 
@@ -22,16 +28,11 @@ Once added, head back to **Tools & Knowledge Base**. The number will now appear 
 
 ### Add Variables
 
-1. Assign dynamic variables in the template.  
-   - **Example:**  
-   ```text
-   For a template with a first name placeholder, set the variable to 'Cristiano'.```
-
-2. Click Save to finalize the configuration.
+1. Fill in each of the template's variables, for example the customer's first name.
+2. Click **Save**.
 
 ---
 
-💡 Tip
-
-- Ensure the WhatsApp number is verified with AI Sensy before selecting it.
-- After setup, notifications will automatically send after each call ends.
+<Tip>
+  Make sure the WhatsApp number is verified with AI Sensy before you select it. Once saved, the message is sent automatically after each call ends.
+</Tip>

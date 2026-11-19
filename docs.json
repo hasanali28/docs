@@ -14,82 +14,76 @@
         "tab": "Guides",
         "groups": [
           {
-            "group": " ",
-            "pages": ["index"]
-          },
-          {
-            "group": "Get Started",
+            "group": "Get started",
             "pages": [
+              "index",
               "essentials/settings",
-              "get-started/authentication",
               "get-started/api-quickstart",
-              "get-started/concepts"
+              "get-started/concepts",
+              "get-started/authentication"
             ]
           },
           {
-            "group": "Build",
+            "group": "Voice agents",
             "pages": [
-              {
-                "group": "Voice Agents",
-                "pages": [
-                  "single-prompt/step1",
-                  "single-prompt/step2",
-                  "single-prompt/step3",
-                  "single-prompt/step4"
-                ]
-              },
-              {
-                "group": "Video Agents",
-                "pages": [
-                  "video-agents/create-video-agent",
-                  "video-agents/avatar",
-                  "video-agents/knowledge-base",
-                  "video-agents/deploy"
-                ]
-              },
-              {
-                "group": "WhatsApp Agents",
-                "pages": [
-                  "Whatsapp/create-whatsapp-agent",
-                  "Whatsapp/connect-whatsapp-number",
-                  "Whatsapp/templates",
-                  "Whatsapp/deploy"
-                ]
-              },
-              {
-                "group": "Knowledge Bases",
-                "pages": [
-                  "knowledgebase/knowledgebase"
-                ]
-              },
-              {
-                "group": "Phone Numbers",
-                "pages": [
-                  "phonenumbers/addphonenumber"
-                ]
-              },
-              {
-                "group": "Campaigns",
-                "pages": [
-                  "campaigns/createcampaign",
-                  "campaigns/analytics"
-                ]
-              },
-              {
-                "group": "Tools",
-                "pages": [
-                  "tools/customtool",
-                  "tools/postcallwhatsapp",
-                  "tools/calltransfer"
-                ]
-              },
-              {
-                "group": "Integrations",
-                "pages": [
-                  "integration/webhooks",
-                  "integration/crmintegration"
-                ]
-              }
+              "single-prompt/overview",
+              "single-prompt/step1",
+              "single-prompt/step2",
+              "single-prompt/step3",
+              "single-prompt/step4"
+            ]
+          },
+          {
+            "group": "Video agents",
+            "pages": [
+              "video-agents/create-video-agent",
+              "video-agents/avatar",
+              "video-agents/knowledge-base",
+              "video-agents/deploy"
+            ]
+          },
+          {
+            "group": "WhatsApp agents",
+            "pages": [
+              "Whatsapp/create-whatsapp-agent",
+              "Whatsapp/connect-whatsapp-number",
+              "Whatsapp/templates",
+              "Whatsapp/deploy"
+            ]
+          },
+          {
+            "group": "Knowledge and tools",
+            "pages": [
+              "knowledgebase/knowledgebase",
+              "tools/customtool",
+              "tools/calltransfer",
+              "tools/postcallwhatsapp"
+            ]
+          },
+          {
+            "group": "Phone numbers",
+            "pages": [
+              "phonenumbers/addphonenumber"
+            ]
+          },
+          {
+            "group": "Campaigns",
+            "pages": [
+              "campaigns/createcampaign",
+              "campaigns/analytics"
+            ]
+          },
+          {
+            "group": "Results and integrations",
+            "pages": [
+              "integration/webhooks",
+              "integration/crmintegration"
+            ]
+          },
+          {
+            "group": "Production",
+            "pages": [
+              "get-started/go-live"
             ]
           }
         ]

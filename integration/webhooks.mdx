@@ -46,6 +46,7 @@ A webhook is a URL registered once for your organization and then attached to th
 ## Securing your endpoint
 
 - If you set `bearerToken`, every delivery includes `Authorization: Bearer <token>`. Reject requests without it.
+- Deliveries come from a fixed weya IP address. If your firewall only accepts known addresses, ask weya for it.
 - Only the URL and bearer token are used. Custom headers and body templates are not sent.
 - Register the final URL of your endpoint. weya follows redirects, but a `301` or `302` turns the `POST` into a `GET`, so the body is lost.
 

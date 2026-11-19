@@ -1,0 +1,50 @@
+---
+title: "Build a voice agent for inbound and outbound calls"
+sidebarTitle: "Overview"
+description: "Plan and build a weya voice agent in four parts: prompt and voice, knowledge and tools, call settings, and the post-call metrics you get back from every call."
+keywords: ["voice agent", "single prompt", "multi prompt", "voice blaster", "outbound", "inbound"]
+icon: "phone"
+---
+
+A weya voice agent holds phone conversations for you: it answers inbound calls, or places outbound calls for a campaign, and reports a structured result for each one. You build it in the dashboard under **Agents** in four parts, one page each.
+
+## Before you build
+
+Decide three things first. They are set when you create the agent.
+
+| Decision | Options |
+| --- | --- |
+| **Agent type** | **Phone agent** for two-way conversations, or **Voice blaster** for high-volume broadcasts, either **Static** (one message for everyone) or **Dynamic** (a message the AI personalises per contact) |
+| **Agent category** | **Single-Prompt Agent**: one prompt drives the whole call. **Multi-Prompt Agent**: for complex flows with several stages |
+| **Call type** | **Outbound**: the agent calls your contacts. **Inbound**: the agent answers calls to your number |
+
+<Tip>
+  Write down the results you need from each call (a promise-to-pay date, an appointment time, whether the person is interested) before you write the prompt. They become your post-call metrics, and the prompt should steer the conversation towards them.
+</Tip>
+
+## Build it in four parts
+
+<Steps>
+  <Step title="Prompt and voice">
+    Write the first message and the system prompt, and choose the voice. [Prompt and voice](/single-prompt/step1)
+  </Step>
+  <Step title="Knowledge and tools">
+    Attach knowledge bases and add tools such as call transfer, a post-call WhatsApp message or your own API. [Knowledge and tools](/single-prompt/step2)
+  </Step>
+  <Step title="Call settings">
+    Set language detection, voicemail retries, background noise, vocabulary, maximum call length and speaking speed. [Call settings](/single-prompt/step3)
+  </Step>
+  <Step title="Post-call metrics">
+    Define the data weya extracts from every call and sends to your webhook or CRM. [Post-call metrics](/single-prompt/step4)
+  </Step>
+</Steps>
+
+## Use variables from your contact list
+
+Every column of your campaign's contact list (other than `phoneNumber`) is available to the agent as a variable, for example `customer_name` or `amount_due`. Refer to them in the prompt so each call is personal, and list the ones every contact must have as **mandatory template variables** when you create the campaign, so incomplete rows are caught at upload.
+
+## After you build
+
+1. Assign the agent to a phone number as its outbound or inbound agent. See [Connect a phone number](/phonenumbers/addphonenumber).
+2. Make a few test calls and listen to the recordings before you launch a large campaign.
+3. Launch a [campaign](/campaigns/createcampaign).

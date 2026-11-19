@@ -1,0 +1,55 @@
+---
+title: "Go-live checklist for weya campaigns"
+sidebarTitle: "Go-live checklist"
+description: "Check your agent, phone numbers, campaign settings, webhook endpoint and API integration before you run a large weya campaign in production."
+keywords: ["go live", "production checklist", "launch", "webhook reliability", "edge cases"]
+icon: "list-check"
+---
+
+Most problems in a first large weya campaign come from a handful of settings and edge cases that a small test doesn't show. Work through this checklist before you launch, and run a small pilot campaign with the exact same setup first.
+
+## Agent
+
+- Make test calls and listen to the recordings, including calls where the person interrupts, asks something off-script or wants a human.
+- Define [post-call metrics](/single-prompt/step4) for every result you need. A completed call is sent to your webhook only once its analysis is ready, so an agent without metrics can leave you without results.
+- Reference your contact variables in the prompt with exactly the same names as your file's columns, and mark the essential ones as **mandatory template variables** on the campaign.
+- If the agent can transfer calls, test the transfer number from a real call.
+
+## Phone numbers
+
+- Every calling number has the right **outbound agent** assigned. A campaign uses the agent of the number it calls from.
+- Your telephony provider account accepts enough simultaneous calls for every campaign that shares it. When it turns calls away, weya slows down and retries, which stretches your campaign.
+- Your account's concurrency limit (set by weya) matches the volume you plan. Ask weya to change it.
+
+## Campaign settings
+
+- **Timezone** is your contacts' timezone. Calling hours are applied in it.
+- **Calling days and hours** are allowed for your industry and region, and a holiday list covers public holidays.
+- **Retries and delay** fit the use case. Each extra attempt is another call to the same person.
+- **Do Not Call** checking is turned on if your organization uses a DNC list. Numbers on it are not dialled and end as `aborted`.
+- There is enough credit for the whole campaign. Calls placed without enough credit end as `aborted`.
+
+## Webhook endpoint
+
+- Attach the webhook **before** you launch. Calls that ended before it was attached are not sent automatically.
+- Return `2xx` within 10 seconds, and do slow work after responding.
+- Never return `4xx` for a temporary problem on your side. Any `4xx` other than `408` and `429` stops delivery for that result; return `5xx` or `503` with `Retry-After` instead.
+- Store results keyed by `request_uuid` and overwrite on repeat, because the same attempt can arrive more than once.
+- Register the final URL. A `301` or `302` redirect turns the `POST` into a `GET` and loses the body.
+- Check the bearer token on every request.
+- Monitor for completed calls that never reach you, and reconcile against the dashboard after the pilot.
+
+See [Call result webhooks](/integration/webhooks) for the full delivery rules.
+
+## API integration
+
+- Call the API only from your servers, with the key in a secret store. See [Authentication](/get-started/authentication).
+- Check `status` in every response, not just the HTTP code.
+- Handle `207` from [Add Calls to Campaign](/api-reference/Campaigns/addCallsToBatch): some chunks were added and others failed. Re-send only the contacts from `failedChunks`.
+- Send contacts in batches rather than one request each, to stay well inside the [rate limits](/get-started/authentication#rate-limits).
+- Pause a campaign before you change its settings.
+
+## During the campaign
+
+- Watch [campaign analytics](/campaigns/analytics) during the first hour: a high share of `failed` or `no-answer` usually points to number format or telephony issues.
+- Use **pause** rather than delete if something looks wrong. Deleting a campaign removes its call records.

@@ -1,99 +1,97 @@
 ---
-title: "Create a Calling Campaign"
+title: "Create an outbound calling campaign"
+sidebarTitle: "Create a campaign"
+description: "Set up a weya calling campaign: choose calling numbers, days, hours and timezone, set retry rules, upload contacts from a CSV and send results to your CRM."
+keywords:
+  - "campaign"
+  - "batch"
+  - "calling schedule"
+  - "retry"
+  - "csv upload"
+  - "contacts"
+icon: "megaphone"
 ---
 
-The **Campaign Management** section allows you to create, configure, and manage outbound calling campaigns. Each campaign can have its own schedule, retry logic, CRM integration, and call data imported via CSV.
+A weya campaign calls a list of contacts with your voice agent, inside the schedule and retry rules you set. Each campaign has its own calling numbers, calling days and hours, retry settings, contact list and result destinations. In the API and in webhooks, a campaign is called a **batch**.
 
----
+## Before you start
 
-### Steps to Create a Campaign
+- A voice agent assigned as the **outbound agent** of at least one phone number. See [Connect a phone number](/phonenumbers/addphonenumber).
+- A contact file in CSV or Excel format. See [Contact file format](#contact-file-format).
 
-1. **Navigate to Campaigns**
-   - From the sidebar menu, click **Campaigns**.
-   - Press the **Create Batch** button at the top right.
+## Create the campaign
 
-2. **Fill in Campaign Details**
-   - In the popup window titled **Create Calling Campaign**, enter a **Batch Name** — for example, "Cristiano".
-   - Under **Calling Numbers**, add one or more phone numbers. These are the numbers your system will use for outbound calls.
-   - You can search and select previously configured numbers from the list.
+<Steps>
+  <Step title="Start a new campaign">
+    Go to **Campaigns** and click **Create Batch**. Give the campaign a name you'll recognise in reports.
+  </Step>
+  <Step title="Choose calling numbers">
+    Under **Calling Numbers**, select one or more of your phone numbers. Each call is handled by the outbound agent assigned to the number it is made from.
+  </Step>
+  <Step title="Set the calling schedule">
+    - **Calling days**: the days of the week calls can be placed.
+    - **Timezone**: the timezone the schedule follows, for example `(GMT+5:30) Chennai, Kolkata, Mumbai, New Delhi`. Use your contacts' timezone, not yours.
+    - **Start and end time**: the daily calling window, for example 09:00 to 17:00.
 
----
+    Calls are placed only inside this window. Outside it the campaign waits and carries on when the window next opens.
+  </Step>
+  <Step title="Set retry rules">
+    - **Max attempts per contact**: how many times a contact can be called, from 1 to 10.
+    - **Delay between attempts**: how long to wait before calling the same contact again, from 5 to 1440 minutes.
+  </Step>
+  <Step title="Choose where results go">
+    Under the CRM options, choose where each call's result is sent: a [webhook](/integration/webhooks), a [CRM](/integration/crmintegration) or a Google Sheet.
+  </Step>
+  <Step title="Allow inbound calls (optional)">
+    Turn on **Allow inbound calls on selected phone numbers** if contacts may call these numbers back. The numbers' inbound agent answers those calls.
+  </Step>
+  <Step title="Upload contacts">
+    1. Select the **country code** used to validate numbers that don't include one, for example `+91` for India.
+    2. Add any **mandatory template variables**: columns every row must have a value for.
+    3. Upload your file.
+  </Step>
+  <Step title="Create the campaign">
+    Review the settings and click **Create Campaign**. The campaign appears in your campaign list with its progress and status.
+  </Step>
+</Steps>
 
-### Configure the Calling Schedule
+## Contact file format
 
-1. **Select Calling Days**
-   - Choose the days of the week your campaign should run. You can click individual days (e.g., M, T, W, T, F) or select all.
+| Rule | Detail |
+| --- | --- |
+| File type | `.csv`, `.xls` or `.xlsx`, up to 50 MB. Excel files use the first sheet |
+| Header row | Required |
+| `phoneNumber` column | Required, one number per row |
+| Other columns | Optional. Each becomes a variable your agent can use, for example `customer_name` |
+| Duplicates | If a number appears twice, only the first row is kept |
+| Encoding | UTF-8 |
 
-2. **Timezone Setting**
-   - Choose your operating timezone. 
-   ```
-    Example: **(GMT+5:30) Chennai, Kolkata, Mumbai, New Delhi**.```
+```csv contacts.csv
+phoneNumber,customer_name,amount_due,due_date
++919800000001,Asha,4500,2026-12-05
++919800000002,Rahul,1200,2026-12-07
+```
 
-3. **Set Start and End Time**
-   - Define the time window for outbound calls.
-   - Default Example: **Start Time** → 09:00, **End Time** → 17:00.
-   - Calls will be initiated only during this window.
+<Tip>
+  Name your columns exactly as the variables in your agent's prompt, and mark the ones the agent can't do without as mandatory. Rows missing them are rejected at upload instead of producing a broken call.
+</Tip>
 
----
+## Manage a running campaign
 
-### Retry Settings
+From the campaign list you can **pause** and resume a campaign, **edit** its settings, **export** its data and **delete** it. Deleting a campaign removes its call records permanently. To change a running campaign's settings, pause it first.
 
-These settings determine how the system handles retries for unanswered calls.
+## Create campaigns with the API
 
-- **Max Attempts per Contact:** Set how many times the same contact number can be retried.  
-  ```
-  Example: 3 attempts.
-  ```
-- **Delay Between Attempts (minutes):** Set how long the system should wait between retries.  
-  ```
-   Example: 5 minutes.
-  ```
+To create campaigns from your own systems, see the [API quickstart](/get-started/api-quickstart), [Upload Campaign CSV](/api-reference/Campaigns/uploadCSV) and [Add Calls to Campaign](/api-reference/Campaigns/addCallsToBatch).
 
----
+## Next steps
 
-### CRM Options
+<Columns cols={2}>
+  <Card title="Campaign analytics" icon="chart-pie" href="/campaigns/analytics">
+    Follow progress and call outcomes.
+  </Card>
 
-Select whether this campaign should interact with your CRM system.
-
-- **Outgoing CRM:** Choose this for outbound lead follow-ups.
-
----
-
-### Inbound Call Settings
-
-- Toggle **Allow inbound calls on selected phone numbers** to enable or disable inbound capabilities on the configured numbers.
-
----
-
-### CSV Upload and Country Validation
-
-Upload your CSV file containing the contact list for outbound calls.
-
-1. **Country Code for CSV Number Validation**
-   - Select the appropriate country code prefix.  
-     Example: **+91** for India.
-
-2. **Mandatory Template Variables for CSV Upload**
-   - Add custom or predefined **template variables** if required for dynamic calling scripts or CRM updates.
-
-3. **Upload CSV File**
-   - Click the upload area or drag your contact file.  
-   - Format: `.csv` with columns for phone numbers and optional variables.  
-   - **Maximum file size:** 50 MB.
-
----
-
-### Finalization
-
-Once all details are filled in:
-
-- Review your configuration settings.  
-- Click **Create Campaign** at the bottom right to finalize.
-
-Your campaign will now appear under **Campaign Management** with call statistics and status indicators.
-
----
-
-💡 **Tip**
-- Always verify phone numbers before uploading CSVs to prevent validation errors.
-
+  <Card title="Core concepts" icon="shapes" href="/get-started/concepts">
+    How retries, calling windows and statuses work.
+  </Card>
+</Columns>
