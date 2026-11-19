@@ -68,6 +68,15 @@ body = res.json()
 
 </CodeGroup>
 
+## Find your user ID
+
+Some endpoints, such as [Upload Campaign CSV](/api-reference/Campaigns/uploadCSV) and [Start Campaign](/api-reference/Campaigns/startCalling), take a `userId`. Get it once from your profile, which returns the user that owns the key as `data._id`:
+
+```bash cURL
+curl --location 'https://api.weya.live/backend/api/auth/profile' \
+  --header "x-api-key: $WEYA_API_KEY"
+```
+
 ## Response format
 
 Most endpoints return the same envelope. Check `status` before you read `data`:
