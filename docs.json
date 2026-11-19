@@ -22,7 +22,8 @@
             "pages": [
               "essentials/settings",
               "get-started/authentication",
-              "get-started/api-quickstart"
+              "get-started/api-quickstart",
+              "get-started/concepts"
             ]
           },
           {
