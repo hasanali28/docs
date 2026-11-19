@@ -1,0 +1,248 @@
+---
+title: "Receive weya call results on your webhook"
+sidebarTitle: "Call result webhooks"
+description: "Send every finished weya call to your own endpoint as JSON: set up a webhook, read each payload field, and handle delivery timing, retries and duplicates."
+keywords: ["webhook", "call results", "payload", "retries", "call_analysis", "bearer token"]
+icon: "webhook"
+---
+
+A weya webhook sends the result of every finished call in a campaign to your endpoint as a JSON `POST` request. Each result carries the call status, recording, the values of your post-call metrics and the contact's own data, so you can update your CRM, trigger a follow-up or feed a report without polling.
+
+## Set up a webhook
+
+A webhook is a URL registered once for your organization and then attached to the campaigns that should use it. Each organization can have up to 5 webhooks.
+
+<Steps>
+  <Step title="Create the webhook">
+    Register your endpoint URL in the dashboard, or with [Create Webhook](/api-reference/Webhooks/createWebhooks):
+
+    ```bash
+    curl --location 'https://api.weya.live/backend/api/webhooks' \
+      --header "x-api-key: $WEYA_API_KEY" \
+      --header 'Content-Type: application/json' \
+      --data '{
+        "name": "Call results",
+        "url": "https://your-domain.com/weya/call-results",
+        "bearerToken": "YOUR_ENDPOINT_TOKEN"
+      }'
+    ```
+  </Step>
+  <Step title="Attach it to a campaign">
+    In the dashboard, add the webhook to the campaign under **Track Call Outcomes**. Through the API, set `pushingCrms` when you [upload a campaign](/api-reference/Campaigns/uploadCSV) or [update one](/api-reference/Campaigns/updateBatch):
+
+    ```json
+    "pushingCrms": [{ "type": "webhook", "crmId": "<webhook _id>", "schemaId": "<webhook _id>" }]
+    ```
+  </Step>
+  <Step title="Return 2xx from your endpoint">
+    Respond with any `2xx` status within 10 seconds. Do slow work, such as CRM writes, after you respond.
+  </Step>
+</Steps>
+
+<Warning>
+  A webhook attached to a campaign receives only calls that end **after** it was attached. To send calls that already finished, select them in the dashboard and use the bulk CRM sync.
+</Warning>
+
+## Securing your endpoint
+
+- If you set `bearerToken`, every delivery includes `Authorization: Bearer <token>`. Reject requests without it.
+- Only the URL and bearer token are used. Custom headers and body templates are not sent.
+- Register the final URL of your endpoint. weya follows redirects, but a `301` or `302` turns the `POST` into a `GET`, so the body is lost.
+
+## Payload
+
+```json Example payload
+{
+  "call_id": "6a1f0c2e9b8d7a6f5e4d3c2b",
+  "request_uuid": "b0c1d2e3-f4a5-6789-abcd-ef0123456789",
+  "batch_id": "64e5f12345abcdef98765432",
+  "agent_id": "686ab1234567890abcdef456",
+  "campaign_channel": "voice",
+  "phoneNumber": "+919800000001",
+  "callingNumber": "+919876543210",
+  "call_direction": "outbound",
+  "callStatus": "completed",
+  "call_outcome": "Promise to pay",
+  "call_started_at": "2026-11-19T10:32:05+05:30",
+  "duration": 94,
+  "recordingUrl": "https://...",
+  "call_analysis": [
+    { "metric_name": "Promise date", "metric_value": "2026-12-05" }
+  ],
+  "lead_data": { "customer_name": "Asha", "amount_due": "4500" },
+  "next_attempt_after": "",
+  "is_expired": false,
+  "expired_reason": "",
+  "initial_lead_data": { "_notice": "deprecated — Weya webhooks no longer send initial_lead_data; use lead_data instead" }
+}
+```
+
+<ResponseField name="call_id" type="string">
+  The contact's ID in the campaign. It stays the same across all attempts to that contact.
+</ResponseField>
+
+<ResponseField name="request_uuid" type="string">
+  The ID of this attempt. Use it as your idempotency key: each attempt has its own `request_uuid`.
+</ResponseField>
+
+<ResponseField name="batch_id" type="string">
+  The campaign's ID.
+</ResponseField>
+
+<ResponseField name="agent_id" type="string">
+  The agent that handled the call.
+</ResponseField>
+
+<ResponseField name="campaign_channel" type="string">
+  The channel. `voice` for calls.
+</ResponseField>
+
+<ResponseField name="phoneNumber" type="string">
+  The contact's phone number.
+</ResponseField>
+
+<ResponseField name="callingNumber" type="string">
+  The weya phone number the call was made from or received on.
+</ResponseField>
+
+<ResponseField name="call_direction" type="string">
+  Whether the call was outbound or inbound.
+</ResponseField>
+
+<ResponseField name="callStatus" type="string">
+  How the attempt ended. See [call statuses](/get-started/concepts#call-statuses).
+</ResponseField>
+
+<ResponseField name="call_outcome" type="string">
+  The call's outcome from the post-call analysis. Empty when no outcome was determined.
+</ResponseField>
+
+<ResponseField name="call_started_at" type="string">
+  When the call started (ISO 8601), in the campaign's timezone.
+</ResponseField>
+
+<ResponseField name="duration" type="number">
+  Length of the call.
+</ResponseField>
+
+<ResponseField name="recordingUrl" type="string">
+  Link to the call recording, when there is one.
+</ResponseField>
+
+<ResponseField name="call_analysis" type="array[object]">
+  One entry per [post-call metric](/single-prompt/step4) defined on the agent, each with `metric_name` and `metric_value`.
+</ResponseField>
+
+<ResponseField name="lead_data" type="object">
+  The contact's variables, as uploaded: the columns of your CSV or the fields you sent in `callData`.
+</ResponseField>
+
+<ResponseField name="next_attempt_after" type="string">
+  When the next attempt to this contact is scheduled, in the campaign's timezone. Empty when no further attempt is scheduled.
+</ResponseField>
+
+<ResponseField name="is_expired" type="boolean">
+  `true` when weya will make no further attempts to this contact. `expired_reason` says why.
+</ResponseField>
+
+<ResponseField name="initial_lead_data" type="object" deprecated>
+  No longer populated. Use `lead_data`.
+</ResponseField>
+
+## When results are sent
+
+weya sends one result per finished attempt with one of these statuses: `completed`, `no-answer`, `busy`, `failed`, `voicemail`, `ivr`, `canceled`, `timeout` or `aborted`. Attempts that were never dialled don't produce a webhook.
+
+The first delivery happens about **five minutes after the call ends**, so the recording and the transcript analysis are included. If the analysis still isn't ready, weya checks again every three minutes for up to 30 minutes.
+
+<Warning>
+  A `completed` call whose analysis still isn't ready after 30 minutes is not sent. Watch for completed calls that never reach your endpoint, and check that the agent has post-call metrics defined.
+</Warning>
+
+## Retries
+
+If your endpoint doesn't return `2xx`, weya decides whether to try again from the response:
+
+| Your endpoint returns | What weya does |
+| --- | --- |
+| `2xx` | Delivered. No more attempts |
+| No response within 10 seconds, a network error, `408`, `429` or `5xx` | Retries, up to 8 deliveries in total over about 22 hours |
+| Any other `4xx` | Stops. The result is not sent again |
+
+Retries wait 1 minute, 5 minutes, 15 minutes, 1 hour, 3 hours, 6 hours, then 12 hours, each with up to 10% random jitter. If you return a `Retry-After` header, weya waits that long instead, between 30 seconds and 6 hours. Pick a response below to see the schedule.
+
+<RetrySchedule />
+
+<Visibility for="agents">
+Retry schedule for network errors, timeouts, 408, 429 and 5xx: delivery 1 at about 5 minutes after the call ends, then retries after 1 minute, 5 minutes, 15 minutes, 1 hour, 3 hours, 6 hours and 12 hours (8 deliveries, about 22 hours of retries). Other 4xx responses stop delivery immediately.
+</Visibility>
+
+## Handling duplicates
+
+Your endpoint can receive the same attempt more than once, for example when the recording arrives after the first delivery and weya re-sends the result with it. Treat `request_uuid` as the key: store the latest payload for each `request_uuid` and overwrite older ones.
+
+<Tip>
+  To build one record per contact, group results by `call_id` and keep the one with the latest `call_started_at`.
+</Tip>
+
+## Stop sending results
+
+Remove the webhook from the campaign's **Track Call Outcomes**, or delete the webhook to stop it in every campaign at once. Retries that are already scheduled may still arrive.
+
+## Related
+
+<Columns cols={2}>
+  <Card title="Post-call metrics" icon="chart-bar" href="/single-prompt/step4">
+    Define what goes into `call_analysis`.
+  </Card>
+  <Card title="Webhooks API" icon="code" href="/api-reference/Webhooks/getWebhooks">
+    Create, list, update and delete webhooks.
+  </Card>
+</Columns>
+
+export const RetrySchedule = () => {
+  const waits = [1, 5, 15, 60, 180, 360, 720];
+  const options = [
+    { id: "5xx", label: "5xx, 408, 429 or timeout", retry: true },
+    { id: "2xx", label: "2xx", retry: false, ok: true },
+    { id: "4xx", label: "Other 4xx (400, 401, 404...)", retry: false },
+  ];
+  const [choice, setChoice] = useState("5xx");
+  const opt = options.find((o) => o.id === choice);
+  const fmt = (m) => (m < 60 ? m + " min" : (m / 60 % 1 === 0 ? m / 60 : (m / 60).toFixed(1)) + " h");
+  let total = 0;
+  const rows = [{ n: 1, wait: null, at: 0 }];
+  if (opt.retry) {
+    waits.forEach((w, i) => { total += w; rows.push({ n: i + 2, wait: w, at: total }); });
+  }
+  return (
+    <div className="not-prose" style={{ border: "1px solid rgba(127,127,127,.25)", borderRadius: 12, padding: 16, display: "grid", gap: 12 }}>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+        {options.map((o) => (
+          <button key={o.id} type="button" aria-pressed={choice === o.id} onClick={() => setChoice(o.id)}
+            style={{ padding: "6px 12px", borderRadius: 8, font: "inherit", fontSize: 13, color: "inherit", cursor: "pointer",
+              border: choice === o.id ? "2px solid #4F1AD6" : "1px solid rgba(127,127,127,.35)",
+              background: choice === o.id ? "rgba(79,26,214,.12)" : "transparent" }}>
+            Endpoint returns {o.label}
+          </button>
+        ))}
+      </div>
+      <div style={{ display: "grid", gap: 6 }}>
+        {rows.map((r) => (
+          <div key={r.n} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, minWidth: 0 }}>
+            <span style={{ width: 84, flexShrink: 0 }}>Delivery {r.n}</span>
+            <div style={{ flex: 1, minWidth: 0, height: 8, borderRadius: 4, background: "rgba(127,127,127,.18)", position: "relative" }}>
+              <div style={{ position: "absolute", left: (r.at / 1341) * 100 + "%", top: -2, width: 12, height: 12, marginLeft: -6, borderRadius: 6, background: "#4F1AD6" }} />
+            </div>
+            <span style={{ width: 150, flexShrink: 0, textAlign: "right", opacity: 0.8 }}>
+              {r.wait === null ? "~5 min after call" : "+" + fmt(r.wait) + " (at " + fmt(r.at) + ")"}
+            </span>
+          </div>
+        ))}
+      </div>
+      <div style={{ fontSize: 13, opacity: 0.8 }}>
+        {opt.ok ? "Delivered on the first try. weya sends nothing more for this attempt." : opt.retry ? "8 deliveries over about " + fmt(total) + " after the first. If all fail, weya gives up on this result." : "weya stops after the first delivery. Fix the endpoint; this result will not be retried."}
+      </div>
+    </div>
+  );
+};

@@ -86,6 +86,7 @@
               {
                 "group": "Integrations",
                 "pages": [
+                  "integration/webhooks",
                   "integration/crmintegration"
                 ]
               }

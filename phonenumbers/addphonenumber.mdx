@@ -1,0 +1,109 @@
+---
+title: "Connect a phone number to your weya voice agents"
+sidebarTitle: "Connect a phone number"
+description: "Bring a phone number from Twilio, Plivo, Telnyx, Exotel, Vobiz, Elisiontec, jambonz or your own SIP trunk into weya and assign the agents that use it."
+keywords:
+  - "phone number"
+  - "twilio"
+  - "plivo"
+  - "telnyx"
+  - "sip"
+  - "exotel"
+  - "vobiz"
+  - "jambonz"
+  - "elisiontec"
+  - "assign agent"
+icon: "phone"
+---
+
+weya places and answers calls through phone numbers you already own with a telephony provider. You add the number with your provider credentials, then assign the agents that use it: an **outbound agent** that makes campaign calls from the number, and an **inbound agent** that answers calls to it.
+
+## Supported providers
+
+| Provider | Credentials weya asks for |
+| --- | --- |
+| Twilio | Account SID and Auth Token |
+| Plivo | Auth ID and Auth Token |
+| Telnyx | API key |
+| SIP trunk | SIP host, port, username, password, "from" user, transport (`udp`, `tcp` or `tls`) and whether to register |
+| Exotel, Vobiz, jambonz | Your account details for that provider |
+| Elisiontec | Your account details and the Elisiontec list ID |
+
+The number must belong to the provider account whose credentials you enter. weya checks the credentials before saving the number, then sets up the provider's call status and recording callbacks for you.
+
+## Add a number
+
+<Steps>
+  <Step title="Open Phone Numbers">
+    In the dashboard, go to **Phone Numbers**, click **Add Number** and choose **Add Phone Number**.
+  </Step>
+  <Step title="Choose the provider and enter credentials">
+    Select your provider, enter the number with its country code (for example `+12125551234`) and the credentials from the table above, then click **Save**.
+  </Step>
+  <Step title="Assign an outbound agent">
+    Click **Assign Outbound Agent**, select the voice agent or voice blaster that should make calls from this number, and click **Connect Agent**.
+  </Step>
+  <Step title="Assign an inbound agent (optional)">
+    To have weya answer calls to this number, assign an inbound agent to it as well.
+  </Step>
+</Steps>
+
+<Check>
+  The number now appears in your list with its agents. Add it to a campaign as a calling number to start using it.
+</Check>
+
+## How numbers, agents and campaigns connect
+
+- A campaign doesn't choose an agent directly. It chooses **calling numbers**, and each call is handled by the outbound agent assigned to the number it is made from. To change which agent a campaign uses, change the number's outbound agent.
+- A campaign can use several calling numbers.
+- A number can be the active number of only one inbound campaign at a time. Adding it to another inbound or mixed campaign asks you to move it.
+- Each number can be added once per user. Adding the same number again fails.
+
+<Warning>
+  Your provider account limits how many calls it accepts at once. If several weya campaigns share one provider account, their calls share that limit too. When the provider turns calls away, weya pauses dialling on that account briefly and tries again, which slows campaigns down. Ask your provider for enough capacity for all campaigns that use the account.
+</Warning>
+
+## Add a number with the API
+
+Use [Add Phone Number](/api-reference/Calling%20Management/addPhone) with the same provider and credentials, and [Get Phone Numbers](/api-reference/PhoneNumbers/getPhoneNumbers) to find a number's `_id` for campaigns.
+
+```bash
+curl --location 'https://api.weya.live/backend/api/call/add-phone' \
+  --header "x-api-key: $WEYA_API_KEY" \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "userId": "YOUR_USER_ID",
+    "phoneNumber": "12125551234",
+    "integration": "twilio",
+    "accSId": "YOUR_ACCOUNT_SID",
+    "authToken": "YOUR_AUTH_TOKEN"
+  }'
+```
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="The number won't save">
+    Check that the credentials belong to the provider account that owns the number, and that the number isn't already in your list.
+  </Accordion>
+
+  <Accordion title="Campaign calls stay pending">
+    Check that the number has an outbound agent assigned, and that the campaign is inside its calling days and hours. See [when calls are placed](/get-started/concepts#when-calls-are-placed).
+  </Accordion>
+
+  <Accordion title="Calls aren't being transferred">
+    The transfer number must be reachable from your provider account. See [Call transfer](/tools/calltransfer).
+  </Accordion>
+</AccordionGroup>
+
+## Next steps
+
+<Columns cols={2}>
+  <Card title="Create a campaign" icon="megaphone" href="/campaigns/createcampaign">
+    Use the number to call a list of contacts.
+  </Card>
+
+  <Card title="Phone numbers API" icon="code" href="/api-reference/PhoneNumbers/getPhoneNumbers">
+    List, update and delete numbers.
+  </Card>
+</Columns>
