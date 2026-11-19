@@ -1,14 +1,16 @@
 ---
 title: "Get Phone Numbers"
-description: "Retrieve the phone numbers in your workspace, 10 at a time."
+description: "List your phone numbers with their telephony provider and assigned agents."
 api: "GET /api/call/get-phone/{userId}"
 ---
 
 ## Overview
 
-List the phone numbers connected to your workspace, including their telephony provider and the inbound and outbound agents assigned to them. Results are paginated.
+List the phone numbers added by the user who owns the API key, including their telephony provider and the inbound and outbound agents assigned to them. Results are paginated and sorted newest first.
 
-To see which inbound campaign each number is active on, use **Get Phone Numbers with Agents**.
+Use a number's `_id` as a `callingNumbers` entry when you create or [update a campaign](/api-reference/Campaigns/updateBatch).
+
+To see which inbound campaign each number is active on, use [Get Phone Numbers with Agents](/api-reference/PhoneNumbers/getPhoneNumbersWithAgent).
 
 ## Prerequisites
 
@@ -16,14 +18,8 @@ To see which inbound campaign each number is active on, use **Get Phone Numbers 
 
 ## Endpoint
 
-<ParamField method="GET" path="/api/call/get-phone/{userId}" />
-
-<Note>
-
-Put `page` and `limit` after a `?`, as in the example. Without the `?` they are not applied and you always get the first 10 numbers.
-
-</Note>
-
+<ParamField path="/api/call/get-phone/{userId}" method="GET">
+</ParamField>
 
 ## Request
 
@@ -32,7 +28,7 @@ Your workspace API key. Create one from the profile menu in the dashboard → **
 </ParamField>
 
 <ParamField path="userId" type="string" required>
-Your user ID. It must be included in the path; phone numbers are always returned for the account that owns the API key.
+Your user ID. The path needs a value, but it isn't used to filter: numbers are always returned for the user who owns the API key.
 </ParamField>
 
 <ParamField query="page" type="integer" default="1">
@@ -40,14 +36,22 @@ Page number.
 </ParamField>
 
 <ParamField query="limit" type="integer" default="10">
-Number of phone numbers per page, from 1 to 10.
+Number of phone numbers per page, from 1 to 1000.
 </ParamField>
 
+<ParamField query="search" type="string">
+  Case-insensitive text to match against the phone number, telephony provider, SIP host or SIP username. Partial matches are returned. Example: `9876` or `plivo`.
+</ParamField>
 
 <RequestExample>
 
 ```bash cURL
-curl --location 'https://api.weya.live/backend/api/call/get-phone/64e5f12345abcdef12345678?page=1&limit=10' \
+curl --location 'https://api.weya.live/backend/api/call/get-phone/64e5f12345abcdef12345678?page=1&limit=50' \
+  --header 'x-api-key: YOUR_API_KEY'
+```
+
+```bash cURL (search)
+curl --location 'https://api.weya.live/backend/api/call/get-phone/64e5f12345abcdef12345678?search=plivo' \
   --header 'x-api-key: YOUR_API_KEY'
 ```
 
@@ -62,7 +66,7 @@ curl --location 'https://api.weya.live/backend/api/call/get-phone/64e5f12345abcd
   "status": true,
   "code": 200,
   "message": "User with phones retrieved successfully",
-  "errorMessage": "",
+  "errorMessage": null,
   "data": {
     "phones": [
       {
@@ -74,16 +78,17 @@ curl --location 'https://api.weya.live/backend/api/call/get-phone/64e5f12345abcd
         "outboundAgentId": "686ab1234567890abcdef456",
         "inboundAgentName": "Customer Support Agent",
         "outboundAgentName": "Sales Agent",
-        "inboundAgentVersion": null,
-        "outboundAgentVersion": null,
-        "createdAt": "2026-07-20T10:15:30.000Z",
-        "updatedAt": "2026-07-20T10:15:30.000Z"
+        "inboundAgentVersion": 4,
+        "outboundAgentVersion": 2,
+        "inboundAgentRootId": "686ab1234567890abcdef123",
+        "outboundAgentRootId": "686ab1234567890abcdef400",
+        "createdAt": "2026-07-20T10:15:30.000Z"
       }
     ],
     "pagination": {
       "total": 1,
       "page": 1,
-      "limit": 10,
+      "limit": 50,
       "totalPages": 1,
       "hasNextPage": false,
       "hasPrevPage": false
@@ -99,43 +104,63 @@ The phone numbers on this page.
 </ResponseField>
 
 <ResponseField name="data.phones[]._id" type="string">
-Phone number ID. Use it as `callingNumbers` when creating a campaign.
+Phone number ID. Use it in `callingNumbers` when creating or updating a campaign.
 </ResponseField>
 
 <ResponseField name="data.phones[].phoneNumber" type="string">
-The phone number. Empty for SIP connections, which are identified by `sipFromUser` and `sipHost`.
+The phone number. SIP connections are identified by `sipFromUser` and `sipHost`.
 </ResponseField>
 
 <ResponseField name="data.phones[].integration" type="string">
-Telephony provider: `twilio`, `plivo`, `telnyx`, `sip`, `exotel`, `elisiontec`, `vobiz` or `jambonz`.
+Telephony provider: `twilio`, `plivo`, `telnyx`, `sip`, `jambonz`, `elisiontec`, `nexmo` or `vobiz`.
+</ResponseField>
+
+<ResponseField name="data.phones[].userId" type="string">
+ID of the user who added the number.
+</ResponseField>
+
+<ResponseField name="data.phones[].createdAt" type="string">
+When the number was added (ISO 8601).
 </ResponseField>
 
 <ResponseField name="data.phones[].inboundAgentId" type="string">
-ID of the agent that answers incoming calls on this number, if any.
+ID of the agent that answers incoming calls on this number, if any. When the number is pinned to an agent version, this is the version's ID.
 </ResponseField>
 
 <ResponseField name="data.phones[].outboundAgentId" type="string">
-ID of the agent that places outgoing calls from this number, if any.
+ID of the agent that places outgoing calls from this number, if any. When the number is pinned to an agent version, this is the version's ID.
 </ResponseField>
 
-<ResponseField name="data.phones[].inboundAgentName" type="string">
-Name of the inbound agent.
+<ResponseField name="data.phones[].inboundAgentName" type="string | null">
+Name of the inbound agent. `null` when no inbound agent is assigned.
 </ResponseField>
 
-<ResponseField name="data.phones[].outboundAgentName" type="string">
-Name of the outbound agent.
+<ResponseField name="data.phones[].outboundAgentName" type="string | null">
+Name of the outbound agent. `null` when no outbound agent is assigned.
 </ResponseField>
 
 <ResponseField name="data.phones[].inboundAgentVersion" type="integer | null">
-Agent version the inbound agent is pinned to. `null` means it always uses the latest version.
+Version of the inbound agent the number uses: the pinned version, or the agent's latest version when the number follows the latest. `null` when no inbound agent is assigned.
 </ResponseField>
 
 <ResponseField name="data.phones[].outboundAgentVersion" type="integer | null">
-Agent version the outbound agent is pinned to. `null` means it always uses the latest version.
+  Version of the outbound agent the number uses: the pinned version, or the agent's latest version when the number follows the latest. `null` when no outbound agent is assigned.
+</ResponseField>
+
+<ResponseField name="data.phones[].inboundAgentRootId" type="string | null">
+  ID of the inbound agent itself. It differs from `inboundAgentId` when the number is pinned to a version. Use it with the Agents endpoints.
+</ResponseField>
+
+<ResponseField name="data.phones[].outboundAgentRootId" type="string | null">
+  ID of the outbound agent itself. It differs from `outboundAgentId` when the number is pinned to a version. Use it with the Agents endpoints.
 </ResponseField>
 
 <ResponseField name="data.phones[].sipHost" type="string">
-SIP connections only: SIP host. Other SIP fields are `sipPort`, `sipUsername`, `sipFromUser`, `sipTransport` and `sipRegister`.
+  SIP connections only: SIP host. The other SIP fields returned are `sipPort`, `sipUsername` and `sipFromUser`.
+</ResponseField>
+
+<ResponseField name="data.phones[].jambonzCarrierName" type="string">
+  jambonz numbers only: name of the SIP carrier. The other jambonz fields returned are `jambonzCarrierId` and `jambonzPhoneNumberSid`.
 </ResponseField>
 
 <ResponseField name="data.pagination" type="object" required>

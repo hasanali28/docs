@@ -6,7 +6,7 @@ api: "PUT /api/call/update-batch/{batchId}"
 
 ## Overview
 
-Update an existing campaign to change its name, calling numbers, calling schedule, retry settings, holiday list or call outcome tracking. You can also add more calls to the campaign in the same request by attaching a CSV file.
+Update an existing campaign to change its name, calling numbers, calling schedule, retry settings, DNC setting, holiday list or call outcome tracking. You can also add more calls to the campaign in the same request by attaching a CSV file.
 
 The request can be sent in two ways:
 
@@ -16,13 +16,14 @@ The request can be sent in two ways:
 ## Prerequisites
 
 - An API key for your workspace
-- An existing campaign and its `batchId`
+- An existing campaign and its `batchId`. The campaign must have been created by the user who owns the API key.
 - The campaign must be **paused** or **completed**. Pause a running campaign before updating it.
-- Calling numbers you pass must belong to the same workspace
+- Voice campaigns only. Chat campaigns can't be edited with this endpoint.
 
 ## Endpoint
 
-<ParamField method="PUT" path="/api/call/update-batch/{batchId}" />
+<ParamField path="/api/call/update-batch/{batchId}" method="PUT">
+</ParamField>
 
 ## Request
 
@@ -59,7 +60,6 @@ curl --location --request PUT 'https://api.weya.live/backend/api/call/update-bat
   --form 'retry="3"' \
   --form 'delay="30"' \
   --form 'file=@"/path/to/new-leads.csv"' \
-  --form 'countryCode="+91"' \
   --form 'mandatoryVariables="[\"customer_name\"]"' \
   --form 'type="false"'
 ```
@@ -90,14 +90,14 @@ curl --location --request PUT 'https://api.weya.live/backend/api/call/update-bat
 
 ### Request Parameters
 
-All settings are optional. Send only the fields you want to change.
+All settings are optional. Send only the fields you want to change; fields you leave out keep their current values.
 
 <ParamField body="batchName" type="string">
 Name of the campaign.
 </ParamField>
 
 <ParamField body="callingNumbers" type="array[string]">
-IDs of the phone numbers used to place calls. At least one is required if the field is sent. Calls are handled by the agent assigned to each number.
+IDs of the phone numbers used to place calls. Replaces the campaign's current list, so send every number the campaign should use. Calls are handled by the agent assigned to each number. Get the IDs from [Get Phone Numbers](/api-reference/PhoneNumbers/getPhoneNumbers).
 </ParamField>
 
 <ParamField body="timezone" type="string">
@@ -105,7 +105,7 @@ Timezone used for the calling schedule. Example: `Asia/Kolkata`.
 </ParamField>
 
 <ParamField body="callingHour" type="object">
-Daily calling window in 24-hour `HH:MM` format. Example: `{ "start": "09:00", "end": "17:00" }`.
+Daily calling window in 24-hour `HH:MM` format. Both `start` and `end` are required. Example: `{ "start": "09:00", "end": "17:00" }`.
 </ParamField>
 
 <ParamField body="allowedDays" type="array[string]">
@@ -113,39 +113,41 @@ Days of the week calls can be placed on. Example: `["Monday", "Tuesday", "Wednes
 </ParamField>
 
 <ParamField body="retry" type="integer">
-Maximum attempts per contact. Allowed range: 1–10.
+Maximum attempts per contact. Use a value from 1 to 10, the range the dashboard allows. The API does not check the range.
 </ParamField>
 
 <ParamField body="delay" type="integer">
-Delay in **minutes** between attempts to the same contact. Allowed range: 5–1440.
+Delay in **minutes** between attempts to the same contact. Use a value from 5 to 1440, the range the dashboard allows. The API does not check the range.
+</ParamField>
+
+<ParamField body="enableDNC" type="boolean">
+  `true` to skip numbers on your Do Not Call list. Can be `true` only when DNC is enabled for your organization. `false` turns DNC checks off for this campaign.
 </ParamField>
 
 <ParamField body="holidayListId" type="string">
-ID of the holiday list to apply. Send an empty string to remove the holiday list.
+ID of a holiday list in your organization. Send an empty string or `null` to remove the holiday list.
 </ParamField>
 
 <ParamField body="pushingCrms" type="array[object]">
-Destinations call outcomes are sent to after each call. Send an empty array to stop tracking. Each item has:
+Destinations call outcomes are sent to after each call. Replaces the current list. Send an empty array to stop tracking. A webhook or Google Sheet added here receives only calls that end after the update; earlier calls are not sent. Each item has:
 
 - `type` – one of `standard` (HubSpot/Zoho), `custom`, `webhook` or `gsheet`
-- `schemaId` – ID of the form or schema
-- `crmId` – ID of the connection, webhook or Google Sheet integration
-</ParamField>
+- `schemaId` – ID of the form or schema. For `gsheet`, the Google Sheet integration ID.
+- `crmId` – ID of the connection or webhook. For `custom` it must equal `schemaId`; for `gsheet` it is set to `schemaId`.
 
-<ParamField body="confirmReassign" type="boolean">
-Inbound campaigns only. Set to `true` to move calling numbers that are already active on another inbound campaign to this campaign. See the `409` error below.
+A campaign can have at most one Google Sheet, and a Google Sheet already connected to another active campaign can't be added.
 </ParamField>
 
 ### CSV Upload Parameters
 
-Send these as `multipart/form-data` to add calls to the campaign. When using form data, send object and array fields (`callingNumbers`, `callingHour`, `allowedDays`, `pushingCrms`) as JSON strings.
+Send these as `multipart/form-data` to add calls to the campaign. When using form data, send object and array fields (`callingNumbers`, `callingHour`, `allowedDays`, `pushingCrms`) as JSON strings, and `enableDNC` as `"true"` or `"false"`.
+
+The settings are saved first, then the file is processed. If the file is rejected, the settings change is still saved, and a paused campaign stays paused.
+
+The file uses the same columns as [Upload Campaign CSV](/api-reference/Campaigns/uploadCSV). New calls use the campaign's settings after this update.
 
 <ParamField body="file" type="file">
-CSV file of contacts to add. `.csv` only, up to 50 MB. Existing calls in the campaign are not removed. Not supported for inbound campaigns.
-</ParamField>
-
-<ParamField body="countryCode" type="string">
-Country code used to validate phone numbers in the CSV. Example: `+91`.
+File of contacts to add: `.csv`, `.xls` or `.xlsx`. Existing calls in the campaign are not removed. Not supported for inbound campaigns.
 </ParamField>
 
 <ParamField body="mandatoryVariables" type="string">
@@ -153,7 +155,7 @@ JSON array of variables that every row must have a value for. Example: `["custom
 </ParamField>
 
 <ParamField body="type" type="string">
-`"true"` to skip invalid rows and upload only the valid ones. `"false"` (default) to reject the upload if any row is invalid.
+`"true"` to skip invalid rows and upload only the valid ones. `"false"` (default) to reject the upload if any row is invalid. A file with no valid rows is always rejected.
 </ParamField>
 
 ## Response
@@ -165,7 +167,7 @@ JSON array of variables that every row must have a value for. Example: `["custom
   "status": true,
   "code": 200,
   "message": "Batch updated and resumed successfully",
-  "errorMessage": "",
+  "errorMessage": null,
   "data": {
     "_id": "6806382f98da85ec32fac955",
     "batchName": "Sales Campaign - July",
@@ -194,11 +196,11 @@ HTTP status code.
 </ResponseField>
 
 <ResponseField name="message" type="string" required>
-Human-readable success message.
+Human-readable success message. It is always `Batch updated and resumed successfully`, even when the campaign was not paused or did not resume. Check `data.queue_status` for the campaign's status.
 </ResponseField>
 
 <ResponseField name="data" type="object" required>
-The updated campaign.
+The updated campaign. The example shows the main fields; the response includes the full campaign record.
 </ResponseField>
 
 <ResponseField name="data._id" type="string">
@@ -234,35 +236,53 @@ Minutes between attempts.
 </ResponseField>
 
 <ResponseField name="data.queue_status" type="string">
-Current campaign status after the update.
+Campaign status after the update:
+
+- A paused campaign resumes: `in-progress`, `pending`, or `freezed` when outside its calling window. It stays `paused` if the automatic resume failed; call **Resume Campaign** in that case.
+- A completed campaign becomes `pending` when the file added calls, and otherwise stays `completed`.
 </ResponseField>
 
 ## Error Handling
 
-- **400 Bad Request** – Invalid field values, the campaign is still running (pause it first), or the CSV has invalid rows. For invalid rows, `data` contains:
-  - `code` – `INVALID_CSV_ROWS`
-  - `totalInvalidRows` – number of invalid rows
-  - `validRows` – rows that would be uploaded if invalid rows are skipped
-  - `truncated` – `true` if `invalidRows` lists only some of the rows
-  - `invalidRows` – list of `{ rowNumber, phoneNumber, reason }`
+Errors return `status: false`, with the reason in `errorMessage`.
 
-  Fix the rows, or resend with `type` set to `"true"` to skip them.
+- **400 Bad Request**
+  - `Invalid Batch ID` – `batchId` is not a valid ID.
+  - `Batch is currently running. Please pause this batch before updating.`
+  - `A chat campaign cannot be edited here…` – the campaign is a chat campaign.
+  - `callingHour` is missing `start` or `end`, or they are not in `HH:MM` format.
+  - `Invalid JSON format for …` – a form field that must be a JSON string could not be parsed.
+  - `enable DNC must be … in organization settings` – `enableDNC: true` was sent but DNC is not enabled for your organization.
+  - `Invalid holidayListId` or `Holiday list not found` – the holiday list ID is malformed or not in your organization.
+  - A `pushingCrms` entry is invalid: `Invalid CRM type`, `Invalid CRM schemaId`, `Invalid CRM crmId`, `Custom CRM crmId must equal schemaId`, more than one Google Sheet, or a Google Sheet already connected to another active campaign.
+  - `CSV upload is not allowed for inbound batches.`
+  - The file is empty, is not CSV or Excel, or has no valid rows.
+  - The file has invalid rows and `type` is `"false"`. `data` contains:
+
+    - `code` – `INVALID_CSV_ROWS`
+    - `totalInvalidRows` – number of invalid rows
+    - `validRows` – rows that would be uploaded if invalid rows are skipped
+    - `truncated` – `true` if `invalidRows` lists only some of the rows
+    - `invalidRows` – list of `{ rowNumber, phoneNumber, reason }`
+
+    Fix the rows, or resend with `type` set to `"true"` to skip them.
 - **401 Unauthorized** – Missing or invalid API key.
   - `Unauthorized: Invalid API Key` – the `x-api-key` value is wrong, the key was deleted, or it was created in a different environment (for example the dev dashboard).
   - `Unauthorized: No API Key OR Token Provided` – the `x-api-key` header was not sent.
-- **404 Not Found** – The campaign does not exist in your workspace.
-- **409 Conflict** – Inbound campaigns only. One or more calling numbers are already active on another inbound campaign. `data.requiresConfirmation` is `true` and `data.conflicts` lists each number as `{ phoneId, phoneNumber, currentBatchId, currentBatchName }`. Resend with `confirmReassign: true` to move them to this campaign.
+- **404 Not Found**
+  - `Batch not found` – no campaign with this ID was created by the user who owns the API key, or it was deleted.
+  - A `pushingCrms` entry points to something that does not exist: `CRM schema not found`, `CRM not found`, `Custom CRM schema not found` or `Google Sheets integration not found`.
 - **500 Internal Server Error** – Unexpected server error.
 
 <Note>
 
-A campaign that was **paused** resumes automatically after a successful update. You do not need to call the resume endpoint.
+A campaign that was **paused** resumes automatically after a successful update. You do not need to call the resume endpoint unless `data.queue_status` is still `paused`.
 
 </Note>
 
 <Note>
 
-The campaign type (outbound, inbound or mixed), DNC setting and scheduled start date are set when the campaign is created and cannot be changed with this endpoint.
+The campaign type (outbound, inbound or mixed) and scheduled start date are set when the campaign is created and cannot be changed with this endpoint. In this request, `type` is the skip-invalid-rows flag described above, not the campaign type.
 
 </Note>
 
