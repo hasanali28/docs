@@ -121,7 +121,7 @@ Delay in **minutes** between attempts to the same contact. Use a value from 5 to
 </ParamField>
 
 <ParamField body="enableDNC" type="boolean">
-  `true` to skip numbers on your Do Not Call list. Can be `true` only when DNC is enabled for your organization. `false` turns DNC checks off for this campaign.
+  The campaign's DNC setting. Can be `true` only when DNC is enabled for your organization. Numbers on your organization's [DNC list](/api-reference/DNC/getDNCList) are skipped in every campaign whatever this value is.
 </ParamField>
 
 <ParamField body="holidayListId" type="string">
