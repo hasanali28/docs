@@ -6,7 +6,9 @@ api: "GET /api/holiday-list/templates/{region}"
 
 ## Overview
 
-Get the public holidays for a country, ready to send as `holidays` to **Create Holiday List**. Nothing is saved by this call.
+Get the public holidays for a country, ready to send as `holidays` to [Create Holiday List](/api-reference/HolidayLists/createHolidayList). Nothing is saved by this call.
+
+The templates contain 2026 dates only. For other years, edit the dates before saving them.
 
 ## Prerequisites
 
@@ -14,7 +16,8 @@ Get the public holidays for a country, ready to send as `holidays` to **Create H
 
 ## Endpoint
 
-<ParamField method="GET" path="/api/holiday-list/templates/{region}" />
+<ParamField path="/api/holiday-list/templates/{region}" method="GET">
+</ParamField>
 
 ## Request
 
@@ -23,7 +26,7 @@ Your workspace API key. Create one from the profile menu in the dashboard → **
 </ParamField>
 
 <ParamField path="region" type="string" required>
-Country code: `IN` (India), `US` (United States), `AU` (Australia) or `AE` (GCC / UAE).
+Country code: `IN` (India), `US` (United States), `AU` (Australia) or `AE` (GCC / UAE). Not case-sensitive.
 </ParamField>
 
 <RequestExample>
@@ -43,12 +46,12 @@ curl --location 'https://api.weya.live/backend/api/holiday-list/templates/IN' \
 {
   "status": true,
   "code": 200,
-  "message": "",
-  "errorMessage": "",
+  "message": "Template holidays fetched successfully",
+  "errorMessage": null,
   "data": [
     { "label": "Republic Day", "date": "2026-01-26" },
     { "label": "Independence Day", "date": "2026-08-15" },
-    { "label": "Gandhi Jayanti", "date": "2026-10-02" }
+    { "label": "Mahatma Gandhi Jayanti", "date": "2026-10-02" }
   ]
 }
 ```
@@ -56,12 +59,12 @@ curl --location 'https://api.weya.live/backend/api/holiday-list/templates/IN' \
 </ResponseExample>
 
 <ResponseField name="data" type="array[object]" required>
-The holidays, each with a `label` and a `date`. The date may come back as `YYYY-MM-DD` or as a midnight-UTC timestamp such as `2026-01-26T00:00:00.000Z`.
+The holidays, each with a `label` and a `date` in `YYYY-MM-DD` format.
 </ResponseField>
 
 ## Error Handling
 
-- **400 Bad Request** – Unsupported `region`.
+- **400 Bad Request** – `Unsupported region: …. Supported regions: IN, US, AU, AE`.
 - **401 Unauthorized** – Missing or invalid API key.
 - **500 Internal Server Error** – Unexpected server error.
 

@@ -6,7 +6,11 @@ api: "PATCH /api/holiday-list/toggle"
 
 ## Overview
 
-Turn the holiday list feature on or off for your organization. This is an organization-wide setting, not a setting for one list. When it's off, the **Holiday List** option is hidden when creating or editing a campaign.
+Turn the holiday list feature on or off for your organization. This is an organization-wide setting, not a setting for one list. When it's off, the **Holiday List** option is hidden when creating or editing a campaign in the dashboard.
+
+When you turn it on and your organization has no holiday lists yet, a default list named "India Holidays" is created from the `IN` template.
+
+The setting doesn't change calling: a campaign that has a holiday list still skips its dates when the setting is off, and the API accepts `holidayListId` either way.
 
 ## Prerequisites
 
@@ -14,7 +18,8 @@ Turn the holiday list feature on or off for your organization. This is an organi
 
 ## Endpoint
 
-<ParamField method="PATCH" path="/api/holiday-list/toggle" />
+<ParamField path="/api/holiday-list/toggle" method="PATCH">
+</ParamField>
 
 ## Request
 
@@ -38,7 +43,7 @@ curl --location --request PATCH 'https://api.weya.live/backend/api/holiday-list/
 ### Request Parameters
 
 <ParamField body="enable" type="boolean" required>
-`true` to turn holiday lists on, `false` to turn them off.
+`true` to turn holiday lists on, `false` to turn them off. Must be a JSON boolean, not a string.
 </ParamField>
 
 ## Response
@@ -49,9 +54,9 @@ curl --location --request PATCH 'https://api.weya.live/backend/api/holiday-list/
 {
   "status": true,
   "code": 200,
-  "message": "",
-  "errorMessage": "",
-  "data": null
+  "message": "Holiday list setting updated successfully",
+  "errorMessage": null,
+  "data": []
 }
 ```
 
@@ -63,6 +68,9 @@ Indicates whether the setting was changed.
 
 ## Error Handling
 
-- **400 Bad Request** – `enable` is missing or isn't a boolean.
+Errors return `status: false`, with the reason in `errorMessage`.
+
+- **400 Bad Request** – `Enable field must be a boolean`.
+- **404 Not Found** – `Organization not found`.
 - **401 Unauthorized** – Missing or invalid API key.
 - **500 Internal Server Error** – Unexpected server error.

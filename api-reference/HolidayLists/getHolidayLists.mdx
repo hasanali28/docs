@@ -6,7 +6,7 @@ api: "GET /api/holiday-list"
 
 ## Overview
 
-List the holiday lists in your organization. A campaign that uses a holiday list does not place calls on the dates in it.
+List the holiday lists in your organization, including lists created by other users in it. A campaign that uses a holiday list does not place calls on the dates in it.
 
 ## Prerequisites
 
@@ -14,7 +14,8 @@ List the holiday lists in your organization. A campaign that uses a holiday list
 
 ## Endpoint
 
-<ParamField method="GET" path="/api/holiday-list" />
+<ParamField path="/api/holiday-list" method="GET">
+</ParamField>
 
 ## Request
 
@@ -39,8 +40,8 @@ curl --location 'https://api.weya.live/backend/api/holiday-list' \
 {
   "status": true,
   "code": 200,
-  "message": "",
-  "errorMessage": "",
+  "message": "Holiday lists fetched successfully",
+  "errorMessage": null,
   "data": [
     {
       "_id": "68a1f2c3b7c7d3f123456789",
@@ -74,7 +75,7 @@ Name of the holiday list.
 </ResponseField>
 
 <ResponseField name="data[].isDefault" type="boolean">
-Whether this is the default list. The default list is preselected when you create a campaign in the dashboard.
+Whether this is the organization's default list. There is at most one. The default list is preselected when you create a campaign in the dashboard.
 </ResponseField>
 
 <ResponseField name="data[].holidays" type="array[object]">

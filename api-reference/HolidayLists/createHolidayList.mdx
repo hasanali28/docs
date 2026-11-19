@@ -6,16 +6,16 @@ api: "POST /api/holiday-list"
 
 ## Overview
 
-Create a holiday list. Campaigns that use it don't place calls on its dates. To start from a country's public holidays, fetch them with **Get Template Holidays** and send them as `holidays`.
+Create a holiday list in your organization. Campaigns that use it don't place calls on its dates. To start from a country's public holidays, fetch them with [Get Template Holidays](/api-reference/HolidayLists/getTemplateHolidays) and send them as `holidays`.
 
 ## Prerequisites
 
 - An API key for your workspace
-- Holiday lists are turned on for your organization (see **Toggle Holiday Lists**)
 
 ## Endpoint
 
-<ParamField method="POST" path="/api/holiday-list" />
+<ParamField path="/api/holiday-list" method="POST">
+</ParamField>
 
 ## Request
 
@@ -44,18 +44,20 @@ curl --location 'https://api.weya.live/backend/api/holiday-list' \
 ### Request Parameters
 
 <ParamField body="name" type="string" required>
-Name of the holiday list.
+Name of the holiday list. Must be unique in your organization.
 </ParamField>
 
 <ParamField body="holidays" type="array[object]" required>
 The holidays. Each item has:
 
 - `label` – name of the holiday
-- `date` – the date, in `YYYY-MM-DD` format
+- `date` – the date, in `YYYY-MM-DD` format (a full ISO 8601 timestamp is cut to its date)
+
+Send an empty array to create a list with no dates yet.
 </ParamField>
 
 <ParamField body="isDefault" type="boolean">
-Set to `true` to make this the default list, preselected when creating a campaign in the dashboard.
+Set to `true` to make this the organization's default list, preselected when creating a campaign in the dashboard. The previous default stops being the default.
 </ParamField>
 
 ## Response
@@ -66,8 +68,8 @@ Set to `true` to make this the default list, preselected when creating a campaig
 {
   "status": true,
   "code": 201,
-  "message": "",
-  "errorMessage": "",
+  "message": "Holiday list created successfully",
+  "errorMessage": null,
   "data": {
     "_id": "68a1f2c3b7c7d3f123456789",
     "name": "India Holidays",
@@ -90,6 +92,12 @@ The new holiday list. `data._id` is the ID to use as `holidayListId` on a campai
 
 ## Error Handling
 
-- **400 Bad Request** – Missing `name` or `holidays`, or a date that isn't in `YYYY-MM-DD` format.
+Errors return `status: false`, with the reason in `errorMessage`.
+
+- **400 Bad Request**
+  - `Holiday list name is required` or `Holidays must be an array`.
+  - `isDefault must be a boolean when provided`.
+  - `Each holiday must have a valid date and label`, or `Invalid date format for holiday`.
+  - `A holiday list with this name already exists for your organization.`
 - **401 Unauthorized** – Missing or invalid API key.
 - **500 Internal Server Error** – Unexpected server error.
