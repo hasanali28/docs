@@ -1,170 +1,94 @@
 ---
 title: "Create Webhook"
-description: "Create a webhook endpoint to receive real-time events from Weya AI."
-openapi: "POST /api/webhooks"
+description: "Add a URL that call outcomes are sent to."
+api: "POST /api/webhooks"
 ---
 
 ## Overview
 
-Create a webhook to receive real-time event notifications from Weya AI. Once configured, Weya AI automatically sends HTTP POST requests to your endpoint whenever the selected events occur.
+Create a webhook. Once it's added to a campaign under **Track Call Outcomes** (`pushingCrms` with `type: "webhook"`), the results of each call in that campaign are sent to its URL as a JSON `POST` request.
 
-Webhooks can be used to integrate with CRMs, internal applications, analytics platforms, or other third-party services.
+Each organization can have up to 5 webhooks.
 
 ## Prerequisites
 
-- Bearer Token authentication
-- A publicly accessible HTTPS endpoint
-- Endpoint capable of accepting `POST` requests
+- An API key for your workspace
+- A public HTTPS URL that accepts `POST` requests
+
+## Endpoint
+
+<ParamField method="POST" path="/api/webhooks" />
 
 ## Request
 
-<ParamField header="Authorization" type="string" required>
-Bearer token for authenticated workspace access.
-</ParamField>
-
-### Request Body
-
-<ParamField body="name" type="string" required>
-Display name for the webhook.
-</ParamField>
-
-<ParamField body="url" type="string" required>
-Public HTTPS endpoint that will receive webhook events.
-</ParamField>
-
-<ParamField body="events" type="array[string]" required>
-List of events that should trigger webhook notifications.
-
-Supported events include:
-
-- `call.started`
-- `call.answered`
-- `call.completed`
-- `call.failed`
-- `call.transferred`
-- `call.recording.available`
-- `call.summary.generated`
-- `call.analysis.completed`
-</ParamField>
-
-<ParamField body="secret" type="string">
-Optional signing secret used to verify incoming webhook requests.
-</ParamField>
-
-<ParamField body="active" type="boolean">
-Enable or disable the webhook after creation.
-
-Default: `true`
+<ParamField header="x-api-key" type="string" required>
+Your workspace API key. Create one from the profile menu in the dashboard → **API Keys**.
 </ParamField>
 
 <RequestExample>
 
 ```bash cURL
 curl --location 'https://api.weya.live/backend/api/webhooks' \
---header 'Authorization: Bearer {{authToken}}' \
---header 'Content-Type: application/json' \
---data '{
-  "name": "CRM Webhook",
-  "url": "https://example.com/webhooks/weya",
-  "events": [
-    "call.completed",
-    "call.recording.available"
-  ],
-  "secret": "my-webhook-secret",
-  "active": true
+  --header 'x-api-key: YOUR_API_KEY' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "name": "Salesforce CRM Sync",
+    "url": "https://your-domain.com/webhook",
+    "bearerToken": "YOUR_ENDPOINT_TOKEN"
 }'
 ```
 
 </RequestExample>
 
+### Request Parameters
+
+<ParamField body="name" type="string">
+A friendly name to identify the webhook.
+</ParamField>
+
+<ParamField body="url" type="string" required>
+URL that call outcomes are sent to, as a JSON `POST` request.
+</ParamField>
+
+<ParamField body="bearerToken" type="string">
+Optional. If your endpoint requires authentication, set its token here. It is sent as `Authorization: Bearer <token>` with each request.
+</ParamField>
+
 ## Response
 
 <ResponseExample>
 
-```json 201
+```json 201 Created
 {
   "status": true,
   "code": 201,
-  "message": "Webhook created successfully",
+  "message": "",
+  "errorMessage": "",
   "data": {
     "_id": "6890abc123456789abcdef01",
-    "name": "CRM Webhook",
-    "url": "https://example.com/webhooks/weya",
-    "events": [
-      "call.completed",
-      "call.recording.available"
-    ],
-    "active": true,
-    "createdAt": "2026-07-20T12:45:00.000Z"
+    "name": "Salesforce CRM Sync",
+    "url": "https://your-domain.com/webhook",
+    "isActive": true,
+    "createdAt": "2026-07-20T12:45:00.000Z",
+    "updatedAt": "2026-07-20T12:45:00.000Z"
   }
 }
 ```
 
 </ResponseExample>
 
-<ResponseField name="status" type="boolean">
-Indicates whether the request was successful.
-</ResponseField>
-
-<ResponseField name="code" type="integer">
-HTTP status code returned by the API.
-</ResponseField>
-
-<ResponseField name="message" type="string">
-Success message.
-</ResponseField>
-
-<ResponseField name="data" type="object">
-Information about the created webhook.
-</ResponseField>
-
-<ResponseField name="data._id" type="string">
-Unique identifier of the webhook.
-</ResponseField>
-
-<ResponseField name="data.name" type="string">
-Webhook display name.
-</ResponseField>
-
-<ResponseField name="data.url" type="string">
-Destination URL that receives webhook events.
-</ResponseField>
-
-<ResponseField name="data.events" type="array[string]">
-Subscribed webhook events.
-</ResponseField>
-
-<ResponseField name="data.active" type="boolean">
-Whether the webhook is enabled.
-</ResponseField>
-
-<ResponseField name="data.createdAt" type="string">
-Webhook creation timestamp.
+<ResponseField name="data" type="object" required>
+The new webhook. `data._id` is the ID to use as `crmId` in a campaign's `pushingCrms`.
 </ResponseField>
 
 ## Error Handling
 
-| Status | Description |
-|---------|-------------|
-|400|Invalid request body or missing required fields|
-|401|Unauthorized|
-|409|Webhook already exists|
-|422|Invalid webhook URL|
-|500|Internal server error|
-
-<Note>
-
-Your webhook endpoint should return an HTTP **200 OK** response within a few seconds. If Weya AI does not receive a successful response, the webhook delivery may be retried.
-
-</Note>
+- **400 Bad Request** – Missing or invalid `url`, or your organization already has 5 webhooks.
+- **401 Unauthorized** – Missing or invalid API key.
+- **500 Internal Server Error** – Unexpected server error.
 
 <Check>
 
-After creating a webhook, you can:
-
-- View all registered webhooks.
-- Update webhook settings.
-- Enable or disable webhook delivery.
-- Delete the webhook when it is no longer required.
+After creating a webhook, add it to a campaign with `pushingCrms: [{ "type": "webhook", "crmId": "<webhook _id>", "schemaId": "<webhook _id>" }]` when creating or updating the campaign.
 
 </Check>

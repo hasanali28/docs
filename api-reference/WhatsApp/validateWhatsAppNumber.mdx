@@ -1,7 +1,7 @@
 ---
 title: "Validate WhatsApp Number"
 description: "Validate a WhatsApp Business phone number before integrating it with your workspace."
-openapi: "POST /api/whatsapp/validate-whatsapp-number"
+api: "POST /api/whatsapp/validate-whatsapp-number"
 ---
 
 ## Overview
@@ -10,20 +10,20 @@ Validate a WhatsApp Business phone number before creating an integration. This e
 
 ## Prerequisites
 
-- Bearer Token authentication
+- An API key for your workspace
 - A valid WhatsApp Business phone number
 
 ## Request
 
-<ParamField header="Authorization" type="string" required>
-Bearer token for authenticated workspace access.
+<ParamField header="x-api-key" type="string" required>
+Your workspace API key. Create one from the profile menu in the dashboard → **API Keys**.
 </ParamField>
 
 <RequestExample>
 
 ```bash cURL
 curl --location 'https://api.weya.live/backend/api/whatsapp/validate-whatsapp-number' \
---header 'Authorization: Bearer {{authToken}}' \
+--header 'x-api-key: YOUR_API_KEY' \
 --header 'Content-Type: application/json' \
 --data '{
     "phoneNumber": "+15551234567"
@@ -85,7 +85,7 @@ Whether the phone number is valid for integration.
 | Status | Description |
 |---------|-------------|
 |400|Invalid or malformed phone number|
-|401|Unauthorized or invalid Bearer token|
+|401|Missing or invalid API key|
 |404|Phone number not found|
 |500|Internal server error|
 

@@ -1,140 +1,158 @@
 ---
 title: "Get Phone Numbers"
-openapi: "GET /api/phone-numbers"
-description: "Retrieve all phone numbers configured in your Weya AI workspace."
+description: "Retrieve the phone numbers in your workspace, 10 at a time."
+api: "GET /api/call/get-phone/{userId}"
 ---
 
-Use this endpoint to retrieve all phone numbers associated with your Weya AI workspace. The response includes each phone number along with its current configuration and assignment status.
+## Overview
+
+List the phone numbers connected to your workspace, including their telephony provider and the inbound and outbound agents assigned to them. Results are paginated.
+
+To see which inbound campaign each number is active on, use **Get Phone Numbers with Agents**.
+
+## Prerequisites
+
+- An API key for your workspace
+
+## Endpoint
+
+<ParamField method="GET" path="/api/call/get-phone/{userId}" />
 
 <Note>
-Only authenticated users can access phone numbers that belong to their workspace.
+
+Put `page` and `limit` after a `?`, as in the example. Without the `?` they are not applied and you always get the first 10 numbers.
+
 </Note>
 
-### OpenAPI
 
-```yaml
-openapi: 3.1.0
-info:
-  title: Get Phone Numbers
-  version: 1.0.0
+## Request
 
-paths:
-  /api/phone-numbers:
-    get:
-      summary: Retrieve all phone numbers
-      description: Returns all phone numbers configured for the authenticated workspace.
-      tags:
-        - Phone Numbers
-
-      security:
-        - bearerAuth: []
-
-      responses:
-        "200":
-          description: Phone numbers retrieved successfully.
-
-        "401":
-          description: Unauthorized.
-
-        "500":
-          description: Internal Server Error.
-
-components:
-  securitySchemes:
-    bearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
-```
-
-## Authorizations
-
-<ParamField header="Authorization" type="string" required>
-Bearer Token for the authenticated user.
-
-Format:
-
-`Authorization: Bearer YOUR_ACCESS_TOKEN`
+<ParamField header="x-api-key" type="string" required>
+Your workspace API key. Create one from the profile menu in the dashboard → **API Keys**.
 </ParamField>
 
-## Example Request
+<ParamField path="userId" type="string" required>
+Your user ID. It must be included in the path; phone numbers are always returned for the account that owns the API key.
+</ParamField>
 
-```bash
-curl --location 'https://api.weya.live/backend/api/phone-numbers' \
---header 'Authorization: Bearer YOUR_ACCESS_TOKEN'
+<ParamField query="page" type="integer" default="1">
+Page number.
+</ParamField>
+
+<ParamField query="limit" type="integer" default="10">
+Number of phone numbers per page, from 1 to 10.
+</ParamField>
+
+
+<RequestExample>
+
+```bash cURL
+curl --location 'https://api.weya.live/backend/api/call/get-phone/64e5f12345abcdef12345678?page=1&limit=10' \
+  --header 'x-api-key: YOUR_API_KEY'
 ```
 
-## Successful Response
+</RequestExample>
 
-```json
-[
-  {
-    "_id": "6872d4b5f8d7a91234567890",
-    "phoneNumber": "+14155552671",
-    "provider": "Twilio",
-    "country": "United States",
-    "status": "Active",
-    "assignedAgent": "Customer Support Agent",
-    "createdAt": "2026-07-20T10:15:30.000Z"
-  },
-  {
-    "_id": "6872d4b5f8d7a91234567891",
-    "phoneNumber": "+919876543210",
-    "provider": "Plivo",
-    "country": "India",
-    "status": "Active",
-    "assignedAgent": "Sales Agent",
-    "createdAt": "2026-07-20T11:05:42.000Z"
+## Response
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "status": true,
+  "code": 200,
+  "message": "User with phones retrieved successfully",
+  "errorMessage": "",
+  "data": {
+    "phones": [
+      {
+        "_id": "6872d4b5f8d7a91234567890",
+        "phoneNumber": "+919876543210",
+        "integration": "plivo",
+        "userId": "64e5f12345abcdef12345678",
+        "inboundAgentId": "686ab1234567890abcdef123",
+        "outboundAgentId": "686ab1234567890abcdef456",
+        "inboundAgentName": "Customer Support Agent",
+        "outboundAgentName": "Sales Agent",
+        "inboundAgentVersion": null,
+        "outboundAgentVersion": null,
+        "createdAt": "2026-07-20T10:15:30.000Z",
+        "updatedAt": "2026-07-20T10:15:30.000Z"
+      }
+    ],
+    "pagination": {
+      "total": 1,
+      "page": 1,
+      "limit": 10,
+      "totalPages": 1,
+      "hasNextPage": false,
+      "hasPrevPage": false
+    }
   }
-]
-```
-
-## Response Fields
-
-<ResponseField name="_id" type="string">
-Unique identifier of the phone number.
-</ResponseField>
-
-<ResponseField name="phoneNumber" type="string">
-The configured phone number in international format.
-</ResponseField>
-
-<ResponseField name="provider" type="string">
-Telephony provider associated with the phone number (for example, Twilio, Plivo, Telnyx, or Vobiz).
-</ResponseField>
-
-<ResponseField name="country" type="string">
-Country associated with the phone number.
-</ResponseField>
-
-<ResponseField name="status" type="string">
-Current status of the phone number.
-</ResponseField>
-
-<ResponseField name="assignedAgent" type="string">
-The AI Agent currently assigned to this phone number, if any.
-</ResponseField>
-
-<ResponseField name="createdAt" type="string">
-Timestamp indicating when the phone number was added.
-</ResponseField>
-
-## Error Responses
-
-### Unauthorized (401)
-
-```json
-{
-  "success": false,
-  "message": "Unauthorized"
 }
 ```
 
-### Internal Server Error (500)
+</ResponseExample>
 
-```json
-{
-  "success": false,
-  "message": "Failed to retrieve phone numbers."
-}
-```
+<ResponseField name="data.phones" type="array[object]" required>
+The phone numbers on this page.
+</ResponseField>
+
+<ResponseField name="data.phones[]._id" type="string">
+Phone number ID. Use it as `callingNumbers` when creating a campaign.
+</ResponseField>
+
+<ResponseField name="data.phones[].phoneNumber" type="string">
+The phone number. Empty for SIP connections, which are identified by `sipFromUser` and `sipHost`.
+</ResponseField>
+
+<ResponseField name="data.phones[].integration" type="string">
+Telephony provider: `twilio`, `plivo`, `telnyx`, `sip`, `exotel`, `elisiontec`, `vobiz` or `jambonz`.
+</ResponseField>
+
+<ResponseField name="data.phones[].inboundAgentId" type="string">
+ID of the agent that answers incoming calls on this number, if any.
+</ResponseField>
+
+<ResponseField name="data.phones[].outboundAgentId" type="string">
+ID of the agent that places outgoing calls from this number, if any.
+</ResponseField>
+
+<ResponseField name="data.phones[].inboundAgentName" type="string">
+Name of the inbound agent.
+</ResponseField>
+
+<ResponseField name="data.phones[].outboundAgentName" type="string">
+Name of the outbound agent.
+</ResponseField>
+
+<ResponseField name="data.phones[].inboundAgentVersion" type="integer | null">
+Agent version the inbound agent is pinned to. `null` means it always uses the latest version.
+</ResponseField>
+
+<ResponseField name="data.phones[].outboundAgentVersion" type="integer | null">
+Agent version the outbound agent is pinned to. `null` means it always uses the latest version.
+</ResponseField>
+
+<ResponseField name="data.phones[].sipHost" type="string">
+SIP connections only: SIP host. Other SIP fields are `sipPort`, `sipUsername`, `sipFromUser`, `sipTransport` and `sipRegister`.
+</ResponseField>
+
+<ResponseField name="data.pagination" type="object" required>
+Pagination details: `total`, `page`, `limit`, `totalPages`, `hasNextPage` and `hasPrevPage`.
+</ResponseField>
+
+## Error Handling
+
+- **401 Unauthorized** – Missing or invalid API key.
+- **500 Internal Server Error** – Unexpected server error.
+
+<Check>
+
+After listing your phone numbers, you can:
+
+- `GET /api/call/get-phone-with-agent/{userId}` to see which inbound campaign each number is active on.
+- `PUT /api/call/update-phone/{phoneId}` to update a number.
+- `DELETE /api/call/delete-phone/{phoneId}` to remove a number.
+
+</Check>

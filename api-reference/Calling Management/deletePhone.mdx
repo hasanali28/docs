@@ -1,14 +1,14 @@
 ---
 title: "Delete Phone Number"
 description: "Remove an outbound phone number and detach it from future campaigns."
-openapi: "DELETE /api/call/delete-phone/{phoneId}"
+api: "DELETE /api/call/delete-phone/{phoneId}"
 ---
 
 ## Overview
 Delete phone numbers that you no longer pay for or that have been reassigned. The number is removed from the workspace and no longer appears in batch or agent pickers.
 
 ## Prerequisites
-- Bearer token for an admin user.
+- An API key for your workspace
 - The `phoneId` of the record you want to remove.
 - Confirm that no active batches rely on the number.
 
@@ -17,14 +17,14 @@ Delete phone numbers that you no longer pay for or that have been reassigned. Th
 Identifier of the phone record to delete.
 </ParamField>
 
-<ParamField header="Authorization" type="string" required>
-Bearer token for the workspace admin.
+<ParamField header="x-api-key" type="string" required>
+Your workspace API key. Create one from the profile menu in the dashboard → **API Keys**.
 </ParamField>
 
 <RequestExample>
 ```bash cURL
 curl --location --request DELETE 'https://api.weya.live/backend/api/call/delete-phone/64e5f12345abcdef87654321' \
-  --header 'Authorization: Bearer {{authToken}}'
+  --header 'x-api-key: YOUR_API_KEY'
 ```
 </RequestExample>
 

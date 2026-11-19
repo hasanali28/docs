@@ -1,20 +1,20 @@
 ---
 title: "Enable/Disable DNC"
 description: "Enable or disable the Do Not Call (DNC) functionality for your organization."
-openapi: "POST /api/dnc/enable-disable"
+api: "POST /api/dnc/enable-disable"
 ---
 
 ## Overview
 Control whether the DNC (Do Not Call) feature is active for your organization. When enabled, the system will respect DNC entries and prevent calling numbers in the list. When disabled, DNC checks are bypassed.
 
 ## Prerequisites
-- Bearer token for authenticated workspace access
+- An API key for your workspace
 - Organization membership (automatically determined from your user account)
 
 ## Request
 
-<ParamField header="Authorization" type="string" required>
-Bearer token for the authenticated workspace account.
+<ParamField header="x-api-key" type="string" required>
+Your workspace API key. Create one from the profile menu in the dashboard → **API Keys**.
 </ParamField>
 
 <ParamField body="enable" type="boolean" required>
@@ -24,7 +24,7 @@ Set to `true` to enable DNC functionality, or `false` to disable it.
 <RequestExample>
 ```bash cURL
 curl --location 'https://api.weya.live/backend/api/dnc/enable-disable' \
-  --header 'Authorization: Bearer {{authToken}}' \
+  --header 'x-api-key: YOUR_API_KEY' \
   --header 'Content-Type: application/json' \
   --data '{
     "enable": true

@@ -1,0 +1,95 @@
+---
+title: "Start Campaign"
+description: "Push a prepared campaign into the outbound dialer queue."
+api: "POST /api/call/start-calling"
+---
+
+## Overview
+Use this endpoint to kick off automated dialing for a campaign once all data checks pass. The call processing runs asynchronously—responses confirm that the campaign moved to the queue while individual call events continue to arrive through webhooks and campaign polling.
+
+## Prerequisites
+- Campaign already exists and contains the final contact list.
+- The authenticated user has Calling Management permissions.
+- Plivo webhooks are configured if you need real-time updates.
+
+## Request
+<ParamField header="x-api-key" type="string" required>
+Your workspace API key. Create one from the profile menu in the dashboard → **API Keys**.
+</ParamField>
+
+<ParamField body="batchId" type="string" required>
+Identifier of the campaign to start dialing.
+</ParamField>
+
+<ParamField body="userId" type="string" required>
+ID of the user who owns the campaign.
+</ParamField>
+
+<ParamField body="callingNumbers" type="array[string]">
+Phone IDs the dialer should rotate through. Optional if campaign already has calling numbers configured.
+</ParamField>
+
+<ParamField body="uuid" type="string">
+Upload ID returned by **Upload Campaign CSV** (`data.uuid`). Pass it to start calling the contacts from that upload.
+</ParamField>
+
+<ParamField body="scheduleAt" type="string">
+Optional date and time (ISO 8601) to start calling instead of starting now. Example: `2026-12-01T09:00:00.000Z`.
+</ParamField>
+
+<RequestExample>
+```bash cURL
+curl --location 'https://api.weya.live/backend/api/call/start-calling' \
+  --header 'x-api-key: YOUR_API_KEY' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "batchId": "6806382f98da85ec32fac955",
+    "userId": "64e5f12345abcdef12345678"
+  }'
+```
+</RequestExample>
+
+## Response
+
+<ResponseExample>
+```json 200 OK
+{
+  "message": "",
+  "status": true,
+  "code": 200,
+  "errorMessage": "",
+  "data": {
+    "batchId": "6806382f98da85ec32fac955",
+    "status": "started"
+  }
+}
+```
+</ResponseExample>
+
+<ResponseField name="status" type="boolean" required>
+Indicates whether the campaign was successfully queued for dialing.
+</ResponseField>
+
+<ResponseField name="code" type="integer" required>
+HTTP status code (200 for success).
+</ResponseField>
+
+<ResponseField name="data" type="object">
+Additional information about the started campaign.
+</ResponseField>
+
+## Error Handling
+
+- **400 Bad Request** – Missing required parameters (`batchId` or `userId`).
+- **401 Unauthorized** – Missing or invalid API key.
+- **404 Not Found** – Campaign not found or user not found.
+- **500 Internal Server Error** – Failed to start calling service; retry or contact support.
+
+<Note>
+**Calling Behavior:**
+
+- The calling service runs asynchronously
+- To pause or resume a running campaign, use `POST /api/call/pause-batch/{batchId}` and `POST /api/call/resume-batch/{batchId}`
+- Calls are queued and processed based on campaign configuration (calling hours, allowed days, etc.)
+- Monitor progress using `GET /api/call/batch-details/{batchId}` or webhook callbacks
+</Note>

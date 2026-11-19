@@ -1,142 +1,63 @@
 ---
 title: "Delete Holiday List"
-openapi: "DELETE /api/holiday-lists/{id}"
-description: "Delete an existing Holiday List from your Weya AI workspace."
+description: "Delete a holiday list from your organization."
+api: "DELETE /api/holiday-list/{id}"
 ---
 
-Use this endpoint to permanently delete a Holiday List. Once deleted, the Holiday List will no longer be available for campaign scheduling or future use.
+## Overview
 
-<Warning>
-Deleting a Holiday List is permanent and cannot be undone. Ensure that the Holiday List is no longer being used by any active campaigns before deleting it.
-</Warning>
+Delete a holiday list. Campaigns that used it no longer skip its dates.
 
-### OpenAPI
+## Prerequisites
 
-```yaml
-openapi: 3.1.0
-info:
-  title: Delete Holiday List
-  version: 1.0.0
+- An API key for your workspace
+- The holiday list's ID
 
-paths:
-  /api/holiday-lists/{id}:
-    delete:
-      summary: Delete a Holiday List
-      description: Permanently deletes an existing Holiday List.
-      tags:
-        - Holiday Lists
+## Endpoint
 
-      security:
-        - bearerAuth: []
+<ParamField method="DELETE" path="/api/holiday-list/{id}" />
 
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
-          description: Unique identifier of the Holiday List.
+## Request
 
-      responses:
-        "200":
-          description: Holiday List deleted successfully.
-
-        "401":
-          description: Unauthorized.
-
-        "404":
-          description: Holiday List not found.
-
-        "409":
-          description: Holiday List is currently in use.
-
-        "500":
-          description: Internal Server Error.
-
-components:
-  securitySchemes:
-    bearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
-```
-
-## Authorizations
-
-<ParamField header="Authorization" type="string" required>
-Bearer Token for the authenticated user.
-
-Format:
-
-`Authorization: Bearer YOUR_ACCESS_TOKEN`
+<ParamField header="x-api-key" type="string" required>
+Your workspace API key. Create one from the profile menu in the dashboard → **API Keys**.
 </ParamField>
-
-## Path Parameters
 
 <ParamField path="id" type="string" required>
-The unique identifier of the Holiday List to delete.
+ID of the holiday list to delete.
 </ParamField>
 
-## Example Request
+<RequestExample>
 
-```bash
-curl --location --request DELETE 'https://api.weya.live/backend/api/holiday-lists/6863f5ab1e4d7f0012345678' \
---header 'Authorization: Bearer YOUR_ACCESS_TOKEN'
+```bash cURL
+curl --location --request DELETE 'https://api.weya.live/backend/api/holiday-list/68a1f2c3b7c7d3f123456789' \
+  --header 'x-api-key: YOUR_API_KEY'
 ```
 
-## Successful Response
+</RequestExample>
 
-```json
+## Response
+
+<ResponseExample>
+
+```json 200 OK
 {
-  "success": true,
-  "message": "Holiday List deleted successfully."
+  "status": true,
+  "code": 200,
+  "message": "",
+  "errorMessage": "",
+  "data": null
 }
 ```
 
-## Response Fields
+</ResponseExample>
 
-<ResponseField name="success" type="boolean">
-Indicates whether the Holiday List was successfully deleted.
+<ResponseField name="status" type="boolean" required>
+Indicates whether the holiday list was deleted.
 </ResponseField>
 
-<ResponseField name="message" type="string">
-Confirmation message indicating the Holiday List has been removed.
-</ResponseField>
+## Error Handling
 
-## Error Responses
-
-### Unauthorized (401)
-
-```json
-{
-  "success": false,
-  "message": "Unauthorized"
-}
-```
-
-### Not Found (404)
-
-```json
-{
-  "success": false,
-  "message": "Holiday List not found."
-}
-```
-
-### Conflict (409)
-
-```json
-{
-  "success": false,
-  "message": "Cannot delete Holiday List because it is currently associated with one or more active campaigns."
-}
-```
-
-### Internal Server Error (500)
-
-```json
-{
-  "success": false,
-  "message": "Failed to delete Holiday List."
-}
-```
+- **401 Unauthorized** – Missing or invalid API key.
+- **404 Not Found** – The holiday list does not exist in your organization.
+- **500 Internal Server Error** – Unexpected server error.

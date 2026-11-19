@@ -1,7 +1,7 @@
 ---
 title: "Assign Agent to WhatsApp Number"
 description: "Assign an existing WhatsApp AI Agent to a connected WhatsApp Business phone number."
-openapi: "POST /api/whatsapp/add-agent-in-whatsapp-number"
+api: "POST /api/whatsapp/add-agent-in-whatsapp-number"
 ---
 
 ## Overview
@@ -10,21 +10,21 @@ Assign a WhatsApp AI Agent to a connected WhatsApp Business phone number. Once a
 
 ## Prerequisites
 
-- Bearer Token authentication
+- An API key for your workspace
 - A connected WhatsApp Business phone number
 - An existing WhatsApp AI Agent
 
 ## Request
 
-<ParamField header="Authorization" type="string" required>
-Bearer token for authenticated workspace access.
+<ParamField header="x-api-key" type="string" required>
+Your workspace API key. Create one from the profile menu in the dashboard → **API Keys**.
 </ParamField>
 
 <RequestExample>
 
 ```bash cURL
 curl --location 'https://api.weya.live/backend/api/whatsapp/add-agent-in-whatsapp-number' \
---header 'Authorization: Bearer {{authToken}}' \
+--header 'x-api-key: YOUR_API_KEY' \
 --header 'Content-Type: application/json' \
 --data '{
   "phoneNumberId": "123456789012345",
@@ -91,7 +91,7 @@ Assigned WhatsApp AI Agent ID.
 | Status | Description |
 |---------|-------------|
 |400|Missing or invalid request parameters|
-|401|Unauthorized or invalid Bearer token|
+|401|Missing or invalid API key|
 |403|Permission denied|
 |404|WhatsApp number or Agent not found|
 |409|An agent is already assigned to this WhatsApp number|

@@ -1,7 +1,7 @@
 ---
 title: "Create Video Agent"
 description: "Create a new AI Video Agent for your workspace."
-openapi: "POST /api/video-agent"
+api: "POST /api/video-agents"
 ---
 
 ## Overview
@@ -10,69 +10,85 @@ Create a new Video Agent that can interact with users using an AI-generated avat
 
 ## Prerequisites
 
-- Bearer Token authentication
+- An API key for your workspace
 - Workspace access with permission to create Video Agents
 
 ## Request
 
-<ParamField header="Authorization" type="string" required>
-Bearer token for authenticated workspace access.
+<ParamField header="x-api-key" type="string" required>
+Your workspace API key. Create one from the profile menu in the dashboard → **API Keys**.
 </ParamField>
 
 <RequestExample>
 
 ```bash cURL
-curl --location 'https://api.weya.live/backend/api/video-agent' \
---header 'Authorization: Bearer {{authToken}}' \
+curl --location 'https://api.weya.live/backend/api/video-agents' \
+--header 'x-api-key: YOUR_API_KEY' \
 --header 'Content-Type: application/json' \
 --data '{
   "agent_name": "Sales Video Agent",
+  "avatar": "6891a23bc456def789aaaaaa",
   "gender": "Female",
-  "avatar": "Business Female",
-  "voice": "en-US-Standard-A",
-  "language": "English",
-  "systemMessage": "You are a professional AI sales representative.",
+  "voice": "6891a23bc456def789bbbbbb",
+  "enable_input_video": false,
+  "selectedLanguage": ["en"],
   "startMessage": "Hello! Welcome to Weya AI. How can I assist you today?",
-  "knowledgeBase": [
-    "6891a23bc456def789123456"
-  ]
+  "systemMessage": "You are a professional AI sales representative.",
+  "rag": { "vectorDBCollection": "kb_6891a23bc456def789123456" },
+  "callSetting": {
+    "callTimeout": 10,
+    "voiceSpeed": 1,
+    "llmConfigs": { "temperature": 0.7, "top_p": 1, "max_tokens": 500, "frequency_penalty": 0, "presence_penalty": 0 }
+  }
 }'
 ```
 
 </RequestExample>
 
-## Request Body
+### Request Parameters
 
 <ParamField body="agent_name" type="string" required>
-Unique name for the Video Agent.
+Name of the video agent.
+</ParamField>
+
+<ParamField body="avatar" type="string" required>
+ID of the avatar shown on screen.
 </ParamField>
 
 <ParamField body="gender" type="string" required>
-Gender of the AI avatar.
+Avatar gender: `Male` or `Female`. Used to pick matching voices.
 </ParamField>
 
-<ParamField body="avatar" type="string">
-Avatar that represents the Video Agent.
+<ParamField body="voice" type="string" required>
+ID of the voice the agent speaks with. Get the options from `GET /api/video-agents/voices`.
 </ParamField>
 
-<ParamField body="voice" type="string">
-Voice assigned to the Video Agent.
+<ParamField body="enable_input_video" type="boolean" required>
+Set to `true` to let the agent see the visitor's camera.
 </ParamField>
 
-<ParamField body="language" type="string">
-Primary language spoken by the Video Agent.
+<ParamField body="selectedLanguage" type="array[string]" required>
+Languages the agent can speak. At least one.
 </ParamField>
 
-<ParamField body="systemMessage" type="string">
-Instructions that define the Video Agent's behavior.
-</ParamField>
-
-<ParamField body="startMessage" type="string">
+<ParamField body="startMessage" type="string" required>
 Greeting spoken when the conversation begins.
 </ParamField>
 
-<ParamField body="knowledgeBase" type="array[string]">
-Knowledge Base IDs attached to the Video Agent.
+<ParamField body="systemMessage" type="string" required>
+Instructions that define the agent's behavior.
+</ParamField>
+
+<ParamField body="rag" type="object">
+Knowledge base to answer from: `{ "vectorDBCollection": "<knowledge base vectorDbCollection>" }`. Use the `vectorDbCollection` value from **Get Knowledge Bases**.
+</ParamField>
+
+<ParamField body="call_metrics" type="array[object]">
+Data to extract after each conversation. Each item has `metric_name`, `type`, an optional `description` and optional `call_outcome_ids`.
+</ParamField>
+
+<ParamField body="callSetting" type="object">
+Conversation settings, including `callTimeout` (2–60 minutes), `voiceSpeed` (0.7–1.2), `vocabulary` (array of words), `auto_detect_language` and `llmConfigs` (`temperature`, `top_p`, `max_tokens`, `frequency_penalty`, `presence_penalty`).
 </ParamField>
 
 ## Response
@@ -90,7 +106,7 @@ Knowledge Base IDs attached to the Video Agent.
     "gender": "Female",
     "avatar": "Business Female",
     "voice": "en-US-Standard-A",
-    "language": "English",
+    "selectedLanguage": ["en"],
     "status": "active",
     "createdAt": "2026-07-21T09:30:00.000Z"
   }
@@ -135,8 +151,8 @@ Selected avatar for the Video Agent.
 Voice assigned to the Video Agent.
 </ResponseField>
 
-<ResponseField name="data.language" type="string">
-Primary language configured for the Video Agent.
+<ResponseField name="data.selectedLanguage" type="array[string]">
+Languages the agent can speak.
 </ResponseField>
 
 <ResponseField name="data.status" type="string">
@@ -152,7 +168,7 @@ Timestamp when the Video Agent was created.
 | Status | Description |
 |---------|-------------|
 |400|Invalid request body or missing required fields|
-|401|Unauthorized or invalid Bearer token|
+|401|Missing or invalid API key|
 |403|Insufficient permissions|
 |409|A Video Agent with the same name already exists|
 |500|Internal server error|
@@ -161,8 +177,8 @@ Timestamp when the Video Agent was created.
 
 After creating a Video Agent, you can:
 
-- Retrieve it using `GET /api/video-agent/{id}`
-- Update it using `PATCH /api/video-agent/{id}`
+- Retrieve it using `GET /api/video-agents/{id}`
+- Update it using `PATCH /api/video-agents/{id}`
 - Attach Knowledge Bases
 - Configure supported voices using the Voices endpoint
 

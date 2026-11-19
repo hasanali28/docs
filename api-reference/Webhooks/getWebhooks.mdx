@@ -1,117 +1,90 @@
 ---
-title: "Webhooks"
-description: "View the webhook endpoints available for telephony providers supported by Weya AI."
-openapi: "GET /api/webhooks"
+title: "Get Webhooks"
+description: "Retrieve the webhooks configured for your organization."
+api: "GET /api/webhooks"
 ---
 
 ## Overview
 
-Webhooks allow telephony providers to notify Weya AI about call events in real time. These events include inbound calls, outbound calls, call status updates, recordings, transfers, voicemail detection, and more.
+List the webhooks in your organization. A webhook is a URL that call outcomes are sent to: add it to a campaign under **Track Call Outcomes** (`pushingCrms` with `type: "webhook"`), and the results of each call are sent to it as a JSON `POST` request.
 
-Depending on the provider you use, you'll need to configure one or more webhook URLs inside your telephony provider's dashboard.
+Each organization can have up to 5 webhooks.
 
----
+## Prerequisites
 
-## Supported Providers
+- An API key for your workspace
 
-<CardGroup cols={2}>
+## Endpoint
 
-<Card title="Twilio" icon="phone">
-Supports inbound calls, call status updates, recordings, and AMD callbacks.
-</Card>
+<ParamField method="GET" path="/api/webhooks" />
 
-<Card title="Plivo" icon="phone">
-Supports inbound/outbound calls, recordings, and call status updates.
-</Card>
+## Request
 
-<Card title="Telnyx" icon="phone">
-Supports inbound calls, status updates, and recording retrieval.
-</Card>
+<ParamField header="x-api-key" type="string" required>
+Your workspace API key. Create one from the profile menu in the dashboard → **API Keys**.
+</ParamField>
 
-<Card title="SIP" icon="network-wired">
-Supports SIP call status callbacks.
-</Card>
+<RequestExample>
 
-<Card title="Vobiz" icon="phone">
-Supports inbound/outbound calls, recordings, and hangup events.
-</Card>
-
-<Card title="Jambonz" icon="server">
-Supports advanced call routing, transfers, recordings, and event callbacks.
-</Card>
-
-<Card title="Nexmo" icon="phone">
-Supports call status notifications.
-</Card>
-
-<Card title="Elisiontec" icon="phone">
-Supports hangup callbacks.
-</Card>
-
-</CardGroup>
-
----
-
-## Available Webhook Endpoints
-
-| Provider | Events |
-|----------|--------|
-| Twilio | Inbound Call, Call Status, Recording Status, AMD Callback |
-| Plivo | Inbound Call, Outbound Call, Call Status, Recording |
-| Telnyx | Inbound Call, Call Status, Recording |
-| SIP | Call Status |
-| Vobiz | Inbound Call, Outbound Call, Call Status, Recording, Hangup |
-| Nexmo | Call Status |
-| Elisiontec | Hangup |
-| Jambonz | Receive Call, Inbound Call, Outbound Call, Call Status, Recording, Listen Complete, Transfer |
-
----
-
-## Typical Event Flow
-
-```text
-Customer
-      │
-      ▼
-Telephony Provider
-      │
-      ▼
-Webhook Event
-      │
-      ▼
-Weya AI
-      │
-      ▼
-Agent Processing
-      │
-      ▼
-CRM / Dashboard / Analytics
+```bash cURL
+curl --location 'https://api.weya.live/backend/api/webhooks' \
+  --header 'x-api-key: YOUR_API_KEY'
 ```
 
----
+</RequestExample>
 
-## Common Webhook Events
+## Response
 
-| Event | Description |
-|--------|-------------|
-| Inbound Call | Triggered when a customer calls your phone number. |
-| Outbound Call | Triggered when Weya AI places a call. |
-| Call Status | Reports ringing, answered, completed, failed, or busy states. |
-| Recording | Sends recording information after the call ends. |
-| AMD Callback | Detects whether a human or voicemail answered the call. |
-| Transfer | Triggered when a call is transferred to another destination. |
-| Hangup | Sent when the call disconnects. |
+<ResponseExample>
 
----
+```json 200 OK
+{
+  "status": true,
+  "code": 200,
+  "message": "",
+  "errorMessage": "",
+  "data": [
+    {
+      "_id": "6890abc123456789abcdef01",
+      "name": "Salesforce CRM Sync",
+      "url": "https://your-domain.com/webhook",
+      "userId": "64e5f12345abcdef12345678",
+      "organizationId": "64e5f12345abcdef00000001",
+      "isActive": true,
+      "createdAt": "2026-07-20T12:45:00.000Z",
+      "updatedAt": "2026-07-20T12:45:00.000Z"
+    }
+  ]
+}
+```
 
-<Note>
+</ResponseExample>
 
-Webhook endpoints are intended to be called automatically by telephony providers. They are **not** designed to be invoked directly by users.
+<ResponseField name="data" type="array[object]" required>
+The webhooks in your organization.
+</ResponseField>
 
-</Note>
+<ResponseField name="data[]._id" type="string">
+Webhook ID. Use it as `crmId` in a campaign's `pushingCrms`.
+</ResponseField>
 
-<Check>
+<ResponseField name="data[].name" type="string">
+Name of the webhook.
+</ResponseField>
 
-Refer to the provider-specific webhook documentation for request payloads, callback events, and expected responses.
+<ResponseField name="data[].url" type="string">
+URL that call outcomes are sent to.
+</ResponseField>
 
-</Check>
+<ResponseField name="data[].bearerToken" type="string">
+Token sent as `Authorization: Bearer <token>` with each request, if one was set.
+</ResponseField>
+
+<ResponseField name="data[].isActive" type="boolean">
+Whether the webhook is active.
+</ResponseField>
+
+## Error Handling
+
+- **401 Unauthorized** – Missing or invalid API key.
+- **500 Internal Server Error** – Unexpected server error.

@@ -1,204 +1,95 @@
 ---
 title: "Create Holiday List"
-openapi: "POST /api/holiday-lists"
-description: "Create a new Holiday List to prevent outbound campaigns from calling contacts on specified holidays."
+description: "Create a list of dates on which campaigns should not place calls."
+api: "POST /api/holiday-list"
 ---
 
-Use this endpoint to create a new Holiday List. Holiday Lists allow you to define dates on which outbound campaigns should automatically avoid placing calls.
+## Overview
 
-<Note>
-Only authenticated users can create Holiday Lists within their workspace.
-</Note>
+Create a holiday list. Campaigns that use it don't place calls on its dates. To start from a country's public holidays, fetch them with **Get Template Holidays** and send them as `holidays`.
 
-### OpenAPI
+## Prerequisites
 
-```yaml
-openapi: 3.1.0
-info:
-  title: Create Holiday List
-  version: 1.0.0
+- An API key for your workspace
+- Holiday lists are turned on for your organization (see **Toggle Holiday Lists**)
 
-paths:
-  /api/holiday-lists:
-    post:
-      summary: Create a Holiday List
-      description: Creates a new Holiday List for the authenticated workspace.
-      tags:
-        - Holiday Lists
+## Endpoint
 
-      security:
-        - bearerAuth: []
+<ParamField method="POST" path="/api/holiday-list" />
 
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - name
-                - holidays
-              properties:
-                name:
-                  type: string
-                  example: India Public Holidays
-                description:
-                  type: string
-                  example: National holidays observed across India.
-                holidays:
-                  type: array
-                  description: List of holidays to include.
-                  items:
-                    type: object
-                    properties:
-                      name:
-                        type: string
-                        example: Republic Day
-                      date:
-                        type: string
-                        format: date
-                        example: "2026-01-26"
+## Request
 
-      responses:
-        "201":
-          description: Holiday List created successfully.
-
-        "400":
-          description: Invalid request.
-
-        "401":
-          description: Unauthorized.
-
-        "500":
-          description: Internal Server Error.
-
-components:
-  securitySchemes:
-    bearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
-```
-
-## Authorizations
-
-<ParamField header="Authorization" type="string" required>
-Bearer Token for the authenticated user.
-
-Format:
-
-`Authorization: Bearer YOUR_ACCESS_TOKEN`
+<ParamField header="x-api-key" type="string" required>
+Your workspace API key. Create one from the profile menu in the dashboard → **API Keys**.
 </ParamField>
 
-## Body Parameters
+<RequestExample>
 
-<ParamField body="name" type="string" required>
-Name of the Holiday List.
-</ParamField>
-
-<ParamField body="description" type="string">
-Optional description for the Holiday List.
-</ParamField>
-
-<ParamField body="holidays" type="array" required>
-Array of holidays to include in the Holiday List.
-</ParamField>
-
-## Example Request
-
-```bash
-curl --location 'https://api.weya.live/backend/api/holiday-lists' \
---header 'Authorization: Bearer YOUR_ACCESS_TOKEN' \
---header 'Content-Type: application/json' \
---data '{
-  "name": "India Public Holidays",
-  "description": "National holidays observed across India.",
-  "holidays": [
-    {
-      "name": "Republic Day",
-      "date": "2026-01-26"
-    },
-    {
-      "name": "Independence Day",
-      "date": "2026-08-15"
-    }
-  ]
+```bash cURL
+curl --location 'https://api.weya.live/backend/api/holiday-list' \
+  --header 'x-api-key: YOUR_API_KEY' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "name": "India Holidays",
+    "isDefault": true,
+    "holidays": [
+      { "label": "Republic Day", "date": "2026-01-26" },
+      { "label": "Independence Day", "date": "2026-08-15" }
+    ]
 }'
 ```
 
-## Successful Response
+</RequestExample>
 
-```json
+### Request Parameters
+
+<ParamField body="name" type="string" required>
+Name of the holiday list.
+</ParamField>
+
+<ParamField body="holidays" type="array[object]" required>
+The holidays. Each item has:
+
+- `label` – name of the holiday
+- `date` – the date, in `YYYY-MM-DD` format
+</ParamField>
+
+<ParamField body="isDefault" type="boolean">
+Set to `true` to make this the default list, preselected when creating a campaign in the dashboard.
+</ParamField>
+
+## Response
+
+<ResponseExample>
+
+```json 201 Created
 {
-  "success": true,
-  "message": "Holiday List created successfully.",
+  "status": true,
+  "code": 201,
+  "message": "",
+  "errorMessage": "",
   "data": {
-    "_id": "6863f5ab1e4d7f0012345678",
-    "name": "India Public Holidays",
-    "description": "National holidays observed across India.",
-    "enabled": true,
-    "holidayCount": 2,
-    "createdAt": "2026-07-21T10:30:15.000Z",
-    "updatedAt": "2026-07-21T10:30:15.000Z"
+    "_id": "68a1f2c3b7c7d3f123456789",
+    "name": "India Holidays",
+    "isDefault": true,
+    "holidays": [
+      { "label": "Republic Day", "date": "2026-01-26" },
+      { "label": "Independence Day", "date": "2026-08-15" }
+    ],
+    "createdAt": "2026-01-02T10:00:00.000Z",
+    "updatedAt": "2026-01-02T10:00:00.000Z"
   }
 }
 ```
 
-## Response Fields
+</ResponseExample>
 
-<ResponseField name="_id" type="string">
-Unique identifier of the Holiday List.
+<ResponseField name="data" type="object" required>
+The new holiday list. `data._id` is the ID to use as `holidayListId` on a campaign.
 </ResponseField>
 
-<ResponseField name="name" type="string">
-Name of the Holiday List.
-</ResponseField>
+## Error Handling
 
-<ResponseField name="description" type="string">
-Description of the Holiday List.
-</ResponseField>
-
-<ResponseField name="enabled" type="boolean">
-Indicates whether the Holiday List is active.
-</ResponseField>
-
-<ResponseField name="holidayCount" type="integer">
-Total number of holidays contained in the Holiday List.
-</ResponseField>
-
-<ResponseField name="createdAt" type="string">
-Timestamp when the Holiday List was created.
-</ResponseField>
-
-<ResponseField name="updatedAt" type="string">
-Timestamp when the Holiday List was last updated.
-</ResponseField>
-
-## Error Responses
-
-### Bad Request (400)
-
-```json
-{
-  "success": false,
-  "message": "Invalid request payload."
-}
-```
-
-### Unauthorized (401)
-
-```json
-{
-  "success": false,
-  "message": "Unauthorized"
-}
-```
-
-### Internal Server Error (500)
-
-```json
-{
-  "success": false,
-  "message": "Failed to create Holiday List."
-}
-```
+- **400 Bad Request** – Missing `name` or `holidays`, or a date that isn't in `YYYY-MM-DD` format.
+- **401 Unauthorized** – Missing or invalid API key.
+- **500 Internal Server Error** – Unexpected server error.

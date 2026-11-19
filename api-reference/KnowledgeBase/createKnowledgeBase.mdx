@@ -1,7 +1,7 @@
 ---
 title: "Create Knowledge Base"
 description: "Create a new Knowledge Base by uploading one or more documents for your AI agents."
-openapi: "POST /api/knowledgeBase/createKnowledgeBase"
+api: "POST /api/knowledgeBase/createKnowledgeBase"
 ---
 
 ## Overview
@@ -10,14 +10,14 @@ Create a new Knowledge Base by uploading documents that your AI agents can use d
 
 ## Prerequisites
 
-- Bearer token for an authenticated workspace
+- An API key for your workspace
 - One or more supported documents
 - `multipart/form-data` request
 
 ## Request
 
-<ParamField header="Authorization" type="string" required>
-Bearer token for authenticated workspace access.
+<ParamField header="x-api-key" type="string" required>
+Your workspace API key. Create one from the profile menu in the dashboard → **API Keys**.
 </ParamField>
 
 <ParamField body="knowledgeBaseName" type="string" required>
@@ -36,7 +36,7 @@ One or more files to upload. Supports PDF, DOCX, TXT, CSV and other supported do
 
 ```bash cURL
 curl --location 'https://api.weya.live/backend/api/knowledgeBase/createKnowledgeBase' \
-  --header 'Authorization: Bearer {{authToken}}' \
+  --header 'x-api-key: YOUR_API_KEY' \
   --form 'knowledgeBaseName="Customer Support KB"' \
   --form 'description="Knowledge base for customer support queries"' \
   --form 'files=@"/Users/john/Documents/FAQ.pdf"' \

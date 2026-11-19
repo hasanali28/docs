@@ -1,7 +1,7 @@
 ---
 title: "Create Agent"
 description: "Create a new AI voice agent."
-openapi: "POST /api/agents/create"
+api: "POST /api/agents"
 ---
 
 ## Overview
@@ -10,14 +10,14 @@ Create a new AI agent that can be used for voice calls, campaigns, or inbound ph
 
 ## Prerequisites
 
-- API Key or Bearer Token
+- An API key for your workspace
 - Organization access
 - At least one supported LLM configured
 
 ## Request
 
-<ParamField header="Authorization" type="string">
-Bearer token for authentication.
+<ParamField header="x-api-key" type="string" required>
+Your workspace API key. Create one from the profile menu in the dashboard → **API Keys**.
 </ParamField>
 
 <ParamField body="agentName" type="string" required>

@@ -1,211 +1,137 @@
 ---
 title: "Update Phone Number"
-openapi: "PATCH /api/phone-numbers/{id}"
-description: "Update the configuration of an existing phone number in your Weya AI workspace."
+description: "Update a phone number's provider credentials or SIP settings."
+api: "PUT /api/call/update-phone/{phoneId}"
 ---
 
-Use this endpoint to update an existing phone number. You can modify its configuration, provider settings, or update the AI Agent associated with the phone number, depending on your workspace configuration.
+## Overview
 
-<Note>
-Only authenticated users can update phone numbers within their workspace.
-</Note>
+Update the details of a phone number connected to your workspace, such as its provider credentials or SIP connection settings. To change which agent handles a number, assign the agent from the dashboard's **Phone Numbers** page.
 
-### OpenAPI
+## Prerequisites
 
-```yaml
-openapi: 3.1.0
-info:
-  title: Update Phone Number
-  version: 1.0.0
+- An API key for your workspace
+- The phone number's ID (`_id` from **Get Phone Numbers**)
 
-paths:
-  /api/phone-numbers/{id}:
-    patch:
-      summary: Update a phone number
-      description: Updates the configuration of an existing phone number.
-      tags:
-        - Phone Numbers
+## Endpoint
 
-      security:
-        - bearerAuth: []
+<ParamField method="PUT" path="/api/call/update-phone/{phoneId}" />
 
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
-          description: Unique identifier of the phone number.
+## Request
 
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                phoneNumber:
-                  type: string
-                  example: "+14155552671"
-                provider:
-                  type: string
-                  example: Twilio
-                assignedAgentId:
-                  type: string
-                  example: 686ab1234567890abcdef123
-                status:
-                  type: string
-                  enum:
-                    - Active
-                    - Inactive
-
-      responses:
-        "200":
-          description: Phone number updated successfully.
-
-        "400":
-          description: Invalid request.
-
-        "401":
-          description: Unauthorized.
-
-        "404":
-          description: Phone number not found.
-
-        "500":
-          description: Internal Server Error.
-
-components:
-  securitySchemes:
-    bearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
-```
-
-## Authorizations
-
-<ParamField header="Authorization" type="string" required>
-Bearer Token for the authenticated user.
-
-Format:
-
-`Authorization: Bearer YOUR_ACCESS_TOKEN`
+<ParamField header="x-api-key" type="string" required>
+Your workspace API key. Create one from the profile menu in the dashboard → **API Keys**.
 </ParamField>
 
-## Path Parameters
-
-<ParamField path="id" type="string" required>
-The unique identifier of the phone number to update.
+<ParamField path="phoneId" type="string" required>
+ID of the phone number to update.
 </ParamField>
 
-## Body Parameters
+<RequestExample>
 
-<ParamField body="phoneNumber" type="string">
-Updated phone number in international (E.164) format.
-</ParamField>
-
-<ParamField body="provider" type="string">
-Updated telephony provider associated with the phone number.
-</ParamField>
-
-<ParamField body="assignedAgentId" type="string">
-Unique identifier of the AI Agent to assign to this phone number.
-</ParamField>
-
-<ParamField body="status" type="string">
-Status of the phone number (`Active` or `Inactive`).
-</ParamField>
-
-## Example Request
-
-```bash
-curl --location --request PATCH 'https://api.weya.live/backend/api/phone-numbers/6872d4b5f8d7a91234567890' \
---header 'Authorization: Bearer YOUR_ACCESS_TOKEN' \
---header 'Content-Type: application/json' \
---data '{
-  "assignedAgentId": "686ab1234567890abcdef123",
-  "status": "Active"
+```bash cURL
+curl --location --request PUT 'https://api.weya.live/backend/api/call/update-phone/6872d4b5f8d7a91234567890' \
+  --header 'x-api-key: YOUR_API_KEY' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "userId": "64e5f12345abcdef12345678",
+    "integration": "plivo",
+    "phoneNumber": "+919876543210",
+    "accSId": "YOUR_PROVIDER_ACCOUNT_ID",
+    "authToken": "YOUR_PROVIDER_AUTH_TOKEN"
 }'
 ```
 
-## Successful Response
+</RequestExample>
 
-```json
+### Request Parameters
+
+<ParamField body="userId" type="string" required>
+Your user ID.
+</ParamField>
+
+<ParamField body="integration" type="string" required>
+Telephony provider: `twilio`, `plivo`, `telnyx`, `sip`, `exotel`, `elisiontec`, `vobiz` or `jambonz`.
+</ParamField>
+
+<ParamField body="phoneNumber" type="string">
+The phone number, with country code. Not used for SIP connections.
+</ParamField>
+
+<ParamField body="accSId" type="string">
+Account ID from your telephony provider.
+</ParamField>
+
+<ParamField body="authToken" type="string">
+Auth token from your telephony provider.
+</ParamField>
+
+<ParamField body="sipHost" type="string">
+SIP only: SIP server host.
+</ParamField>
+
+<ParamField body="sipPort" type="integer">
+SIP only: SIP server port.
+</ParamField>
+
+<ParamField body="sipUsername" type="string">
+SIP only: SIP username.
+</ParamField>
+
+<ParamField body="sipSecret" type="string">
+SIP only: SIP password.
+</ParamField>
+
+<ParamField body="sipFromUser" type="string">
+SIP only: the "from" user for outgoing calls.
+</ParamField>
+
+<ParamField body="sipTransport" type="string">
+SIP only: `udp`, `tcp` or `tls`.
+</ParamField>
+
+<ParamField body="sipRegister" type="boolean">
+SIP only: whether to register with the SIP server.
+</ParamField>
+
+<ParamField body="elisiontecListId" type="string">
+Elisiontec only: list ID.
+</ParamField>
+
+## Response
+
+<ResponseExample>
+
+```json 200 OK
 {
-  "success": true,
-  "message": "Phone number updated successfully.",
-  "data": {
+  "status": true,
+  "code": 200,
+  "message": "",
+  "errorMessage": "",
+  "phoneNumber": {
     "_id": "6872d4b5f8d7a91234567890",
-    "phoneNumber": "+14155552671",
-    "provider": "Twilio",
-    "status": "Active",
-    "assignedAgent": "Customer Support Agent",
-    "updatedAt": "2026-07-22T09:15:42.000Z"
+    "phoneNumber": "+919876543210",
+    "integration": "plivo",
+    "userId": "64e5f12345abcdef12345678",
+    "createdAt": "2026-07-20T10:15:30.000Z",
+    "updatedAt": "2026-11-19T09:00:00.000Z"
   }
 }
 ```
 
-## Response Fields
+</ResponseExample>
 
-<ResponseField name="_id" type="string">
-Unique identifier of the phone number.
+<ResponseField name="status" type="boolean" required>
+Indicates whether the phone number was updated.
 </ResponseField>
 
-<ResponseField name="phoneNumber" type="string">
+<ResponseField name="phoneNumber" type="object">
 The updated phone number.
 </ResponseField>
 
-<ResponseField name="provider" type="string">
-Telephony provider associated with the phone number.
-</ResponseField>
+## Error Handling
 
-<ResponseField name="status" type="string">
-Current status of the phone number.
-</ResponseField>
-
-<ResponseField name="assignedAgent" type="string">
-Name of the AI Agent currently assigned to the phone number.
-</ResponseField>
-
-<ResponseField name="updatedAt" type="string">
-Timestamp indicating when the phone number was last updated.
-</ResponseField>
-
-## Error Responses
-
-### Bad Request (400)
-
-```json
-{
-  "success": false,
-  "message": "Invalid request payload."
-}
-```
-
-### Unauthorized (401)
-
-```json
-{
-  "success": false,
-  "message": "Unauthorized"
-}
-```
-
-### Not Found (404)
-
-```json
-{
-  "success": false,
-  "message": "Phone number not found."
-}
-```
-
-### Internal Server Error (500)
-
-```json
-{
-  "success": false,
-  "message": "Failed to update phone number."
-}
-```
+- **400 Bad Request** – Invalid or missing fields.
+- **401 Unauthorized** – Missing or invalid API key.
+- **404 Not Found** – The phone number does not exist in your workspace.
+- **500 Internal Server Error** – Unexpected server error.

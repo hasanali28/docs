@@ -1,7 +1,7 @@
 ---
 title: "Get WhatsApp Templates"
 description: "Retrieve all approved WhatsApp message templates available for a connected WhatsApp Business phone number."
-openapi: "GET /api/whatsapp/get-templates/{phoneNumberId}"
+api: "GET /api/whatsapp/get-templates/{phoneNumberId}"
 ---
 
 ## Overview
@@ -10,13 +10,13 @@ Retrieve all WhatsApp message templates associated with a connected WhatsApp Bus
 
 ## Prerequisites
 
-- Bearer Token authentication
+- An API key for your workspace
 - A connected WhatsApp Business phone number
 
 ## Request
 
-<ParamField header="Authorization" type="string" required>
-Bearer token for authenticated workspace access.
+<ParamField header="x-api-key" type="string" required>
+Your workspace API key. Create one from the profile menu in the dashboard → **API Keys**.
 </ParamField>
 
 <ParamField path="phoneNumberId" type="string" required>
@@ -27,7 +27,7 @@ Unique identifier of the connected WhatsApp Business phone number.
 
 ```bash cURL
 curl --location 'https://api.weya.live/backend/api/whatsapp/get-templates/123456789012345' \
---header 'Authorization: Bearer {{authToken}}'
+--header 'x-api-key: YOUR_API_KEY'
 ```
 
 </RequestExample>
@@ -103,7 +103,7 @@ Current approval status of the template.
 | Status | Description |
 |---------|-------------|
 |400|Invalid phone number ID|
-|401|Unauthorized or invalid Bearer token|
+|401|Missing or invalid API key|
 |403|Permission denied|
 |404|WhatsApp phone number not found|
 |500|Internal server error|

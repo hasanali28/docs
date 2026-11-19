@@ -1,7 +1,7 @@
 ---
 title: "Get Agent By ID"
 description: "Retrieve the complete configuration and details of a specific AI agent."
-openapi: "GET /api/agents/{id}"
+api: "GET /api/agents/{id}"
 ---
 
 ## Overview
@@ -10,13 +10,13 @@ Retrieve the complete details of an AI agent using its unique Agent ID. This end
 
 ## Prerequisites
 
-- Bearer token for an authenticated workspace
+- An API key for your workspace
 - Valid Agent ID
 
 ## Request
 
-<ParamField header="Authorization" type="string" required>
-Bearer token for authenticated workspace access.
+<ParamField header="x-api-key" type="string" required>
+Your workspace API key. Create one from the profile menu in the dashboard → **API Keys**.
 </ParamField>
 
 <ParamField path="id" type="string" required>
@@ -27,7 +27,7 @@ Unique identifier of the AI agent.
 
 ```bash cURL
 curl --location 'https://api.weya.live/backend/api/agents/{id}' \
-  --header 'Authorization: Bearer {{authToken}}'
+  --header 'x-api-key: YOUR_API_KEY'
 ```
 
 </RequestExample>
@@ -109,7 +109,7 @@ Knowledge Base IDs associated with the AI agent.
 ## Error Handling
 
 - **400 Bad Request** – Invalid Agent ID format.
-- **401 Unauthorized** – Missing or invalid Bearer token.
+- **401 Unauthorized** – Missing or invalid API key.
 - **403 Forbidden** – You do not have permission to access this agent.
 - **404 Not Found** – No AI agent found for the provided ID.
 - **500 Internal Server Error** – Unexpected server error.

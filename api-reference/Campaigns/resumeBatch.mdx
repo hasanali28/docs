@@ -1,0 +1,102 @@
+---
+title: "Resume Campaign"
+description: "Start calling again on a paused campaign."
+api: "POST /api/call/resume-batch/{batchId}"
+---
+
+## Overview
+
+Resume a paused campaign so it starts placing calls again. If the current time is outside the campaign's calling hours or calling days, it waits until the next calling window.
+
+You don't need to call this after **Update Campaign**: a paused campaign resumes automatically when its settings are updated.
+
+## Prerequisites
+
+- An API key for your workspace
+- The campaign's `batchId`
+- The campaign is paused
+
+## Endpoint
+
+<ParamField method="POST" path="/api/call/resume-batch/{batchId}" />
+
+## Request
+
+<ParamField header="x-api-key" type="string" required>
+Your workspace API key. Create one from the profile menu in the dashboard → **API Keys**.
+</ParamField>
+
+<ParamField path="batchId" type="string" required>
+Unique identifier of the campaign to resume.
+</ParamField>
+
+This endpoint takes no request body.
+
+<RequestExample>
+
+```bash cURL
+curl --location --request POST 'https://api.weya.live/backend/api/call/resume-batch/6806382f98da85ec32fac955' \
+  --header 'x-api-key: YOUR_API_KEY'
+```
+
+</RequestExample>
+
+## Response
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "status": true,
+  "code": 200,
+  "message": "Batch resumed successfully",
+  "errorMessage": "",
+  "data": {
+    "batchId": "6806382f98da85ec32fac955",
+    "batchName": "Sales Campaign - July",
+    "status": "pending"
+  }
+}
+```
+
+</ResponseExample>
+
+<ResponseField name="status" type="boolean" required>
+Indicates whether the campaign was resumed.
+</ResponseField>
+
+<ResponseField name="code" type="integer" required>
+HTTP status code.
+</ResponseField>
+
+<ResponseField name="message" type="string" required>
+Human-readable success message.
+</ResponseField>
+
+<ResponseField name="data.batchId" type="string">
+ID of the resumed campaign.
+</ResponseField>
+
+<ResponseField name="data.batchName" type="string">
+Name of the resumed campaign.
+</ResponseField>
+
+<ResponseField name="data.status" type="string">
+New campaign status. `pending` means it will start calling; `freezed` means it is outside its calling window and will start at the next one.
+</ResponseField>
+
+## Error Handling
+
+- **400 Bad Request** – The campaign is not paused.
+- **401 Unauthorized** – Missing or invalid API key.
+- **404 Not Found** – The campaign does not exist in your workspace.
+- **500 Internal Server Error** – Unexpected server error.
+
+<Check>
+
+After resuming a campaign, you can:
+
+- `GET /api/call/batch-details/{batchId}` to follow its calls.
+- `POST /api/call/pause-batch/{batchId}` to pause it again.
+
+</Check>

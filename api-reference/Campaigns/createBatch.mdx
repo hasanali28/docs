@@ -1,0 +1,183 @@
+---
+title: "Create Campaign"
+description: "Create a voice, video or web chat campaign without uploading contacts."
+api: "POST /api/call/createBatch"
+---
+
+## Overview
+
+Create an empty campaign that you add contacts to later, for example with **Add Calls to Campaign**. The fields you send depend on `channel_type`:
+
+- **`voice`** (default) – an outbound calling campaign. Send the calling numbers and schedule.
+- **`video`** – a video agent campaign. Send `videoAgentId`. The response includes the link people use to join.
+- **`web_chat`** – a chat widget campaign. Send `chatAgentId` and `allowedDomains`. The response includes the script tag to embed.
+
+To create a voice campaign and upload contacts in one step, use **Upload Campaign CSV** instead.
+
+## Prerequisites
+
+- An API key for your workspace
+- For voice: at least one phone number in your workspace with an outbound agent assigned
+- For video or web chat: an existing video or chat agent
+
+## Endpoint
+
+<ParamField method="POST" path="/api/call/createBatch" />
+
+## Request
+
+<ParamField header="x-api-key" type="string" required>
+Your workspace API key. Create one from the profile menu in the dashboard → **API Keys**.
+</ParamField>
+
+<RequestExample>
+
+```bash cURL (voice)
+curl --location 'https://api.weya.live/backend/api/call/createBatch' \
+  --header 'x-api-key: YOUR_API_KEY' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "channel_type": "voice",
+    "batchName": "API Campaign May 2025",
+    "callingNumbers": ["64e5f12345abcdef87654321"],
+    "retry": 3,
+    "delay": 30,
+    "timezone": "Asia/Kolkata",
+    "callingHour": { "start": "09:00", "end": "17:00" },
+    "allowedDays": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+    "holidayListId": "64f12345abcdef9876543210"
+}'
+```
+
+```bash cURL (video)
+curl --location 'https://api.weya.live/backend/api/call/createBatch' \
+  --header 'x-api-key: YOUR_API_KEY' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "channel_type": "video",
+    "batchName": "Product Demo Campaign",
+    "videoAgentId": "6891a23bc456def789123456"
+}'
+```
+
+```bash cURL (web chat)
+curl --location 'https://api.weya.live/backend/api/call/createBatch' \
+  --header 'x-api-key: YOUR_API_KEY' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "channel_type": "web_chat",
+    "batchName": "Website Chat",
+    "chatAgentId": "6891a23bc456def789654321",
+    "allowedDomains": ["example.com"]
+}'
+```
+
+</RequestExample>
+
+### Request Parameters
+
+<ParamField body="channel_type" type="string" default="voice">
+Type of campaign: `voice`, `video` or `web_chat`.
+</ParamField>
+
+<ParamField body="batchName" type="string" required>
+Name of the campaign, shown in the dashboard.
+</ParamField>
+
+#### Voice campaigns
+
+<ParamField body="callingNumbers" type="array[string]" required>
+IDs of the phone numbers to call from. Calls are handled by the outbound agent assigned to each number.
+</ParamField>
+
+<ParamField body="retry" type="integer">
+Maximum attempts per contact. Allowed range: 1–10.
+</ParamField>
+
+<ParamField body="delay" type="integer">
+Time to wait between attempts to the same contact, in **minutes**. Allowed range: 5–1440.
+</ParamField>
+
+<ParamField body="timezone" type="string">
+Timezone used for the calling schedule. Example: `Asia/Kolkata`.
+</ParamField>
+
+<ParamField body="callingHour" type="object">
+Daily calling window in 24-hour `HH:MM` format. Example: `{ "start": "09:00", "end": "17:00" }`.
+</ParamField>
+
+<ParamField body="allowedDays" type="array[string]">
+Days of the week calls can be placed on. Example: `["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]`.
+</ParamField>
+
+<ParamField body="holidayListId" type="string">
+ID of a holiday list. No calls are placed on the dates in that list.
+</ParamField>
+
+#### Video campaigns
+
+<ParamField body="videoAgentId" type="string" required>
+ID of the video agent people talk to. Required when `channel_type` is `video`.
+</ParamField>
+
+#### Web chat campaigns
+
+<ParamField body="chatAgentId" type="string" required>
+ID of the chat agent. Required when `channel_type` is `web_chat`.
+</ParamField>
+
+<ParamField body="voiceAgentId" type="string">
+Optional voice agent for visitors who switch to a call from the chat widget.
+</ParamField>
+
+<ParamField body="allowedDomains" type="array[string]" required>
+Websites the chat widget is allowed to load on. Required when `channel_type` is `web_chat`.
+</ParamField>
+
+## Response
+
+<ResponseExample>
+
+```json 201 Created
+{
+  "message": "Batch created successfully",
+  "status": true,
+  "code": 201,
+  "errorMessage": "",
+  "data": "64e5f12345abcdef98765432"
+}
+```
+
+</ResponseExample>
+
+<ResponseField name="status" type="boolean" required>
+Indicates whether the campaign was created.
+</ResponseField>
+
+<ResponseField name="code" type="integer" required>
+HTTP status code.
+</ResponseField>
+
+<ResponseField name="message" type="string" required>
+Human-readable success message.
+</ResponseField>
+
+<ResponseField name="data" type="string | object" required>
+For voice campaigns, the new campaign's ID (`batchId`). For video campaigns, an object with the campaign `id` and its join `link`. For web chat campaigns, an object with the campaign `id`, `campaignToken` and the `scriptTag` to embed on your site.
+</ResponseField>
+
+## Error Handling
+
+- **400 Bad Request** – Missing `batchName`, missing or empty `callingNumbers` for a voice campaign, or a missing agent ID for a video or web chat campaign.
+- **401 Unauthorized** – Missing or invalid API key.
+- **500 Internal Server Error** – Unexpected server error.
+
+<Check>
+
+After creating a campaign, you can:
+
+- `POST /api/call/addCallsToBatch` to add contacts to a voice campaign.
+- `POST /api/call/start-calling` to start calling.
+- `GET /api/call/batches/{userId}` to see it in your campaign list.
+
+</Check>

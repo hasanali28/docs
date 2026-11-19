@@ -1,49 +1,46 @@
 ---
 title: "Add to DNC List"
 description: "Add a phone number to the Do Not Call (DNC) list for your organization."
-openapi: "POST /api/dnc/add"
+api: "POST /api/dnc/add"
 ---
 
 ## Overview
 Add a phone number to your organization's Do Not Call (DNC) list. Once added, this number will be excluded from future outbound calling campaigns. The system automatically sends a notification email to the organization admin when a number is added to the DNC list.
 
 ## Prerequisites
-- Bearer token for authenticated workspace access
-- Valid `batchId` that exists in your workspace
-- Valid `requestUUID` from a call record in the specified batch
+- An API key for your workspace
+- If linking to a call: a valid `batchId` and `requestUUID` from that campaign
 
 ## Request
 
-<ParamField header="Authorization" type="string" required>
-Bearer token for the authenticated workspace account.
+<ParamField header="x-api-key" type="string" required>
+Your workspace API key. Create one from the profile menu in the dashboard → **API Keys**.
 </ParamField>
 
 <ParamField body="phoneNumber" type="string" required>
 Phone number to add to the DNC list with country code (e.g., "12125551234"). The `+` prefix is optional.
 </ParamField>
 
-<ParamField body="batchId" type="string" required>
-ID of the batch associated with the call that triggered this DNC request.
-</ParamField>
-
-<ParamField body="requestUUID" type="string" required>
-Unique identifier (UUID) of the specific call record from the batch's phone logs.
-</ParamField>
-
 <ParamField body="type" type="string">
-Optional classification for the DNC entry (e.g., "customer_request", "complaint", etc.).
+Channel the number should not be contacted on: `Call`, `Email` or `Whatsapp`.
+</ParamField>
+
+<ParamField body="batchId" type="string">
+Optional. ID of the campaign whose call led to this request. Send it together with `requestUUID` to link the DNC entry to that call.
+</ParamField>
+
+<ParamField body="requestUUID" type="string">
+Optional. ID of the call record the request came from. Send it together with `batchId`.
 </ParamField>
 
 <RequestExample>
 ```bash cURL
 curl --location 'https://api.weya.live/backend/api/dnc/add' \
-  --header 'Authorization: Bearer {{authToken}}' \
+  --header 'x-api-key: YOUR_API_KEY' \
   --header 'Content-Type: application/json' \
   --data '{
     "phoneNumber": "12125551234",
-    "batchId": "64e5f12345abcdef98765432",
-    "requestUUID": "550e8400-e29b-41d4-a716-446655440000",
-    "type": "customer_request"
+    "type": "Call"
   }'
 ```
 </RequestExample>
@@ -75,8 +72,8 @@ HTTP status code (200 for success).
 
 ## Error Handling
 
-- **400 Bad Request** – Missing required fields (`phoneNumber`, `batchId`, or `requestUUID`), or phone number already exists in DNC for this organization.
-- **404 Not Found** – Batch not found, user not found for the batch, or call record not found for the given `batchId` and `requestUUID`.
+- **400 Bad Request** – Missing `phoneNumber`, or the phone number is already on your organization's DNC list.
+- **404 Not Found** – When `batchId` and `requestUUID` are sent: the campaign or the call record was not found.
 - **500 Internal Server Error** – Server error while processing the request.
 
 <Note>

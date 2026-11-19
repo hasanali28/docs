@@ -1,7 +1,7 @@
 ---
 title: "Update Knowledge Base"
 description: "Update the details of an existing Knowledge Base or upload additional documents."
-openapi: "PUT /api/knowledgeBase/{knowledgeBaseId}"
+api: "PUT /api/knowledgeBase/{knowledgeBaseId}"
 ---
 
 ## Overview
@@ -10,14 +10,14 @@ Update an existing Knowledge Base by modifying its name, description, or uploadi
 
 ## Prerequisites
 
-- Bearer token for an authenticated workspace
+- An API key for your workspace
 - Valid Knowledge Base ID
 - `multipart/form-data` request
 
 ## Request
 
-<ParamField header="Authorization" type="string" required>
-Bearer token for authenticated workspace access.
+<ParamField header="x-api-key" type="string" required>
+Your workspace API key. Create one from the profile menu in the dashboard → **API Keys**.
 </ParamField>
 
 <ParamField path="knowledgeBaseId" type="string" required>
@@ -40,7 +40,7 @@ One or more new documents to upload. Existing documents are preserved.
 
 ```bash cURL
 curl --location --request PUT 'https://api.weya.live/backend/api/knowledgeBase/687b1c2ab7c7d3f123456789' \
-  --header 'Authorization: Bearer {{authToken}}' \
+  --header 'x-api-key: YOUR_API_KEY' \
   --form 'knowledgeBaseName="Updated Customer Support KB"' \
   --form 'description="Updated support documentation"' \
   --form 'files=@"/Users/john/Documents/RefundPolicy.pdf"' \

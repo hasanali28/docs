@@ -1,7 +1,7 @@
 ---
 title: "Create WhatsApp Agent"
 description: "Create a new AI-powered WhatsApp Agent for handling customer conversations."
-openapi: "POST /api/whatsapp/save-whatsapp-agent"
+api: "POST /api/whatsapp/save-whatsapp-agent"
 ---
 
 ## Overview
@@ -10,22 +10,22 @@ Create a WhatsApp Agent that can automatically respond to customer messages on a
 
 ## Prerequisites
 
-- Bearer Token authentication
+- An API key for your workspace
 - At least one integrated WhatsApp Business number
 - (Optional) Knowledge Base created
 - (Optional) WhatsApp templates configured
 
 ## Request
 
-<ParamField header="Authorization" type="string" required>
-Bearer token for authenticated workspace access.
+<ParamField header="x-api-key" type="string" required>
+Your workspace API key. Create one from the profile menu in the dashboard → **API Keys**.
 </ParamField>
 
 <RequestExample>
 
 ```bash cURL
 curl --location 'https://api.weya.live/backend/api/whatsapp/save-whatsapp-agent' \
---header 'Authorization: Bearer {{authToken}}' \
+--header 'x-api-key: YOUR_API_KEY' \
 --header 'Content-Type: application/json' \
 --data '{
   "agentName": "Support Assistant",
@@ -134,7 +134,7 @@ Timestamp when the agent was created.
 | Status | Description |
 |---------|-------------|
 |400|Missing or invalid request parameters|
-|401|Unauthorized or invalid Bearer token|
+|401|Missing or invalid API key|
 |403|You do not have permission to create WhatsApp agents|
 |404|WhatsApp number or Knowledge Base not found|
 |409|An agent already exists for the selected WhatsApp number|

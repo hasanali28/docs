@@ -1,225 +1,97 @@
 ---
 title: "Update Holiday List"
-openapi: "PUT /api/holiday-lists/{id}"
-description: "Update an existing Holiday List, including its name, description, or list of holidays."
+description: "Rename a holiday list, change its dates, or make it the default."
+api: "PUT /api/holiday-list/{id}"
 ---
 
-Use this endpoint to update an existing Holiday List. You can modify the Holiday List's name, description, or update the holidays it contains.
+## Overview
 
-<Note>
-Only authenticated users can update Holiday Lists that belong to their workspace.
-</Note>
+Update a holiday list. Send only the fields you want to change. If you send `holidays`, it replaces the whole list of dates.
 
-### OpenAPI
+## Prerequisites
 
-```yaml
-openapi: 3.1.0
-info:
-  title: Update Holiday List
-  version: 1.0.0
+- An API key for your workspace
+- The holiday list's ID
 
-paths:
-  /api/holiday-lists/{id}:
-    put:
-      summary: Update a Holiday List
-      description: Updates an existing Holiday List.
-      tags:
-        - Holiday Lists
+## Endpoint
 
-      security:
-        - bearerAuth: []
+<ParamField method="PUT" path="/api/holiday-list/{id}" />
 
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
-          description: Unique identifier of the Holiday List.
+## Request
 
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                name:
-                  type: string
-                  example: India Public Holidays
-                description:
-                  type: string
-                  example: Updated list of public holidays.
-                holidays:
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      name:
-                        type: string
-                        example: Republic Day
-                      date:
-                        type: string
-                        format: date
-                        example: "2026-01-26"
-
-      responses:
-        "200":
-          description: Holiday List updated successfully.
-
-        "400":
-          description: Invalid request.
-
-        "401":
-          description: Unauthorized.
-
-        "404":
-          description: Holiday List not found.
-
-        "500":
-          description: Internal Server Error.
-
-components:
-  securitySchemes:
-    bearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
-```
-
-## Authorizations
-
-<ParamField header="Authorization" type="string" required>
-Bearer Token for the authenticated user.
-
-Format:
-
-`Authorization: Bearer YOUR_ACCESS_TOKEN`
+<ParamField header="x-api-key" type="string" required>
+Your workspace API key. Create one from the profile menu in the dashboard → **API Keys**.
 </ParamField>
-
-## Path Parameters
 
 <ParamField path="id" type="string" required>
-The unique identifier of the Holiday List to update.
+ID of the holiday list to update.
 </ParamField>
 
-## Body Parameters
+<RequestExample>
 
-<ParamField body="name" type="string">
-Updated name of the Holiday List.
-</ParamField>
-
-<ParamField body="description" type="string">
-Updated description for the Holiday List.
-</ParamField>
-
-<ParamField body="holidays" type="array">
-Updated array of holidays to include in the Holiday List.
-</ParamField>
-
-## Example Request
-
-```bash
-curl --location --request PUT 'https://api.weya.live/backend/api/holiday-lists/6863f5ab1e4d7f0012345678' \
---header 'Authorization: Bearer YOUR_ACCESS_TOKEN' \
---header 'Content-Type: application/json' \
---data '{
-  "name": "India Public Holidays 2026",
-  "description": "Updated public holiday schedule.",
-  "holidays": [
-    {
-      "name": "Republic Day",
-      "date": "2026-01-26"
-    },
-    {
-      "name": "Independence Day",
-      "date": "2026-08-15"
-    },
-    {
-      "name": "Gandhi Jayanti",
-      "date": "2026-10-02"
-    }
-  ]
+```bash cURL
+curl --location --request PUT 'https://api.weya.live/backend/api/holiday-list/68a1f2c3b7c7d3f123456789' \
+  --header 'x-api-key: YOUR_API_KEY' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "name": "India Holidays 2026",
+    "holidays": [
+      { "label": "Republic Day", "date": "2026-01-26" },
+      { "label": "Independence Day", "date": "2026-08-15" },
+      { "label": "Gandhi Jayanti", "date": "2026-10-02" }
+    ]
 }'
 ```
 
-## Successful Response
+</RequestExample>
 
-```json
+### Request Parameters
+
+<ParamField body="name" type="string">
+New name for the holiday list.
+</ParamField>
+
+<ParamField body="holidays" type="array[object]">
+The full list of holidays, replacing the current one. Each item has a `label` and a `date` in `YYYY-MM-DD` format.
+</ParamField>
+
+<ParamField body="isDefault" type="boolean">
+Set to `true` to make this the default list.
+</ParamField>
+
+## Response
+
+<ResponseExample>
+
+```json 200 OK
 {
-  "success": true,
-  "message": "Holiday List updated successfully.",
+  "status": true,
+  "code": 200,
+  "message": "",
+  "errorMessage": "",
   "data": {
-    "_id": "6863f5ab1e4d7f0012345678",
-    "name": "India Public Holidays 2026",
-    "description": "Updated public holiday schedule.",
-    "enabled": true,
-    "holidayCount": 3,
-    "updatedAt": "2026-07-21T14:30:22.000Z"
+    "_id": "68a1f2c3b7c7d3f123456789",
+    "name": "India Holidays 2026",
+    "isDefault": true,
+    "holidays": [
+      { "label": "Republic Day", "date": "2026-01-26" },
+      { "label": "Independence Day", "date": "2026-08-15" },
+      { "label": "Gandhi Jayanti", "date": "2026-10-02" }
+    ],
+    "updatedAt": "2026-11-19T09:00:00.000Z"
   }
 }
 ```
 
-## Response Fields
+</ResponseExample>
 
-<ResponseField name="_id" type="string">
-Unique identifier of the Holiday List.
+<ResponseField name="data" type="object" required>
+The updated holiday list.
 </ResponseField>
 
-<ResponseField name="name" type="string">
-Updated Holiday List name.
-</ResponseField>
+## Error Handling
 
-<ResponseField name="description" type="string">
-Updated description of the Holiday List.
-</ResponseField>
-
-<ResponseField name="enabled" type="boolean">
-Whether the Holiday List is currently enabled.
-</ResponseField>
-
-<ResponseField name="holidayCount" type="integer">
-Total number of holidays in the Holiday List.
-</ResponseField>
-
-<ResponseField name="updatedAt" type="string">
-Timestamp indicating when the Holiday List was last updated.
-</ResponseField>
-
-## Error Responses
-
-### Bad Request (400)
-
-```json
-{
-  "success": false,
-  "message": "Invalid request payload."
-}
-```
-
-### Unauthorized (401)
-
-```json
-{
-  "success": false,
-  "message": "Unauthorized"
-}
-```
-
-### Not Found (404)
-
-```json
-{
-  "success": false,
-  "message": "Holiday List not found."
-}
-```
-
-### Internal Server Error (500)
-
-```json
-{
-  "success": false,
-  "message": "Failed to update Holiday List."
-}
-```
+- **400 Bad Request** – Invalid fields or date format.
+- **401 Unauthorized** – Missing or invalid API key.
+- **404 Not Found** – The holiday list does not exist in your organization.
+- **500 Internal Server Error** – Unexpected server error.

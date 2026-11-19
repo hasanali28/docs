@@ -1,0 +1,102 @@
+---
+title: "Pause Campaign"
+description: "Stop a running campaign from starting new calls. Calls already in progress finish normally."
+api: "POST /api/call/pause-batch/{batchId}"
+---
+
+## Overview
+
+Pause a running campaign. While paused, no new calls are started; calls that are already connected finish normally. Resume it later with **Resume Campaign**.
+
+A campaign must be paused before you can change its settings with **Update Campaign**.
+
+## Prerequisites
+
+- An API key for your workspace
+- The campaign's `batchId`
+- The campaign is running. Completed, failed and inbound campaigns can't be paused.
+
+## Endpoint
+
+<ParamField method="POST" path="/api/call/pause-batch/{batchId}" />
+
+## Request
+
+<ParamField header="x-api-key" type="string" required>
+Your workspace API key. Create one from the profile menu in the dashboard → **API Keys**.
+</ParamField>
+
+<ParamField path="batchId" type="string" required>
+Unique identifier of the campaign to pause.
+</ParamField>
+
+This endpoint takes no request body.
+
+<RequestExample>
+
+```bash cURL
+curl --location --request POST 'https://api.weya.live/backend/api/call/pause-batch/6806382f98da85ec32fac955' \
+  --header 'x-api-key: YOUR_API_KEY'
+```
+
+</RequestExample>
+
+## Response
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "status": true,
+  "code": 200,
+  "message": "Batch paused successfully",
+  "errorMessage": "",
+  "data": {
+    "batchId": "6806382f98da85ec32fac955",
+    "batchName": "Sales Campaign - July",
+    "status": "paused"
+  }
+}
+```
+
+</ResponseExample>
+
+<ResponseField name="status" type="boolean" required>
+Indicates whether the campaign was paused.
+</ResponseField>
+
+<ResponseField name="code" type="integer" required>
+HTTP status code.
+</ResponseField>
+
+<ResponseField name="message" type="string" required>
+Human-readable success message.
+</ResponseField>
+
+<ResponseField name="data.batchId" type="string">
+ID of the paused campaign.
+</ResponseField>
+
+<ResponseField name="data.batchName" type="string">
+Name of the paused campaign.
+</ResponseField>
+
+<ResponseField name="data.status" type="string">
+New campaign status: `paused`.
+</ResponseField>
+
+## Error Handling
+
+- **400 Bad Request** – The campaign is already paused, or it is completed or failed and can't be paused.
+- **401 Unauthorized** – Missing or invalid API key.
+- **404 Not Found** – The campaign does not exist in your workspace.
+- **500 Internal Server Error** – Unexpected server error.
+
+<Check>
+
+After pausing a campaign, you can:
+
+- `PUT /api/call/update-batch/{batchId}` to change its settings or add calls.
+- `POST /api/call/resume-batch/{batchId}` to start calling again.
+
+</Check>

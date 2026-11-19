@@ -1,47 +1,79 @@
 ---
 title: "Add Phone Number"
 description: "Add a new phone number to your workspace for outbound or inbound calling."
-openapi: "POST /api/call/add-phone"
+api: "POST /api/call/add-phone"
 ---
 
 ## Overview
 Add a phone number to your workspace that can be used for outbound calling campaigns or inbound call handling. The system supports multiple integrations including Plivo, Twilio, and Telnyx. Credentials are validated before the number is saved, and webhooks are automatically configured for the selected integration.
 
 ## Prerequisites
-- Bearer token for authenticated workspace access
+- An API key for your workspace
 - Valid phone number credentials for your chosen integration provider
 - Phone number must be owned by your integration account
 
 ## Request
 
-<ParamField header="Authorization" type="string" required>
-Bearer token for the authenticated workspace account.
+<ParamField header="x-api-key" type="string" required>
+Your workspace API key. Create one from the profile menu in the dashboard → **API Keys**.
 </ParamField>
 
 <ParamField body="userId" type="string" required>
 ID of the user who will own this phone number.
 </ParamField>
 
-<ParamField body="phoneNumber" type="string" required>
-Phone number with country code (e.g., "12125551234"). The `+` prefix is optional. Must be owned by your integration account.
+<ParamField body="phoneNumber" type="string">
+Phone number with country code (e.g., "12125551234"). The `+` prefix is optional. Must be owned by your provider account. Required for every provider except `sip`.
 </ParamField>
 
-<ParamField body="integration" type="string" required allowedValues="plivo,twilio,telnyx">
-Integration provider for this phone number. Choose one of: `plivo`, `twilio`, or `telnyx`.
+<ParamField body="integration" type="string" required allowedValues="twilio,plivo,telnyx,sip,exotel,elisiontec,vobiz,jambonz">
+Telephony provider for this phone number: `twilio`, `plivo`, `telnyx`, `sip`, `exotel`, `elisiontec`, `vobiz` or `jambonz`.
 </ParamField>
 
-<ParamField body="authToken" type="string" required>
+<ParamField body="authToken" type="string">
 Authentication token for your integration provider account. For Plivo, this is the Auth Token. For Twilio, this is the Auth Token. For Telnyx, this is the API Key.
 </ParamField>
 
-<ParamField body="accSId" type="string" required>
+<ParamField body="accSId" type="string">
 Account identifier for your integration provider. For Plivo, this is the Auth ID. For Twilio, this is the Account SID. For Telnyx, this is the App ID (automatically configured).
+</ParamField>
+
+<ParamField body="sipHost" type="string">
+SIP only: SIP server host.
+</ParamField>
+
+<ParamField body="sipPort" type="integer">
+SIP only: SIP server port.
+</ParamField>
+
+<ParamField body="sipUsername" type="string">
+SIP only: SIP username.
+</ParamField>
+
+<ParamField body="sipSecret" type="string">
+SIP only: SIP password.
+</ParamField>
+
+<ParamField body="sipFromUser" type="string">
+SIP only: the "from" user for outgoing calls.
+</ParamField>
+
+<ParamField body="sipTransport" type="string">
+SIP only: `udp`, `tcp` or `tls`.
+</ParamField>
+
+<ParamField body="sipRegister" type="boolean">
+SIP only: whether to register with the SIP server.
+</ParamField>
+
+<ParamField body="elisiontecListId" type="string">
+Elisiontec only: list ID.
 </ParamField>
 
 <RequestExample>
 ```bash cURL
 curl --location 'https://api.weya.live/backend/api/call/add-phone' \
-  --header 'Authorization: Bearer {{authToken}}' \
+  --header 'x-api-key: YOUR_API_KEY' \
   --header 'Content-Type: application/json' \
   --data '{
     "userId": "64e5f12345abcdef12345678",
