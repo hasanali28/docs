@@ -6,17 +6,11 @@ api: "GET /api/webhooks"
 
 ## Overview
 
-List the webhooks in your organization. A webhook is a URL that call outcomes are sent to: add it to a campaign under **Track Call Outcomes** (`pushingCrms` with `type: "webhook"`), and the results of each call are sent to it as a JSON `POST` request.
-
-Each organization can have up to 5 webhooks.
+List the webhooks in your organization, including those created by other users in it. A webhook is a URL that call outcomes are sent to: add it to a campaign under **Track Call Outcomes** (`pushingCrms` with `type: "webhook"`), and the result of each finished call is sent to it as a JSON `POST` request. See [Create Webhook](/api-reference/Webhooks/createWebhooks) for how delivery works.
 
 ## Prerequisites
 
 - An API key for your workspace
-
-## Endpoint
-
-<ParamField method="GET" path="/api/webhooks" />
 
 ## Request
 
@@ -41,13 +35,14 @@ curl --location 'https://api.weya.live/backend/api/webhooks' \
 {
   "status": true,
   "code": 200,
-  "message": "",
-  "errorMessage": "",
+  "message": "Webhooks fetched successfully",
+  "errorMessage": null,
   "data": [
     {
       "_id": "6890abc123456789abcdef01",
       "name": "Salesforce CRM Sync",
       "url": "https://your-domain.com/webhook",
+      "bearerToken": "YOUR_ENDPOINT_TOKEN",
       "userId": "64e5f12345abcdef12345678",
       "organizationId": "64e5f12345abcdef00000001",
       "isActive": true,
@@ -61,11 +56,11 @@ curl --location 'https://api.weya.live/backend/api/webhooks' \
 </ResponseExample>
 
 <ResponseField name="data" type="array[object]" required>
-The webhooks in your organization.
+The webhooks in your organization. The list isn't paginated.
 </ResponseField>
 
 <ResponseField name="data[]._id" type="string">
-Webhook ID. Use it as `crmId` in a campaign's `pushingCrms`.
+Webhook ID. Use it as `crmId` and `schemaId` in a campaign's `pushingCrms`.
 </ResponseField>
 
 <ResponseField name="data[].name" type="string">
@@ -77,11 +72,11 @@ URL that call outcomes are sent to.
 </ResponseField>
 
 <ResponseField name="data[].bearerToken" type="string">
-Token sent as `Authorization: Bearer <token>` with each request, if one was set.
+Token sent as `Authorization: Bearer <token>` with each request. Empty if none was set. Returned in plain text, so don't log the response.
 </ResponseField>
 
 <ResponseField name="data[].isActive" type="boolean">
-Whether the webhook is active.
+Stored flag. It doesn't stop deliveries; see [Update Webhook](/api-reference/Webhooks/updateWebhooks).
 </ResponseField>
 
 ## Error Handling

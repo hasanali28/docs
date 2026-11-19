@@ -1,19 +1,19 @@
 ---
 title: "Delete Webhook"
-description: "Delete an existing webhook from your workspace."
+description: "Delete a webhook and stop sending call outcomes to it."
 api: "DELETE /api/webhooks/{webhookId}"
 ---
 
 ## Overview
 
-Delete a webhook from your Weya AI workspace. Once deleted, Weya AI will immediately stop sending event notifications to the configured endpoint.
+Permanently delete a webhook from your organization. It stops in every campaign that uses it at once: calls that end afterwards are not sent to it.
 
-> This action is permanent and cannot be undone.
+Deliveries already queued before the deletion, including scheduled retries, can still be sent.
 
 ## Prerequisites
 
 - An API key for your workspace
-- Valid Webhook ID
+- The webhook's ID (`_id` from [Get Webhooks](/api-reference/Webhooks/getWebhooks))
 
 ## Request
 
@@ -22,14 +22,14 @@ Your workspace API key. Create one from the profile menu in the dashboard → **
 </ParamField>
 
 <ParamField path="webhookId" type="string" required>
-Unique identifier of the webhook to delete.
+ID of the webhook to delete.
 </ParamField>
 
 <RequestExample>
 
 ```bash cURL
 curl --location --request DELETE 'https://api.weya.live/backend/api/webhooks/6890abc123456789abcdef01' \
---header 'x-api-key: YOUR_API_KEY'
+  --header 'x-api-key: YOUR_API_KEY'
 ```
 
 </RequestExample>
@@ -42,46 +42,33 @@ curl --location --request DELETE 'https://api.weya.live/backend/api/webhooks/689
 {
   "status": true,
   "code": 200,
-  "message": "Webhook deleted successfully"
+  "message": "Webhook deleted successfully",
+  "errorMessage": null,
+  "data": []
 }
 ```
 
 </ResponseExample>
 
-<ResponseField name="status" type="boolean">
-Indicates whether the request completed successfully.
+<ResponseField name="status" type="boolean" required>
+`true` when the webhook was deleted.
 </ResponseField>
 
-<ResponseField name="code" type="integer">
-HTTP status code returned by the API.
-</ResponseField>
-
-<ResponseField name="message" type="string">
-Confirmation message indicating that the webhook has been deleted.
+<ResponseField name="message" type="string" required>
+`Webhook deleted successfully`.
 </ResponseField>
 
 ## Error Handling
 
-| Status | Description |
-|---------|-------------|
-|400|Invalid Webhook ID|
-|401|Missing or invalid API key|
-|403|You do not have permission to delete this webhook|
-|404|Webhook not found|
-|500|Internal server error|
+Errors return `status: false`, with the reason in `errorMessage`.
+
+- **400 Bad Request** – `webhookId` isn't a valid ID.
+- **401 Unauthorized** – Missing or invalid API key.
+- **404 Not Found** – `Webhook not found or unauthorized`: the webhook doesn't exist in your organization.
+- **500 Internal Server Error** – Unexpected server error.
 
 <Warning>
 
-Deleting a webhook immediately stops all future event deliveries to the configured endpoint. Any integrations depending on this webhook will no longer receive notifications.
+This can't be undone. To stop a webhook in only one campaign, remove it from that campaign's `pushingCrms` with [Update Campaign](/api-reference/Campaigns/updateBatch) instead.
 
 </Warning>
-
-<Check>
-
-Before deleting a webhook, make sure:
-
-- The webhook is no longer required by your application.
-- A replacement webhook has been configured if necessary.
-- Any downstream integrations have been updated.
-
-</Check>

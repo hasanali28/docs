@@ -58,9 +58,10 @@ HTTP status code (200 for success).
 
 Errors return `status: false`, with the reason in `errorMessage`.
 
+- **400 Bad Request** – `id` isn't a valid ID.
 - **401 Unauthorized** – Missing or invalid API key.
 - **404 Not Found** – `DNC record not found or you are not authorized to delete it`: no entry with this ID exists in your organization.
-- **500 Internal Server Error** – Unexpected server error, including an `id` that isn't a valid ID.
+- **500 Internal Server Error** – Unexpected server error.
 
 <Warning>
 This action is permanent. Once a DNC record is deleted, the phone number can be called again in future campaigns. Make sure you have the correct DNC record ID before deleting.
