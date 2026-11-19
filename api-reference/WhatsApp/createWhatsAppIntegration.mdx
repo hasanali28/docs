@@ -1,62 +1,67 @@
 ---
 title: "Create WhatsApp Integration"
-description: "Connect a WhatsApp Business phone number to your Weya AI workspace."
+description: "Connect a WhatsApp Business number from your AiSensy account."
 api: "POST /api/whatsapp/whatsapp-integration"
 ---
 
 ## Overview
 
-Create a new WhatsApp Business integration by connecting a WhatsApp phone number to your Weya AI workspace. Once connected, the number can be used with WhatsApp Agents, templates, and automated conversations.
+Connect a WhatsApp Business number to Weya, for the user who owns the API key. WhatsApp numbers are connected through AiSensy, using your AiSensy API token.
+
+There are two plans:
+
+- **`basic`** (default) – the number and token are saved as sent. Check them first with [Validate WhatsApp Number](/api-reference/WhatsApp/validateWhatsAppNumber).
+- **`pro`** – also needs your AiSensy `projectId`. The credentials are checked with AiSensy and Weya subscribes to the project's message events before the number is saved.
+
+The response's `_id` is the ID that the other WhatsApp endpoints call `phoneNumberId`.
 
 ## Prerequisites
 
 - An API key for your workspace
-- A valid WhatsApp Business Account
-- A verified WhatsApp Business phone number
+- An AiSensy account with the WhatsApp number connected, and its API token
 
 ## Request
 
 <ParamField header="x-api-key" type="string" required>
-Your workspace API key. Create one from the profile menu in the dashboard → **API Keys**.
+  Your workspace API key. Create one from the profile menu in the dashboard → **API Keys**.
 </ParamField>
 
 <RequestExample>
 
 ```bash cURL
 curl --location 'https://api.weya.live/backend/api/whatsapp/whatsapp-integration' \
---header 'x-api-key: YOUR_API_KEY' \
---header 'Content-Type: application/json' \
---data '{
-  "phoneNumberId": "123456789012345",
-  "businessAccountId": "987654321098765",
-  "accessToken": "EAAGxxxxxxxxxxxxxxxx",
-  "phoneNumber": "+15551234567",
-  "displayName": "Weya Support"
-}'
+  --header 'x-api-key: YOUR_API_KEY' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "provider": "AI_SENSY",
+    "plan": "basic",
+    "phoneNumber": "+15551234567",
+    "token": "YOUR_AISENSY_API_TOKEN"
+  }'
 ```
 
 </RequestExample>
 
-## Request Body
+### Request Parameters
 
-<ParamField body="phoneNumberId" type="string" required>
-Unique identifier of the WhatsApp Business phone number.
-</ParamField>
-
-<ParamField body="businessAccountId" type="string" required>
-Meta WhatsApp Business Account ID.
-</ParamField>
-
-<ParamField body="accessToken" type="string" required>
-Meta access token used to authorize the integration.
+<ParamField body="provider" type="string" required>
+  Always `AI_SENSY`.
 </ParamField>
 
 <ParamField body="phoneNumber" type="string" required>
-WhatsApp Business phone number including the country code.
+  The WhatsApp Business number, with country code.
 </ParamField>
 
-<ParamField body="displayName" type="string">
-Display name associated with the WhatsApp Business account.
+<ParamField body="token" type="string" required>
+  Your AiSensy API token.
+</ParamField>
+
+<ParamField body="plan" default="basic" type="string">
+  `basic` or `pro`.
+</ParamField>
+
+<ParamField body="projectId" type="string">
+  Your AiSensy project ID. Required when `plan` is `pro`.
 </ParamField>
 
 ## Response
@@ -68,78 +73,55 @@ Display name associated with the WhatsApp Business account.
   "status": true,
   "code": 201,
   "message": "WhatsApp integration created successfully",
+  "errorMessage": null,
   "data": {
     "_id": "6891f1d0c45d123456789abc",
-    "phoneNumberId": "123456789012345",
     "phoneNumber": "+15551234567",
-    "displayName": "Weya Support",
-    "status": "connected"
+    "provider": "AI_SENSY",
+    "plan": "basic",
+    "token": "YOUR_AISENSY_API_TOKEN",
+    "userId": "64e5f12345abcdef12345678",
+    "whatsappAgentId": null,
+    "createdAt": "2026-07-21T09:15:30.000Z"
   }
 }
 ```
 
 </ResponseExample>
 
-<ResponseField name="status" type="boolean">
-Indicates whether the integration was created successfully.
-</ResponseField>
-
-<ResponseField name="code" type="integer">
-HTTP status code.
-</ResponseField>
-
-<ResponseField name="message" type="string">
-Confirmation message.
-</ResponseField>
-
-<ResponseField name="data" type="object">
-Details of the newly created WhatsApp integration.
-</ResponseField>
-
 <ResponseField name="data._id" type="string">
-Unique identifier of the integration.
+  Integration ID. Use it as `phoneNumberId` in the other WhatsApp endpoints.
 </ResponseField>
 
-<ResponseField name="data.phoneNumberId" type="string">
-WhatsApp Business Phone Number ID.
+<ResponseField name="data.plan" type="string">
+  `basic` or `pro`.
 </ResponseField>
 
-<ResponseField name="data.phoneNumber" type="string">
-Connected WhatsApp phone number.
+<ResponseField name="data.token" type="string">
+  The AiSensy token you sent, in plain text. Don't log the response.
 </ResponseField>
 
-<ResponseField name="data.displayName" type="string">
-Business display name.
-</ResponseField>
-
-<ResponseField name="data.status" type="string">
-Current integration status.
+<ResponseField name="data.webhookStatus" type="string">
+  `pro` only: `configured` when Weya is subscribed to the project's events.
 </ResponseField>
 
 ## Error Handling
 
-| Status | Description |
-|---------|-------------|
-|400|Missing or invalid request parameters|
-|401|Missing or invalid API key|
-|403|Invalid WhatsApp Business credentials|
-|409|Phone number is already integrated|
-|500|Internal server error|
+Errors return `status: false`, with the reason in `errorMessage`.
 
-<Note>
-
-Each WhatsApp Business phone number can only be connected to one workspace at a time.
-
-</Note>
+- **400 Bad Request**
+  - `provider` isn't `AI_SENSY`, `phoneNumber` or `token` is missing, or `projectId` is missing for `pro`.
+  - `WhatsApp integration already exists for this phone number`.
+  - `pro`: `WhatsApp integration already exists for this AiSensy project`, or AiSensy rejected the credentials.
+- **401 Unauthorized** – Missing or invalid API key.
+- **429 Too Many Requests** – More than 1,000 WhatsApp requests in 15 minutes from your IP address.
+- **500 Internal Server Error** – Unexpected server error.
 
 <Check>
+  Typical workflow:
 
-Typical workflow:
-
-1. Validate the WhatsApp number.
-2. Create the WhatsApp integration.
-3. Create a WhatsApp Agent.
-4. Assign the agent to the integrated phone number.
-5. Configure webhooks and templates.
-
+  1. [Validate WhatsApp Number](/api-reference/WhatsApp/validateWhatsAppNumber).
+  2. Create the integration (this endpoint).
+  3. [Create WhatsApp Agent](/api-reference/WhatsApp/createWhatsAppAgent).
+  4. [Assign the agent to the number](/api-reference/WhatsApp/assignAgentToWhatsAppNumber).
 </Check>
