@@ -1,16 +1,18 @@
 ---
 title: "Add Calls to Campaign"
-description: "Queue one or more contacts in an existing campaign before launching the dialer."
+description: "Add contacts to an existing outbound or mixed campaign as JSON."
 api: "POST /api/call/addCallsToBatch"
 ---
 
 ## Overview
-After creating a campaign you can enqueue contact records that the dialer should process. Each record can include any custom fields your agent definition expects. Validation runs against the agent’s variable schema so you catch missing data before the dialer starts.
+
+Add contacts to an existing campaign. Each contact needs a `phoneNumber`; any other fields are stored with the contact and passed to the agent as variables.
+
+Contacts are queued for calling straight away and are called during the campaign's calling hours. You don't need to call **Start Campaign** afterwards. A `completed` campaign is moved back to `pending` so the new contacts get called.
 
 ## Prerequisites
-- You created the campaign and captured its `batchId`.
-- All required agent variables are present in every contact.
-- The API key you use owns the campaign.
+- An outbound or mixed campaign and its `batchId`, created by the user who owns the API key. Contacts can't be added to `inbound` campaigns.
+- The campaign's calling numbers have an outbound agent assigned.
 
 ## Request
 <ParamField header="x-api-key" type="string" required>
@@ -18,11 +20,15 @@ Your workspace API key. Create one from the profile menu in the dashboard → **
 </ParamField>
 
 <ParamField body="batchId" type="string" required>
-Identifier returned by `POST /api/call/createBatch`.
+ID of the campaign, from [Create Campaign](/api-reference/Campaigns/createBatch) or [Get Campaigns](/api-reference/Campaigns/getBatch).
 </ParamField>
 
 <ParamField body="callData" type="array[object]" required>
-Array of call records to be added to the campaign. Each object MUST include `phoneNumber`. All other fields are flexible and determined by your agent's configuration. The system automatically chunks large arrays (1000 records per chunk) for efficient processing.
+Contacts to add, up to 10,000 per request. Each object must include `phoneNumber` in E.164 format, for example `+919876543210`. Other fields are stored with the contact.
+
+- `timezone` – optional per-contact timezone. Defaults to the campaign's timezone.
+- Agent variables you leave out are stored as `null`. They are not rejected.
+- These field names are reserved and rejected: `call_status`, `retry_count`, `call_duration`, `insertuuid`, `_id`, `x_weya_transliterated_name`, `x_weya_transliterated_language`.
 </ParamField>
 
 <RequestExample>
@@ -35,7 +41,7 @@ curl -X POST 'https://api.weya.live/backend/api/call/addCallsToBatch' \
     "callData": [
       {
         "phoneNumber": "+918800000000",
-        "name": "Hasan Ali",
+        "name": "Asha Rao",
         "amount": "500.00"
       },
       {
@@ -50,106 +56,95 @@ curl -X POST 'https://api.weya.live/backend/api/call/addCallsToBatch' \
 
 ## Response
 
+This endpoint returns a summary object, not the standard `status`/`data` wrapper. Errors use the standard wrapper (see below).
+
 <ResponseExample>
 ```json 200 OK
 {
-  "message": "Calls enqueued successfully",
-  "status": true,
-  "code": 200,
-  "errorMessage": "",
-  "data": {
-    "added": 2,
-    "callIds": ["64e5f12345abcdef11111111", "64e5f12345abcdef22222222"]
-  }
+  "success": true,
+  "added": 2,
+  "callIds": ["2f6c1a3e-6b1d-4c52-9f0a-3a7d2e9b8c11", "8a1d0c55-1e2f-4b8a-a0c3-5d6e7f8a9b10"],
+  "summary": {
+    "totalChunks": 1,
+    "successfulChunks": 1,
+    "failedChunks": 0,
+    "skippedRows": 0
+  },
+  "message": "All calls processed successfully"
+}
+```
+
+```json 207 Multi-Status
+{
+  "success": false,
+  "added": 1000,
+  "callIds": ["2f6c1a3e-6b1d-4c52-9f0a-3a7d2e9b8c11"],
+  "summary": {
+    "totalChunks": 2,
+    "successfulChunks": 1,
+    "failedChunks": 1,
+    "skippedRows": 0
+  },
+  "partial": true,
+  "message": "Partial success: Some chunks failed",
+  "failedChunks": [
+    { "chunkNum": 2, "error": "..." }
+  ]
 }
 ```
 </ResponseExample>
 
-<ResponseExample>
-```json 207 Partial Content
-{
-  "message": "Some calls failed to enqueue",
-  "status": false,
-  "code": 207,
-  "errorMessage": "Partial content, check failedChunks for details",
-  "data": {
-    "added": 1,
-    "callIds": ["64e5f12345abcdef11111111"],
-    "failedChunks": [
-      {
-        "chunkNum": 2,
-        "error": "Database connection error"
-      }
-    ]
-  }
-}
-```
-</ResponseExample>
+<ResponseField name="success" type="boolean" required>
+`true` when every chunk was saved.
+</ResponseField>
+
+<ResponseField name="added" type="integer" required>
+Number of new contacts added. Contacts whose phone number is already in the campaign are updated instead and aren't counted.
+</ResponseField>
+
+<ResponseField name="callIds" type="array[string]" required>
+IDs of the contacts added or updated by this request. All of them are queued for calling.
+</ResponseField>
+
+<ResponseField name="summary" type="object" required>
+Contacts are saved in chunks of 1,000: `totalChunks`, `successfulChunks`, `failedChunks` (a count) and `skippedRows` (rows skipped because the phone number was invalid).
+</ResponseField>
 
 <ResponseField name="message" type="string" required>
-A human-readable message indicating the outcome.
+`All calls processed successfully`, `Calls saved but with warnings` (some rows were skipped), or `Partial success: Some chunks failed`.
 </ResponseField>
 
-<ResponseField name="status" type="boolean" required>
-Indicates whether the operation was entirely successful. If `false` and `code` is 207, check `data.failedChunks`.
+<ResponseField name="partial" type="boolean">
+`true` when some chunks failed. The HTTP status is then `207`.
 </ResponseField>
 
-<ResponseField name="code" type="integer" required>
-The HTTP status code (200 for full success, 207 for partial success).
+<ResponseField name="failedChunks" type="array[object]">
+Present when chunks failed: each `{ chunkNum, error }`. Send the contacts of those chunks again.
 </ResponseField>
 
-<ResponseField name="errorMessage" type="string">
-Error message, if any.
-</ResponseField>
-
-<ResponseField name="data" type="object">
-Contains details about the operation.
-</ResponseField>
-
-<ResponseField name="data.added" type="integer" required>
-Total number of call records successfully added to the campaign across all chunks.
-</ResponseField>
-
-<ResponseField name="data.callIds" type="array[string]" required>
-Array of call record IDs that were inserted or updated.
-</ResponseField>
-
-<ResponseField name="data.failedChunks" type="array[object]">
-Present when `status` is `false` and `code` is 207. Array of chunk processing failures, each containing `chunkNum` and `error` message.
+<ResponseField name="warnings.invalidRows" type="array[object]">
+Present when rows were skipped: each `{ rowNumber, phoneNumber, error }`. `rowNumber` is the 1-based position in `callData`.
 </ResponseField>
 
 ## Error Handling
 
-- **400 Bad Request** – Missing `batchId`, empty `callData` array, or validation failure.
-- **403 Forbidden** – Invalid or missing API key, or API key doesn't own the campaign.
-- **404 Not Found** – Campaign not found, or no agent found for the campaign's calling numbers.
-- **207 Partial Content** – Some chunks processed successfully while others failed. Check `failedChunks` for details.
-- **500 Internal Server Error** – Server error during processing; retry with exponential backoff.
+Errors return `status: false`, with the reason in `errorMessage`.
+
+- **400 Bad Request**
+  - `Valid callData is required` – `callData` is missing or empty.
+  - `Upload exceeds the maximum of 10,000 rows…` – split the contacts into several requests.
+  - `Call data contains restricted headers: …` – a contact uses a reserved field name.
+  - `No valid phone numbers in callData…` – every phone number was invalid.
+  - `Cannot add lead data to an inbound batch`.
+  - `Batch has no calling numbers`.
+- **401 Unauthorized** – Missing or invalid API key.
+- **403 Forbidden** – `Batch not found or not authorized for this user`: the campaign doesn't exist, was deleted, or wasn't created by the user who owns the API key.
+- **404 Not Found** – `Agent not found for the provided calling numbers`: no calling number has an outbound agent.
+- **500 Internal Server Error** – Unexpected server error.
 
 <Note>
-**Flexible Parameters:**
+**Duplicates:**
 
-The `callData` array accepts any custom key-value pairs beyond the required `phoneNumber` field. You can include any parameters your agent needs:
-
-- Customer identifiers (e.g., `account_id`, `customer_id`, `unique_id`)
-- Custom data fields (e.g., `custom_field_1`, `custom_field_2`, `priority`)
-- Business-specific data (e.g., `order_amount`, `subscription_tier`, `category`)
-- Any other data your AI agent requires for the conversation
-
-**Important:** Each object in `callData` MUST include `phoneNumber`. All other fields are flexible and determined by your agent's configuration.
+- When the same phone number appears more than once in `callData`, only the first is kept.
+- When a phone number is already in the campaign, that contact's data is replaced with the new values and it becomes callable again: its retry counter is reset to 0 and it is no longer expired. Its earlier call history is kept.
 </Note>
-
-<Note>
-**Processing Details:**
-
-- Large arrays are automatically chunked into campaigns of 1000 records for efficient processing
-- Each call record is validated against the agent's required variables
-- Existing calls with the same phone number are updated if they have a "pending" status
-- Completed calls create new phone log entries
-- The system automatically starts the calling service after successful insertion
-- Timezone information is applied to each call record if not provided
-</Note>
-
-<Tip>
-You can safely enqueue thousands of contacts in a single request. The system handles chunking automatically. Monitor the response for `status: false` and `code: 207` to identify any failed chunks that may need retry.
-</Tip>

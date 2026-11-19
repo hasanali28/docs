@@ -1,15 +1,15 @@
 ---
 title: "Get Campaign Details"
-description: "Inspect campaign metadata and page through associated calls with filtering and sorting."
+description: "Get a campaign's status and page through its contacts with the latest call attempt of each."
 api: "GET /api/call/batch-details/{batchId}"
 ---
 
 ## Overview
-Fetch detailed information for a single campaign, including campaign metadata, status, and a paginated list of call records. This endpoint supports advanced filtering, sorting, and searching to help you analyze call data. Use it for monitoring execution from the dashboard or building custom analytics.
+Fetch a single campaign's name and status, and a paginated list of its contacts. Each contact comes with the result of its latest call attempt. You can filter by call status, outcome, duration and date, search by phone number or call ID, and sort.
 
 ## Prerequisites
 - An API key for your workspace
-- The campaign's `batchId`: the `_id` from **Get Campaigns**, the ID returned when you created the campaign, or the last part of the campaign's URL in the dashboard.
+- The campaign's `batchId`: the `_id` from [Get Campaigns](/api-reference/Campaigns/getBatch), the ID returned when you created the campaign, or the last part of the campaign's URL in the dashboard. The campaign must have been created by the user who owns the API key.
 
 ## Request
 
@@ -18,40 +18,49 @@ Your workspace API key. Create one from the profile menu in the dashboard → **
 </ParamField>
 
 <ParamField path="batchId" type="string" required>
-Campaign identifier you want to inspect.
+ID of the campaign.
 </ParamField>
 
 <ParamField query="page" type="integer" default="1">
-Page number for paginated calls.
+Page number. Ignored when `cursor` is sent.
 </ParamField>
 
 <ParamField query="limit" type="integer" default="10">
-Maximum call records to return per page (default: 10).
+Contacts per page, from 1 to 500. Larger values are capped at 500.
 </ParamField>
 
 <ParamField query="cursor" type="string">
-Cursor for loading the next page of calls. Pass the `data.nextCursor` value from the previous response.
+Cursor for the next page. Pass the `data.nextCursor` value from the previous response, with the same `sortBy`, `sortOrder`, `filter` and `search`. Faster than `page` for large campaigns.
 </ParamField>
 
-<ParamField query="filter" type="string">
-JSON stringified filter object to filter calls by specific fields. Example: `{"callStatus":"completed"}`.
+<ParamField query="sortBy" default="updatedAt" type="string">
+Field to sort by: `updatedAt`, `createdAt`, `retry_count`, `call_started_at`, `call_duration` or `call_status`. Any other value sorts by `createdAt`.
 </ParamField>
 
-<ParamField query="sortBy" type="string">
-Field to sort by (e.g., "createdAt").
-</ParamField>
-
-<ParamField query="sortOrder" type="string" allowedValues="asc,desc" default="asc">
-Sort order: "asc" for ascending or "desc" for descending.
+<ParamField query="sortOrder" default="desc" type="string">
+`asc` for ascending. Any other value sorts descending.
 </ParamField>
 
 <ParamField query="search" type="string">
-Search term to filter calls across dynamic fields (e.g., customer name, phone number).
+Matches contacts whose phone number contains this text, or whose call has exactly this call ID (`request_uuid`, `call_uuid` or stream ID).
+</ParamField>
+
+<ParamField query="filter" type="string">
+URL-encoded JSON object. Applies to each contact's latest call attempt. Fields:
+
+- `call_status` – array of statuses, for example `["completed", "no-answer"]`
+- `call_outcome` – array of call outcomes
+- `hangup_source` – array of hangup sources
+- `call_durationMin`, `call_durationMax` – call duration in seconds
+- `createdAtMin`, `createdAtMax` – call start time (ISO 8601)
+- `crm_sync_status` – array of `synced`, `failed` or `not_synced`. Covers webhook and Google Sheet syncs only.
+
+Example: `{"call_status":["completed"],"call_durationMin":30}`. Unknown fields are ignored, and a value that isn't valid JSON is ignored, so check the `total` you get back.
 </ParamField>
 
 <RequestExample>
 ```bash cURL
-curl --location 'https://api.weya.live/backend/api/call/batch-details/67def9053495307c718d9dfb?page=1&limit=10&sortBy=createdAt&sortOrder=desc' \
+curl --location --globoff 'https://api.weya.live/backend/api/call/batch-details/67def9053495307c718d9dfb?limit=50&sortBy=call_started_at&sortOrder=desc&filter={"call_status":["completed"]}' \
   --header 'x-api-key: YOUR_API_KEY'
 ```
 </RequestExample>
@@ -61,35 +70,46 @@ curl --location 'https://api.weya.live/backend/api/call/batch-details/67def90534
 <ResponseExample>
 ```json 200 OK
 {
-  "message": "Calls fetched successfully",
   "status": true,
   "code": 200,
-  "errorMessage": "",
+  "message": "Calls fetched successfully",
+  "errorMessage": null,
   "data": {
     "batchId": "67def9053495307c718d9dfb",
     "batchName": "Marketing Campaign May 2025",
-    "batchStatus": "active",
+    "batchStatus": "in-progress",
+    "hasCrm": true,
+    "hasCrmSyncData": true,
     "page": 1,
-    "limit": 10,
+    "limit": 50,
     "total": 150,
-    "totalPages": 15,
+    "totalPages": 3,
+    "nextCursor": "eyJpZCI6IjEyMyIsInNvcnRWYWx1ZSI6IjIwMjUtMDUtMTUifQ==",
     "data": [
       {
-        "_id": "64e5f12345abcdef11111111",
-        "phoneNumber": "12125551234",
-        "name": "Emily Davis",
-        "account_id": "ACC-5678",
-        "priority": "high",
-        "phoneLogs": [
-          {
-            "callStatus": "completed",
-            "callDuration": 120,
-            "recordingUrl": "https://example.com/recording.mp3",
-            "transcript": "Call transcript here...",
-            "createdAt": "2025-05-15T14:30:00.000Z"
-          }
-        ],
-        "createdAt": "2025-05-15T14:00:00.000Z"
+        "_id": "2f6c1a3e-6b1d-4c52-9f0a-3a7d2e9b8c11",
+        "phoneNumber": "+12125551234",
+        "createdAt": "2025-05-15T14:00:00.000Z",
+        "updatedAt": "2025-05-15T14:32:00.000Z",
+        "retry_count": 1,
+        "attempts": 1,
+        "followUpAt": null,
+        "followUpAtRaw": null,
+        "isExpired": false,
+        "tool_status": "success",
+        "tool_counts": { "success": 2, "failure": 0, "total": 2 },
+        "phoneLogs": {
+          "call_status": "completed",
+          "call_duration": 120,
+          "call_started_at": "2025-05-15T14:30:00.000Z",
+          "hangup_source": null,
+          "hangup_reason": null,
+          "call_outcome": "Interested",
+          "call_journey": null,
+          "call_uuid": "a1b2c3d4-0000-0000-0000-000000000000",
+          "request_uuid": "a1b2c3d4-0000-0000-0000-000000000000",
+          "webhook_events": []
+        }
       }
     ]
   }
@@ -97,20 +117,24 @@ curl --location 'https://api.weya.live/backend/api/call/batch-details/67def90534
 ```
 </ResponseExample>
 
-<ResponseField name="data" type="object" required>
-Contains campaign metadata and paginated call records.
-</ResponseField>
-
 <ResponseField name="data.batchId" type="string" required>
-The campaign identifier.
+Campaign ID.
 </ResponseField>
 
 <ResponseField name="data.batchName" type="string" required>
-The name of the campaign.
+Campaign name.
 </ResponseField>
 
 <ResponseField name="data.batchStatus" type="string" required>
-Current status of the campaign (e.g., "active", "completed", "paused").
+Campaign status: `pending`, `in-progress`, `paused`, `freezed` (outside the calling window), `completed` or `failed`.
+</ResponseField>
+
+<ResponseField name="data.hasCrm" type="boolean">
+`true` when the campaign sends call outcomes to a CRM, webhook or Google Sheet, or has done so before.
+</ResponseField>
+
+<ResponseField name="data.hasCrmSyncData" type="boolean">
+  `true` when webhook or Google Sheet sync records exist for this campaign, so the `crm_sync_status` filter applies.
 </ResponseField>
 
 <ResponseField name="data.page" type="integer" required>
@@ -118,40 +142,66 @@ Current page number.
 </ResponseField>
 
 <ResponseField name="data.limit" type="integer" required>
-Number of records per page.
+Contacts per page.
 </ResponseField>
 
 <ResponseField name="data.total" type="integer" required>
-Total number of calls in the campaign matching the filter criteria.
+Number of contacts matching the filter and search.
 </ResponseField>
 
 <ResponseField name="data.totalPages" type="integer" required>
-Total number of pages available.
+Number of pages.
 </ResponseField>
 
-<ResponseField name="data.nextCursor" type="string">
-Cursor to pass as `cursor` to load the next page of calls.
+<ResponseField name="data.nextCursor" type="string | null">
+Cursor to pass as `cursor` for the next page. `null` when this page is empty.
 </ResponseField>
 
 <ResponseField name="data.data" type="array[object]" required>
-Array of call records with enriched data including phone logs, recording URLs, and transcripts when available.
+The contacts on this page.
 </ResponseField>
+
+<ResponseField name="data.data[]._id" type="string">
+  Contact (call) ID.
+</ResponseField>
+
+<ResponseField name="data.data[].phoneNumber" type="string">
+  Contact's phone number. Masked when phone number masking is turned on for your organization.
+</ResponseField>
+
+<ResponseField name="data.data[].retry_count" type="integer">
+  Retry counter for this contact. Reset to 0 when the contact is marked for retry.
+</ResponseField>
+
+<ResponseField name="data.data[].attempts" type="integer">
+  Number of call attempts ever made to this contact. Unlike `retry_count`, it is never reset.
+</ResponseField>
+
+<ResponseField name="data.data[].followUpAt" type="string | null">
+  When the next attempt is scheduled, if it is after the latest call started.
+</ResponseField>
+
+<ResponseField name="data.data[].isExpired" type="boolean">
+  `true` when the contact won't be called again.
+</ResponseField>
+
+<ResponseField name="data.data[].tool_status" type="string | null">
+  Result of the tools the agent ran during calls to this contact: `success` (all succeeded), `warning` (some failed), `error` (all failed), or `null` (no tools ran). `tool_counts` gives the `success`, `failure` and `total` counts.
+</ResponseField>
+
+<ResponseField name="data.data[].phoneLogs" type="object">
+  The latest call attempt: `call_status`, `call_duration` (seconds), `call_started_at`, `hangup_source`, `hangup_reason`, `call_outcome`, `call_journey`, `call_uuid`, `request_uuid`, and `webhook_events` (webhook and Google Sheet sync records for this attempt). Fields are `null` until the contact has been called.
+</ResponseField>
+
+<Note>
+  The response doesn't include the contact's CSV variables (`lead_data`) or call transcripts and recordings.
+</Note>
 
 ## Error Handling
 
-- **400 Bad Request** – Invalid campaign ID format, invalid filter JSON, or query parameters out of range.
-- **404 Not Found** – Campaign not found or does not belong to the authenticated user.
-- **500 Internal Server Error** – Failed to aggregate campaign data; retry or contact support.
+Errors return `status: false`, with the reason in `errorMessage`.
 
-<Note>
-**Advanced Features:**
-
-- **Filtering:** Use the `filter` parameter with JSON to filter calls by specific fields from the phone logs
-- **Sorting:** Sort by any field using `sortBy` and control order with `sortOrder`
-- **Searching:** The `search` parameter performs a regex search across all dynamic string fields in call records
-- Phone logs are automatically included with each call record when available
-</Note>
-
-<Tip>
-For real-time monitoring, combine this endpoint with webhooks to track campaign progress. Use filtering and sorting to identify specific call outcomes or issues.
-</Tip>
+- **400 Bad Request** – `Invalid Batch ID`: `batchId` is not a valid ID.
+- **401 Unauthorized** – Missing or invalid API key.
+- **404 Not Found** – `Batch not found`: no campaign with this ID was created by the user who owns the API key, or it was deleted.
+- **500 Internal Server Error** – Unexpected server error.

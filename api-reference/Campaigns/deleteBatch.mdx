@@ -1,23 +1,27 @@
 ---
 title: "Delete Campaign"
-description: "Delete a campaign. This stops it and removes it from your campaign list."
+description: "Delete a completed campaign and remove it from your campaign list."
 api: "DELETE /api/call/delete-batch/{batchId}"
 ---
 
 ## Overview
-Delete a campaign you no longer need. Deleting stops the campaign and hides it from your campaign list. It cannot be undone, but the record is kept: you can still retrieve it with `GET /api/call/batches/{userId}?includeDeleted=true`.
+
+Delete a campaign you no longer need. Only a `completed` campaign can be deleted; a campaign that is still running, paused or waiting for its calling window can't.
+
+A deleted campaign no longer appears in [Get Campaigns](/api-reference/Campaigns/getBatch) and can't be retrieved or restored through the API. Any Google Sheet connected to it is disconnected.
 
 ## Prerequisites
 - An API key for your workspace
-- Confirm no audits or dispute processes require the campaign history.
+- A `completed` campaign created by the user who owns the API key
 
 ## Request
-<ParamField path="batchId" type="string" required>
-Identifier of the campaign to delete.
-</ParamField>
 
 <ParamField header="x-api-key" type="string" required>
 Your workspace API key. Create one from the profile menu in the dashboard → **API Keys**.
+</ParamField>
+
+<ParamField path="batchId" type="string" required>
+  ID of the campaign to delete.
 </ParamField>
 
 <RequestExample>
@@ -34,26 +38,31 @@ curl --location --request DELETE 'https://api.weya.live/backend/api/call/delete-
   "status": true,
   "code": 200,
   "message": "Batch deleted successfully",
-  "errorMessage": "",
-  "data": null
+  "errorMessage": null,
+  "data": []
 }
 ```
 </ResponseExample>
 
 <ResponseField name="status" type="boolean" required>
-Indicates whether the campaign was deleted.
+`true` when the campaign was deleted.
 </ResponseField>
 
 <ResponseField name="message" type="string" required>
-Human-readable confirmation message.
+`Batch deleted successfully`.
 </ResponseField>
 
 ## Error Handling
-- **400 Bad Request** – Invalid `batchId` supplied.
+
+Errors return `status: false`, with the reason in `errorMessage`.
+
+- **400 Bad Request**
+  - `Invalid Batch ID`.
+  - `Batch is not completed or stopped` – the campaign hasn't finished. Wait until it is `completed`.
 - **401 Unauthorized** – Missing or invalid API key.
-- **404 Not Found** – Campaign already deleted or does not belong to the workspace.
-- **500 Internal Server Error** – Deletion failed; retry, then escalate with the campaign id.
+- **404 Not Found** – `Batch not found`: the campaign doesn't exist, is already deleted, or wasn't created by the user who owns the API key.
+- **500 Internal Server Error** – Unexpected server error.
 
 <Warning>
-This operation cannot be undone. Export call data first with `GET /api/call/export/csv?batchId={batchId}&format=csv&columns=[...]` if you need it.
+This can't be undone through the API. If you need the call data, export it first with `GET /api/call/export/csv?batchId={batchId}&format=csv&columns=[...]`.
 </Warning>

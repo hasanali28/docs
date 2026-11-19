@@ -6,23 +6,24 @@ api: "POST /api/call/createBatch"
 
 ## Overview
 
-Create an empty campaign that you add contacts to later, for example with **Add Calls to Campaign**. The fields you send depend on `channel_type`:
+Create an empty campaign that you add contacts to later, for example with [Add Calls to Campaign](/api-reference/Campaigns/addCallsToBatch). The fields you send depend on `channel_type`:
 
 - **`voice`** (default) – an outbound calling campaign. Send the calling numbers and schedule.
 - **`video`** – a video agent campaign. Send `videoAgentId`. The response includes the link people use to join.
 - **`web_chat`** – a chat widget campaign. Send `chatAgentId` and `allowedDomains`. The response includes the script tag to embed.
 
-To create a voice campaign and upload contacts in one step, use **Upload Campaign CSV** instead.
+To create a voice campaign and upload contacts in one step, use [Upload Campaign CSV](/api-reference/Campaigns/uploadCSV) instead.
 
 ## Prerequisites
 
 - An API key for your workspace
-- For voice: at least one phone number in your workspace with an outbound agent assigned
-- For video or web chat: an existing video or chat agent
+- For voice: at least one phone number with an outbound agent assigned. The agent is needed when you add contacts.
+- For video or web chat: a video or chat agent created by the user who owns the API key. A chat agent (and the optional voice agent) must have at least one saved version.
 
 ## Endpoint
 
-<ParamField method="POST" path="/api/call/createBatch" />
+<ParamField path="/api/call/createBatch" method="POST">
+</ParamField>
 
 ## Request
 
@@ -87,15 +88,19 @@ Name of the campaign, shown in the dashboard.
 #### Voice campaigns
 
 <ParamField body="callingNumbers" type="array[string]" required>
-IDs of the phone numbers to call from. Calls are handled by the outbound agent assigned to each number.
+IDs of the phone numbers to call from, from [Get Phone Numbers](/api-reference/PhoneNumbers/getPhoneNumbers). At least one is required. Calls are handled by the outbound agent assigned to each number.
+</ParamField>
+
+<ParamField body="type" default="outbound" type="string">
+Campaign type: `outbound`, `inbound` or `mixed`. Any other value creates an `outbound` campaign. It can't be changed later.
 </ParamField>
 
 <ParamField body="retry" type="integer">
-Maximum attempts per contact. Allowed range: 1–10.
+Maximum attempts per contact. Use a value from 1 to 10, the range the dashboard allows. The API does not check the range.
 </ParamField>
 
 <ParamField body="delay" type="integer">
-Time to wait between attempts to the same contact, in **minutes**. Allowed range: 5–1440.
+  Time to wait between attempts to the same contact, in **minutes**. Use a value from 5 to 1440, the range the dashboard allows. The API does not check the range.
 </ParamField>
 
 <ParamField body="timezone" type="string">
@@ -103,7 +108,7 @@ Timezone used for the calling schedule. Example: `Asia/Kolkata`.
 </ParamField>
 
 <ParamField body="callingHour" type="object">
-Daily calling window in 24-hour `HH:MM` format. Example: `{ "start": "09:00", "end": "17:00" }`.
+Daily calling window in 24-hour `HH:MM` format, with both `start` and `end`. Example: `{ "start": "09:00", "end": "17:00" }`. This endpoint does not check the format, so send valid values.
 </ParamField>
 
 <ParamField body="allowedDays" type="array[string]">
@@ -111,7 +116,7 @@ Days of the week calls can be placed on. Example: `["Monday", "Tuesday", "Wednes
 </ParamField>
 
 <ParamField body="holidayListId" type="string">
-ID of a holiday list. No calls are placed on the dates in that list.
+ID of a holiday list in your organization. No calls are placed on the dates in that list.
 </ParamField>
 
 #### Video campaigns
@@ -127,11 +132,11 @@ ID of the chat agent. Required when `channel_type` is `web_chat`.
 </ParamField>
 
 <ParamField body="voiceAgentId" type="string">
-Optional voice agent for visitors who switch to a call from the chat widget.
+Optional voice agent for visitors who switch to a call from the chat widget. Must not be a chat agent.
 </ParamField>
 
 <ParamField body="allowedDomains" type="array[string]" required>
-Websites the chat widget is allowed to load on. Required when `channel_type` is `web_chat`.
+Websites the chat widget is allowed to load on: 1 to 50 domains. Required when `channel_type` is `web_chat`.
 </ParamField>
 
 ## Response
@@ -143,8 +148,21 @@ Websites the chat widget is allowed to load on. Required when `channel_type` is 
   "message": "Batch created successfully",
   "status": true,
   "code": 201,
-  "errorMessage": "",
+  "errorMessage": null,
   "data": "64e5f12345abcdef98765432"
+}
+```
+
+```json 201 Created (video)
+{
+  "message": "Video campaign created",
+  "status": true,
+  "code": 201,
+  "errorMessage": null,
+  "data": {
+    "id": "64e5f12345abcdef98765433",
+    "link": "https://..."
+  }
 }
 ```
 
@@ -159,7 +177,7 @@ HTTP status code.
 </ResponseField>
 
 <ResponseField name="message" type="string" required>
-Human-readable success message.
+Human-readable success message: `Batch created successfully`, `Video campaign created` or `Chat campaign created`.
 </ResponseField>
 
 <ResponseField name="data" type="string | object" required>
@@ -168,8 +186,16 @@ For voice campaigns, the new campaign's ID (`batchId`). For video campaigns, an 
 
 ## Error Handling
 
-- **400 Bad Request** – Missing `batchName`, missing or empty `callingNumbers` for a voice campaign, or a missing agent ID for a video or web chat campaign.
+Errors return `status: false`, with the reason in `errorMessage`.
+
+- **400 Bad Request**
+  - `batchName` is missing, or `channel_type` is not `voice`, `video` or `web_chat`.
+  - Voice: `Batch name & valid callingNumbers required` – `callingNumbers` is missing or empty.
+  - Voice: `Invalid holidayListId` or `Holiday list not found`.
+  - Video: `videoAgentId is required for a video campaign`.
+  - Web chat: `chatAgentId` missing, `allowedDomains` empty, over 50 entries or containing an invalid domain, or the chat or voice agent has no saved version.
 - **401 Unauthorized** – Missing or invalid API key.
+- **404 Not Found** – `Video agent not found`, `Chat agent not found` or `Voice agent not found`: the agent doesn't exist or wasn't created by the user who owns the API key.
 - **500 Internal Server Error** – Unexpected server error.
 
 <Check>

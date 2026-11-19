@@ -1,175 +1,193 @@
 ---
 title: "Get Campaigns"
-description: "Retrieve a paginated list of all campaigns for an authenticated user with search capabilities."
+description: "Retrieve a paginated list of your campaigns, with search and status filters."
 api: "GET /api/call/batches/{userId}"
 ---
 
 ## Overview
-This endpoint lists every campaign created by the authenticated user with pagination and search support. Only non-deleted campaigns are returned by default. Use this to monitor active campaigns, view campaign summaries, and track campaign statistics.
+
+List the campaigns created by the user who owns the API key. Deleted campaigns are never returned. Results are paginated and sorted by last update, newest first.
 
 ## Prerequisites
+
 - An API key for your workspace
-- The user must own the campaigns being retrieved.
 
 ## Request
 
 <ParamField header="x-api-key" type="string" required>
-Your workspace API key. Create one from the profile menu in the dashboard → **API Keys**.
+  Your workspace API key. Create one from the profile menu in the dashboard → **API Keys**.
 </ParamField>
 
 <ParamField path="userId" type="string" required>
-Your user ID. Campaigns are always returned for the account that owns the API key.
+  Your user ID. The path needs a value, but it isn't used to filter: campaigns are always returned for the user who owns the API key.
 </ParamField>
 
-<ParamField query="page" type="integer" default="1">
-Page number for pagination.
+<ParamField query="page" default="1" type="integer">
+  Page number.
 </ParamField>
 
-<ParamField query="limit" type="integer" default="10">
-Number of campaigns to return per page (default: 10).
-</ParamField>
-
-<ParamField query="statusFilter" type="string">
-Filter by status. Voice campaigns: `active`, `inactive`, `completed` or `all`. Video and WhatsApp campaigns: `active` or `inactive`.
-</ParamField>
-
-<ParamField query="channel_type" type="string">
-Only return campaigns of this type: `voice`, `video`, `whatsapp` or `web_chat`. If omitted, campaigns of every type are returned.
-</ParamField>
-
-<ParamField query="includeDeleted" type="boolean" default="false">
-Set to `true` to also return deleted campaigns.
+<ParamField query="limit" default="10" type="integer">
+  Number of campaigns per page.
 </ParamField>
 
 <ParamField query="search" type="string">
-Search term to filter campaigns by `batchName` or `queue_status`.
+  Case-insensitive text matched against the campaign name and `queue_status`. Partial matches are returned.
+</ParamField>
+
+<ParamField query="channel_type" type="string">
+  Only return campaigns of this channel: `voice`, `video`, `whatsapp` or `web_chat`. If omitted, campaigns of every channel are returned.
+</ParamField>
+
+<ParamField query="statusFilter" type="string">
+  Filter by a group of statuses. What each value matches depends on `channel_type`:
+
+  - **Voice** (or `channel_type` omitted):
+    - `active` – `in-progress`, plus `completed` campaigns updated in the last 2 hours. `in-progress` campaigns are listed first.
+    - `inactive` – `pending`, `paused`, `freezed` or `failed`.
+    - `completed` – `completed` campaigns last updated more than 2 hours ago.
+  - **Video and web chat**: `active` (link not revoked) or `inactive` (link revoked).
+  - **WhatsApp**: `active` or `inactive`.
+
+  Any other value, or no value, returns every status.
+</ParamField>
+
+<ParamField query="status" type="string">
+  Only return campaigns with exactly this `queue_status`, for example `paused`.
+</ParamField>
+
+<ParamField query="type" type="string">
+  Only return campaigns of this type: `outbound`, `inbound` or `mixed`.
+</ParamField>
+
+<ParamField query="createdAtMin" type="string">
+  Only return campaigns created at or after this date (ISO 8601).
+</ParamField>
+
+<ParamField query="createdAtMax" type="string">
+  Only return campaigns created at or before this date (ISO 8601).
 </ParamField>
 
 <RequestExample>
+
 ```bash cURL
-curl --location 'https://api.weya.live/backend/api/call/batches/64e5f12345abcdef12345678?page=1&limit=10&search=Marketing' \
+curl --location 'https://api.weya.live/backend/api/call/batches/64e5f12345abcdef12345678?page=1&limit=10&channel_type=voice&search=Marketing' \
   --header 'x-api-key: YOUR_API_KEY'
 ```
+
 </RequestExample>
 
 ## Response
 
 <ResponseExample>
+
 ```json 200 OK
 {
-  "message": "Batches fetched successfully",
   "status": true,
   "code": 200,
-  "errorMessage": "",
+  "message": "Batches fetched successfully",
+  "errorMessage": null,
   "data": {
     "batches": [
       {
         "_id": "64e5f12345abcdef98765432",
         "batchName": "Marketing Campaign May 2025",
+        "type": "outbound",
+        "queue_status": "in-progress",
         "totalCalls": 150,
         "callsPicked": 120,
         "callsCompleted": 100,
-        "queue_status": "active",
+        "callStats": {
+          "leads": 150,
+          "leadsConnected": 96,
+          "connectivityPct": 64,
+          "dials": 210,
+          "basis": "lead",
+          "legacy": { "totalCalls": 150, "callsPicked": 120, "callsCompleted": 100 }
+        },
         "createdAt": "2025-05-01T12:00:00.000Z",
         "updatedAt": "2025-05-15T14:30:00.000Z"
-      },
-      {
-        "_id": "64e5f12345abcdef98765433",
-        "batchName": "Sales Outreach June 2025",
-        "totalCalls": 200,
-        "callsPicked": 150,
-        "callsCompleted": 120,
-        "queue_status": "paused",
-        "createdAt": "2025-06-01T09:00:00.000Z",
-        "updatedAt": "2025-06-10T16:45:00.000Z"
       }
     ],
     "pagination": {
       "total": 25,
-      "page": 1,
-      "limit": 10,
-      "totalPages": 3
+      "page": "1",
+      "limit": "10",
+      "totalPages": 3,
+      "hasNextPage": true,
+      "hasPrevPage": false
     }
   }
 }
 ```
+
 </ResponseExample>
 
-<ResponseField name="data" type="object" required>
-Contains the campaigns array and pagination metadata.
-</ResponseField>
-
 <ResponseField name="data.batches" type="array[object]" required>
-Array of campaign records with summary statistics.
+  The campaigns on this page.
 </ResponseField>
 
 <ResponseField name="data.batches[]._id" type="string" required>
-Unique identifier for the campaign.
+  Campaign ID.
 </ResponseField>
 
 <ResponseField name="data.batches[].batchName" type="string" required>
-Display name for the campaign.
+  Campaign name.
 </ResponseField>
 
-<ResponseField name="data.batches[].totalCalls" type="integer" required>
-Total number of calls in the campaign.
+<ResponseField name="data.batches[].type" type="string">
+  Campaign type: `outbound`, `inbound` or `mixed`.
 </ResponseField>
 
-<ResponseField name="data.batches[].callsPicked" type="integer" required>
-Number of calls that were picked up/answered.
-</ResponseField>
-
-<ResponseField name="data.batches[].callsCompleted" type="integer" required>
-Number of calls that completed successfully.
+<ResponseField name="data.batches[].channel_type" type="string">
+  Channel, for video, WhatsApp and web chat campaigns. Voice campaigns may not have this field.
 </ResponseField>
 
 <ResponseField name="data.batches[].queue_status" type="string" required>
-Current status of the campaign queue (e.g., "active", "paused", "completed").
+  Campaign status. For voice campaigns: `pending`, `in-progress`, `paused`, `freezed` (outside the calling window), `completed` or `failed`.
 </ResponseField>
 
-<ResponseField name="data.batches[].createdAt" type="string" required>
-Timestamp when the campaign was created (ISO 8601 format).
+<ResponseField name="data.batches[].totalCalls" type="integer">
+  Number of contacts (leads) in the campaign.
 </ResponseField>
 
-<ResponseField name="data.batches[].updatedAt" type="string" required>
-Timestamp when the campaign was last updated (ISO 8601 format).
+<ResponseField name="data.batches[].callsPicked" type="integer">
+  Legacy counter of dials placed. Use `callStats` instead.
+</ResponseField>
+
+<ResponseField name="data.batches[].callsCompleted" type="integer">
+  Legacy counter of dials that lasted 10 seconds or more. Use `callStats` instead.
+</ResponseField>
+
+<ResponseField name="data.batches[].callStats" type="object">
+  Per-contact call statistics for the campaign's whole history. They are updated every few minutes, so recent calls may not be counted yet. Missing when no statistics are available yet.
+
+  - `leads` – contacts counted in the statistics
+  - `leadsConnected` – of those, contacts with a connected call
+  - `connectivityPct` – `leadsConnected` as a percentage of `leads`
+  - `dials` – total call attempts
+  - `basis` – always `lead`
+  - `legacy` – the `totalCalls`, `callsPicked` and `callsCompleted` counters
+</ResponseField>
+
+<ResponseField name="data.batches[].createdAt" type="string">
+  When the campaign was created (ISO 8601).
+</ResponseField>
+
+<ResponseField name="data.batches[].updatedAt" type="string">
+  When the campaign was last updated (ISO 8601).
 </ResponseField>
 
 <ResponseField name="data.pagination" type="object" required>
-Pagination metadata.
-</ResponseField>
-
-<ResponseField name="data.pagination.total" type="integer" required>
-Total number of campaigns matching the search criteria.
-</ResponseField>
-
-<ResponseField name="data.pagination.page" type="integer" required>
-Current page number.
-</ResponseField>
-
-<ResponseField name="data.pagination.limit" type="integer" required>
-Number of records per page.
-</ResponseField>
-
-<ResponseField name="data.pagination.totalPages" type="integer" required>
-Total number of pages available.
+  Pagination details: `total`, `page`, `limit`, `totalPages`, `hasNextPage` and `hasPrevPage`. `page` and `limit` are returned as strings when you pass them in the query.
 </ResponseField>
 
 ## Error Handling
 
-- **400 Bad Request** – Invalid `userId` format or invalid query parameters.
-- **404 Not Found** – No campaigns found for the authenticated user.
-- **500 Internal Server Error** – Failed to fetch campaign data; retry or contact support.
+- **401 Unauthorized** – Missing or invalid API key.
+- **500 Internal Server Error** – Unexpected server error.
 
-<Note>
-**Filtering Behavior:**
-
-- Deleted campaigns are left out unless you pass `includeDeleted=true`
-- Use the `search` parameter to filter by campaign name or queue status
-- Results are sorted by creation date in descending order (newest first)
-- Pagination helps manage large lists of campaigns efficiently
-</Note>
+When no campaign matches, the response is `200` with an empty `batches` array.
 
 <Tip>
-Combine this endpoint with `GET /api/call/batch-details/{batchId}` to first get an overview of all campaigns, then drill down into specific campaign details.
+  Use `GET /api/call/batch-details/{batchId}` to get the details and calls of one campaign.
 </Tip>
