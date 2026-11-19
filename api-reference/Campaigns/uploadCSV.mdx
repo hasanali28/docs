@@ -37,7 +37,7 @@ Type of campaign: `outbound` for outbound-only campaigns, `mixed` for outbound c
 </ParamField>
 
 <ParamField formData="enableDNC" type="string">
-Set to `"true"` to skip numbers on your Do Not Call list. Allowed only when DNC is enabled for your organization.
+The campaign's DNC setting, `"true"` or `"false"`. `"true"` is allowed only when DNC is enabled for your organization. Numbers on your organization's [DNC list](/api-reference/DNC/getDNCList) are skipped in every campaign whatever this value is.
 </ParamField>
 
 <ParamField formData="type" type="string">
