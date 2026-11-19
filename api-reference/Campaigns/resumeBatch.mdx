@@ -13,12 +13,13 @@ You don't need to call this after **Update Campaign**: a paused campaign resumes
 ## Prerequisites
 
 - An API key for your workspace
-- The campaign's `batchId`
+- The campaign's `batchId`. The campaign must have been created by the user who owns the API key.
 - The campaign is paused
 
 ## Endpoint
 
-<ParamField method="POST" path="/api/call/resume-batch/{batchId}" />
+<ParamField path="/api/call/resume-batch/{batchId}" method="POST">
+</ParamField>
 
 ## Request
 
@@ -50,7 +51,7 @@ curl --location --request POST 'https://api.weya.live/backend/api/call/resume-ba
   "status": true,
   "code": 200,
   "message": "Batch resumed successfully",
-  "errorMessage": "",
+  "errorMessage": null,
   "data": {
     "batchId": "6806382f98da85ec32fac955",
     "batchName": "Sales Campaign - July",
@@ -82,14 +83,22 @@ Name of the resumed campaign.
 </ResponseField>
 
 <ResponseField name="data.status" type="string">
-New campaign status. `pending` means it will start calling; `freezed` means it is outside its calling window and will start at the next one.
+New campaign status:
+
+- `in-progress` – calls are waiting and the campaign is calling again.
+- `pending` – the campaign will start calling.
+- `freezed` – the current time is outside the campaign's calling hours, calling days or holiday list. Calling starts at the next calling window.
 </ResponseField>
 
 ## Error Handling
 
-- **400 Bad Request** – The campaign is not paused.
+Errors return `status: false`, with the reason in `errorMessage`.
+
+- **400 Bad Request**
+  - `Invalid Batch ID` – `batchId` is not a valid ID.
+  - `Batch is not paused (current status: …)` – only a paused campaign can be resumed.
 - **401 Unauthorized** – Missing or invalid API key.
-- **404 Not Found** – The campaign does not exist in your workspace.
+- **404 Not Found** – No campaign with this ID was created by the user who owns the API key, or it was deleted.
 - **500 Internal Server Error** – Unexpected server error.
 
 <Check>
