@@ -125,22 +125,24 @@ Delay in **minutes** between attempts to the same contact. Use a value from 5 to
 </ParamField>
 
 <ParamField body="holidayListId" type="string">
-ID of the holiday list to apply. Send an empty string to remove the holiday list.
+ID of a holiday list in your organization. Send an empty string or `null` to remove the holiday list.
 </ParamField>
 
 <ParamField body="pushingCrms" type="array[object]">
 Destinations call outcomes are sent to after each call. Replaces the current list. Send an empty array to stop tracking. A webhook or Google Sheet added here receives only calls that end after the update; earlier calls are not sent. Each item has:
 
 - `type` – one of `standard` (HubSpot/Zoho), `custom`, `webhook` or `gsheet`
-- `schemaId` – ID of the form or schema
-- `crmId` – ID of the connection, webhook or Google Sheet integration
+- `schemaId` – ID of the form or schema. For `gsheet`, the Google Sheet integration ID.
+- `crmId` – ID of the connection or webhook. For `custom` it must equal `schemaId`; for `gsheet` it is set to `schemaId`.
+
+A campaign can have at most one Google Sheet, and a Google Sheet already connected to another active campaign can't be added.
 </ParamField>
 
 ### CSV Upload Parameters
 
 Send these as `multipart/form-data` to add calls to the campaign. When using form data, send object and array fields (`callingNumbers`, `callingHour`, `allowedDays`, `pushingCrms`) as JSON strings, and `enableDNC` as `"true"` or `"false"`.
 
-The settings are saved first, then the file is processed. If the file is rejected, the settings change is still saved.
+The settings are saved first, then the file is processed. If the file is rejected, the settings change is still saved, and a paused campaign stays paused.
 
 The file uses the same columns as [Upload Campaign CSV](/api-reference/Campaigns/uploadCSV). New calls use the campaign's settings after this update.
 
@@ -250,8 +252,9 @@ Errors return `status: false`, with the reason in `errorMessage`.
   - `A chat campaign cannot be edited here…` – the campaign is a chat campaign.
   - `callingHour` is missing `start` or `end`, or they are not in `HH:MM` format.
   - `Invalid JSON format for …` – a form field that must be a JSON string could not be parsed.
-  - `enable DNC must be false in organization settings` – `enableDNC: true` was sent but DNC is not enabled for your organization.
-  - A `pushingCrms` entry is invalid, for example its connection or schema does not exist.
+  - `enable DNC must be … in organization settings` – `enableDNC: true` was sent but DNC is not enabled for your organization.
+  - `Invalid holidayListId` or `Holiday list not found` – the holiday list ID is malformed or not in your organization.
+  - A `pushingCrms` entry is invalid: `Invalid CRM type`, `Invalid CRM schemaId`, `Invalid CRM crmId`, `Custom CRM crmId must equal schemaId`, more than one Google Sheet, or a Google Sheet already connected to another active campaign.
   - `CSV upload is not allowed for inbound batches.`
   - The file is empty, is not CSV or Excel, or has no valid rows.
   - The file has invalid rows and `type` is `"false"`. `data` contains:
@@ -266,7 +269,9 @@ Errors return `status: false`, with the reason in `errorMessage`.
 - **401 Unauthorized** – Missing or invalid API key.
   - `Unauthorized: Invalid API Key` – the `x-api-key` value is wrong, the key was deleted, or it was created in a different environment (for example the dev dashboard).
   - `Unauthorized: No API Key OR Token Provided` – the `x-api-key` header was not sent.
-- **404 Not Found** – No campaign with this ID was created by the user who owns the API key, or it was deleted.
+- **404 Not Found**
+  - `Batch not found` – no campaign with this ID was created by the user who owns the API key, or it was deleted.
+  - A `pushingCrms` entry points to something that does not exist: `CRM schema not found`, `CRM not found`, `Custom CRM schema not found` or `Google Sheets integration not found`.
 - **500 Internal Server Error** – Unexpected server error.
 
 <Note>
@@ -277,7 +282,7 @@ A campaign that was **paused** resumes automatically after a successful update. 
 
 <Note>
 
-The scheduled start date is set when the campaign is created and cannot be changed with this endpoint.
+The campaign type (outbound, inbound or mixed) and scheduled start date are set when the campaign is created and cannot be changed with this endpoint. In this request, `type` is the skip-invalid-rows flag described above, not the campaign type.
 
 </Note>
 
