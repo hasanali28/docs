@@ -6,16 +6,19 @@ api: "DELETE /api/holiday-list/{id}"
 
 ## Overview
 
-Delete a holiday list. Campaigns that used it no longer skip its dates.
+Delete a holiday list from your organization. The default list can't be deleted: make another list the default first with [Update Holiday List](/api-reference/HolidayLists/updateHolidayList).
+
+The API doesn't check whether campaigns use the list. Remove it from those campaigns first with [Update Campaign](/api-reference/Campaigns/updateBatch) (`holidayListId: ""`).
 
 ## Prerequisites
 
 - An API key for your workspace
-- The holiday list's ID
+- The holiday list's ID (`_id` from [Get Holiday Lists](/api-reference/HolidayLists/getHolidayLists))
 
 ## Endpoint
 
-<ParamField method="DELETE" path="/api/holiday-list/{id}" />
+<ParamField path="/api/holiday-list/{id}" method="DELETE">
+</ParamField>
 
 ## Request
 
@@ -44,9 +47,9 @@ curl --location --request DELETE 'https://api.weya.live/backend/api/holiday-list
 {
   "status": true,
   "code": 200,
-  "message": "",
-  "errorMessage": "",
-  "data": null
+  "message": "Holiday list deleted successfully",
+  "errorMessage": null,
+  "data": []
 }
 ```
 
@@ -58,6 +61,9 @@ Indicates whether the holiday list was deleted.
 
 ## Error Handling
 
+Errors return `status: false`, with the reason in `errorMessage`.
+
+- **400 Bad Request** – `Cannot delete the default holiday list`.
 - **401 Unauthorized** – Missing or invalid API key.
-- **404 Not Found** – The holiday list does not exist in your organization.
+- **404 Not Found** – `Holiday list not found`: the list doesn't exist in your organization.
 - **500 Internal Server Error** – Unexpected server error.
