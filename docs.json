@@ -19,7 +19,10 @@
           },
           {
             "group": "Get Started",
-            "pages": ["essentials/settings"]
+            "pages": [
+              "essentials/settings",
+              "get-started/authentication"
+            ]
           },
           {
             "group": "Build",
