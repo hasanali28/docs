@@ -1,17 +1,17 @@
 ---
 title: "Update WhatsApp Agent"
-description: "Update the configuration and settings of an existing WhatsApp AI Agent."
+description: "Update the configuration of one of your WhatsApp agents."
 api: "PUT /api/whatsapp/update-whatsapp-agent/{agentId}"
 ---
 
 ## Overview
 
-Update an existing WhatsApp AI Agent by modifying its configuration, prompts, AI model, knowledge bases, assigned WhatsApp number, or other settings. Only the fields you provide will be updated.
+Update a WhatsApp agent created by the user who owns the API key. Send only the fields you want to change. To attach the agent to a number, use [Assign Agent to WhatsApp Number](/api-reference/WhatsApp/assignAgentToWhatsAppNumber); `phoneNumberId` can't be changed here.
 
 ## Prerequisites
 
 - An API key for your workspace
-- Valid WhatsApp Agent ID
+- The agent's ID, from [Get WhatsApp Agents](/api-reference/WhatsApp/getWhatsAppAgents)
 
 ## Request
 
@@ -20,59 +20,39 @@ Your workspace API key. Create one from the profile menu in the dashboard → **
 </ParamField>
 
 <ParamField path="agentId" type="string" required>
-Unique identifier of the WhatsApp AI Agent to update.
+ID of the WhatsApp agent to update.
 </ParamField>
 
 <RequestExample>
 
 ```bash cURL
 curl --location --request PUT 'https://api.weya.live/backend/api/whatsapp/update-whatsapp-agent/6894a98a7fcde123456789ab' \
---header 'x-api-key: YOUR_API_KEY' \
---header 'Content-Type: application/json' \
---data '{
-  "agentName": "Premium Support Assistant",
-  "systemPrompt": "You are an expert customer support assistant.",
-  "welcomeMessage": "Hello! Welcome to Weya AI Support.",
-  "model": "gpt-4.1",
-  "temperature": 0.5,
-  "knowledgeBase": [
-    "6892fd48bde23a1234567890",
-    "6892fd48bde23a1234567891"
-  ]
-}'
+  --header 'x-api-key: YOUR_API_KEY' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "agentName": "Premium Support Assistant",
+    "systemMessage": "You are an expert customer support assistant.",
+    "sessionTimeout": 45
+  }'
 ```
 
 </RequestExample>
 
-## Request Body
+### Request Parameters
 
-<ParamField body="agentName" type="string">
-Updated display name of the WhatsApp Agent.
-</ParamField>
+All fields are optional. They are described in [Create WhatsApp Agent](/api-reference/WhatsApp/createWhatsAppAgent). Other fields are ignored.
 
-<ParamField body="phoneNumberId" type="string">
-Assign the agent to a different WhatsApp Business number.
-</ParamField>
-
-<ParamField body="systemPrompt" type="string">
-Updated system prompt that controls the agent's behavior.
-</ParamField>
-
-<ParamField body="welcomeMessage" type="string">
-Updated greeting message shown to users.
-</ParamField>
-
-<ParamField body="knowledgeBase" type="array[string]">
-Updated list of Knowledge Base IDs available to the agent.
-</ParamField>
-
-<ParamField body="model" type="string">
-Updated AI model used by the agent.
-</ParamField>
-
-<ParamField body="temperature" type="number">
-Updated response creativity value.
-</ParamField>
+| Field | Description |
+| --- | --- |
+| `agentName` | Name of the agent |
+| `systemMessage` | The agent's instructions |
+| `sessionTimeout` | Minutes of user inactivity before a conversation ends |
+| `gender` | `Male`, `Female` or `Other` |
+| `voice` | Voice ID |
+| `selectedLanguage` | Language codes |
+| `rag` | Knowledge base `vectorDbCollection` |
+| `analysisMetrics` | Data to extract after each conversation |
+| `tools`, `templates`, `library_tools` | Tools and message templates |
 
 ## Response
 
@@ -82,71 +62,25 @@ Updated response creativity value.
 {
   "status": true,
   "code": 200,
-  "message": "WhatsApp Agent updated successfully",
-  "data": {
-    "_id": "6894a98a7fcde123456789ab",
-    "agentName": "Premium Support Assistant",
-    "status": "active",
-    "updatedAt": "2026-07-21T16:15:42.000Z"
-  }
+  "message": "Whatsapp agent updated successfully",
+  "errorMessage": null,
+  "data": []
 }
 ```
 
 </ResponseExample>
 
-<ResponseField name="status" type="boolean">
-Indicates whether the request completed successfully.
-</ResponseField>
-
-<ResponseField name="code" type="integer">
-HTTP status code returned by the API.
-</ResponseField>
-
 <ResponseField name="message" type="string">
-Confirmation message indicating the agent was updated successfully.
-</ResponseField>
-
-<ResponseField name="data" type="object">
-Updated WhatsApp Agent information.
-</ResponseField>
-
-<ResponseField name="data._id" type="string">
-Unique identifier of the WhatsApp Agent.
-</ResponseField>
-
-<ResponseField name="data.agentName" type="string">
-Updated name of the WhatsApp Agent.
-</ResponseField>
-
-<ResponseField name="data.status" type="string">
-Current status of the agent.
-</ResponseField>
-
-<ResponseField name="data.updatedAt" type="string">
-Timestamp when the agent was last updated.
+`Whatsapp agent updated successfully`. The updated agent isn't returned; use [Get WhatsApp Agent By ID](/api-reference/WhatsApp/getWhatsAppAgentById).
 </ResponseField>
 
 ## Error Handling
 
-| Status | Description |
-|---------|-------------|
-|400|Invalid request body or Agent ID|
-|401|Missing or invalid API key|
-|403|You do not have permission to update this WhatsApp Agent|
-|404|WhatsApp Agent not found|
-|500|Internal server error|
+Errors return `status: false`, with the reason in `errorMessage`.
 
-<Note>
-
-Only the fields included in the request are updated. Any omitted fields retain their existing values.
-
-</Note>
-
-<Check>
-
-After updating an agent, you can verify the changes using:
-
-- `GET /api/whatsapp/get-whatsapp-agent`
-- `GET /api/whatsapp/get-whatsapp-agent/{agentId}`
-
-</Check>
+- **400 Bad Request** – `Invalid Agent ID`, or `Only one send_whatsapp_start_message tool is allowed`.
+- **401 Unauthorized** – Missing or invalid API key.
+- **403 Forbidden** – The request sets `settings.cross_memory`, which only super admins can change.
+- **404 Not Found** – `WhatsApp agent not found`: it doesn't exist or wasn't created by the user who owns the API key.
+- **429 Too Many Requests** – More than 1,000 WhatsApp requests in 15 minutes from your IP address.
+- **500 Internal Server Error** – Unexpected server error.

@@ -1,17 +1,23 @@
 ---
 title: "Delete WhatsApp Agent"
-description: "Permanently delete an existing WhatsApp AI Agent from your workspace."
+description: "Permanently delete one of your WhatsApp agents."
 api: "DELETE /api/whatsapp/delete-whatsapp-agent/{agentId}"
 ---
 
 ## Overview
 
-Delete a WhatsApp AI Agent from your workspace. Once deleted, the agent will no longer respond to incoming WhatsApp messages, and its configuration cannot be recovered.
+Permanently delete a WhatsApp agent created by the user who owns the API key.
+
+The API doesn't unassign the agent from a WhatsApp number. Remove it first with [Remove Agent from WhatsApp Number](/api-reference/WhatsApp/removeAgentFromWhatsAppNumber), or assign another agent, so the number isn't left pointing at a deleted agent.
+
+<Warning>
+  This can't be undone.
+</Warning>
 
 ## Prerequisites
 
 - An API key for your workspace
-- Valid WhatsApp Agent ID
+- The agent's ID, from [Get WhatsApp Agents](/api-reference/WhatsApp/getWhatsAppAgents)
 
 ## Request
 
@@ -20,14 +26,14 @@ Your workspace API key. Create one from the profile menu in the dashboard → **
 </ParamField>
 
 <ParamField path="agentId" type="string" required>
-Unique identifier of the WhatsApp AI Agent to delete.
+ID of the WhatsApp agent to delete.
 </ParamField>
 
 <RequestExample>
 
 ```bash cURL
 curl --location --request DELETE 'https://api.weya.live/backend/api/whatsapp/delete-whatsapp-agent/6894a98a7fcde123456789ab' \
---header 'x-api-key: YOUR_API_KEY'
+  --header 'x-api-key: YOUR_API_KEY'
 ```
 
 </RequestExample>
@@ -40,46 +46,20 @@ curl --location --request DELETE 'https://api.weya.live/backend/api/whatsapp/del
 {
   "status": true,
   "code": 200,
-  "message": "WhatsApp Agent deleted successfully"
+  "message": "Whatsapp agent deleted successfully",
+  "errorMessage": null,
+  "data": []
 }
 ```
 
 </ResponseExample>
 
-<ResponseField name="status" type="boolean">
-Indicates whether the request completed successfully.
-</ResponseField>
-
-<ResponseField name="code" type="integer">
-HTTP status code returned by the API.
-</ResponseField>
-
-<ResponseField name="message" type="string">
-Confirmation message indicating the WhatsApp Agent was deleted successfully.
-</ResponseField>
-
 ## Error Handling
 
-| Status | Description |
-|---------|-------------|
-|400|Invalid WhatsApp Agent ID|
-|401|Missing or invalid API key|
-|403|You do not have permission to delete this WhatsApp Agent|
-|404|WhatsApp Agent not found|
-|500|Internal server error|
+Errors return `status: false`, with the reason in `errorMessage`.
 
-<Warning>
-
-Deleting a WhatsApp Agent is permanent. Any conversations routed to this agent will stop being handled until another agent is assigned.
-
-</Warning>
-
-<Check>
-
-Before deleting a WhatsApp Agent, you may want to:
-
-- Retrieve the agent using `GET /api/whatsapp/get-whatsapp-agent/{agentId}`.
-- Export or save the agent configuration if needed.
-- Assign another WhatsApp Agent to the WhatsApp Business number to avoid service interruption.
-
-</Check>
+- **400 Bad Request** – `Invalid Agent ID`.
+- **401 Unauthorized** – Missing or invalid API key.
+- **404 Not Found** – `WhatsApp agent not found`: it doesn't exist, is already deleted, or wasn't created by the user who owns the API key.
+- **429 Too Many Requests** – More than 1,000 WhatsApp requests in 15 minutes from your IP address.
+- **500 Internal Server Error** – Unexpected server error.

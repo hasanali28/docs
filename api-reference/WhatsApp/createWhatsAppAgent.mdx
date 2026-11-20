@@ -1,19 +1,18 @@
 ---
 title: "Create WhatsApp Agent"
-description: "Create a new AI-powered WhatsApp Agent for handling customer conversations."
+description: "Create an AI agent that handles WhatsApp conversations."
 api: "POST /api/whatsapp/save-whatsapp-agent"
 ---
 
 ## Overview
 
-Create a WhatsApp Agent that can automatically respond to customer messages on an integrated WhatsApp Business number. The agent can be configured with prompts, AI models, knowledge bases, templates, and conversation settings.
+Create a WhatsApp agent for the user who owns the API key. Optionally attach it to one of your WhatsApp integrations with `phoneNumberId`; you can also attach it later with [Assign Agent to WhatsApp Number](/api-reference/WhatsApp/assignAgentToWhatsAppNumber).
+
+Tools, templates, analysis metrics and memory settings are easiest to set up in the dashboard after the agent exists.
 
 ## Prerequisites
 
 - An API key for your workspace
-- At least one integrated WhatsApp Business number
-- (Optional) Knowledge Base created
-- (Optional) WhatsApp templates configured
 
 ## Request
 
@@ -21,56 +20,55 @@ Create a WhatsApp Agent that can automatically respond to customer messages on a
 Your workspace API key. Create one from the profile menu in the dashboard → **API Keys**.
 </ParamField>
 
+<ParamField body="agentName" type="string" required>
+Name of the agent.
+</ParamField>
+
+<ParamField body="systemMessage" type="string" required>
+The agent's instructions (prompt).
+</ParamField>
+
+<ParamField body="sessionTimeout" type="integer" required>
+Minutes of user inactivity after which a conversation ends. The dashboard allows 1 to 360; the API only requires a value.
+</ParamField>
+
+<ParamField body="phoneNumberId" type="string">
+Integration ID (`_id` from [Get WhatsApp Numbers](/api-reference/WhatsApp/getWhatsAppNumbers)) to attach the agent to.
+</ParamField>
+
+<ParamField body="gender" type="string">
+`Male`, `Female` or `Other`. Used for verb forms in some languages.
+</ParamField>
+
+<ParamField body="selectedLanguage" type="array[string]">
+Language codes the agent speaks.
+</ParamField>
+
+<ParamField body="rag" type="string">
+Knowledge base to answer from: the `vectorDbCollection` of one of your knowledge bases, from [Get Knowledge Bases](/api-reference/KnowledgeBase/getKnowledgeBases).
+</ParamField>
+
+<ParamField body="variables" type="array[object]">
+  Variables the agent uses.
+</ParamField>
+
 <RequestExample>
 
 ```bash cURL
 curl --location 'https://api.weya.live/backend/api/whatsapp/save-whatsapp-agent' \
---header 'x-api-key: YOUR_API_KEY' \
---header 'Content-Type: application/json' \
---data '{
-  "agentName": "Support Assistant",
-  "phoneNumberId": "123456789012345",
-  "systemPrompt": "You are a helpful customer support assistant.",
-  "welcomeMessage": "Hello 👋 How can I help you today?",
-  "knowledgeBase": [
-    "6892fd48bde23a1234567890"
-  ],
-  "model": "gpt-4.1",
-  "temperature": 0.7
-}'
+  --header 'x-api-key: YOUR_API_KEY' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "agentName": "Support Assistant",
+    "systemMessage": "You are a helpful customer support assistant.",
+    "sessionTimeout": 30,
+    "gender": "Female",
+    "selectedLanguage": ["en-IN"],
+    "phoneNumberId": "6891f1d0c45d123456789abc"
+  }'
 ```
 
 </RequestExample>
-
-## Request Body
-
-<ParamField body="agentName" type="string" required>
-Name of the WhatsApp AI Agent.
-</ParamField>
-
-<ParamField body="phoneNumberId" type="string" required>
-WhatsApp Business Phone Number ID that the agent will be assigned to.
-</ParamField>
-
-<ParamField body="systemPrompt" type="string" required>
-Primary instructions that define the behavior of the AI agent.
-</ParamField>
-
-<ParamField body="welcomeMessage" type="string">
-Message automatically sent when a new conversation starts.
-</ParamField>
-
-<ParamField body="knowledgeBase" type="array[string]">
-List of Knowledge Base IDs the agent can use while answering questions.
-</ParamField>
-
-<ParamField body="model" type="string">
-AI model used for generating responses.
-</ParamField>
-
-<ParamField body="temperature" type="number">
-Controls the creativity of the AI responses.
-</ParamField>
 
 ## Response
 
@@ -80,80 +78,27 @@ Controls the creativity of the AI responses.
 {
   "status": true,
   "code": 201,
-  "message": "WhatsApp Agent created successfully",
-  "data": {
-    "_id": "6894a98a7fcde123456789ab",
-    "agentName": "Support Assistant",
-    "phoneNumberId": "123456789012345",
-    "status": "active",
-    "createdAt": "2026-07-21T13:45:18.000Z"
-  }
+  "message": "Whatsapp agent created successfully",
+  "errorMessage": null,
+  "data": []
 }
 ```
 
 </ResponseExample>
 
-<ResponseField name="status" type="boolean">
-Indicates whether the request was successful.
-</ResponseField>
-
-<ResponseField name="code" type="integer">
-HTTP status code.
-</ResponseField>
-
-<ResponseField name="message" type="string">
-Success message returned by the API.
-</ResponseField>
-
-<ResponseField name="data" type="object">
-Information about the newly created WhatsApp Agent.
-</ResponseField>
-
-<ResponseField name="data._id" type="string">
-Unique identifier of the WhatsApp Agent.
-</ResponseField>
-
-<ResponseField name="data.agentName" type="string">
-Name of the WhatsApp Agent.
-</ResponseField>
-
-<ResponseField name="data.phoneNumberId" type="string">
-WhatsApp Business Phone Number assigned to the agent.
-</ResponseField>
-
-<ResponseField name="data.status" type="string">
-Current status of the agent.
-</ResponseField>
-
-<ResponseField name="data.createdAt" type="string">
-Timestamp when the agent was created.
+<ResponseField name="data" type="array">
+Always empty: the response doesn't include the new agent or its ID. Find it with [Get WhatsApp Agents](/api-reference/WhatsApp/getWhatsAppAgents) (most recently edited first).
 </ResponseField>
 
 ## Error Handling
 
-| Status | Description |
-|---------|-------------|
-|400|Missing or invalid request parameters|
-|401|Missing or invalid API key|
-|403|You do not have permission to create WhatsApp agents|
-|404|WhatsApp number or Knowledge Base not found|
-|409|An agent already exists for the selected WhatsApp number|
-|500|Internal server error|
+Errors return `status: false`, with the reason in `errorMessage`.
 
-<Note>
-
-A WhatsApp Agent must be associated with an integrated WhatsApp Business number before it can start responding to incoming messages.
-
-</Note>
-
-<Check>
-
-Typical workflow:
-
-1. Validate the WhatsApp number.
-2. Create the WhatsApp integration.
-3. Create the WhatsApp Agent.
-4. Assign the agent to the integrated number.
-5. Test the agent by sending a WhatsApp message.
-
-</Check>
+- **400 Bad Request**
+  - `Agent name, system message, and session timeout are required`.
+  - `Invalid Phone Number ID`.
+  - `Only one send_whatsapp_start_message tool is allowed`.
+- **401 Unauthorized** – Missing or invalid API key.
+- **403 Forbidden** – The request sets `settings.cross_memory`, which only super admins can change.
+- **429 Too Many Requests** – More than 1,000 WhatsApp requests in 15 minutes from your IP address.
+- **500 Internal Server Error** – Unexpected server error.
