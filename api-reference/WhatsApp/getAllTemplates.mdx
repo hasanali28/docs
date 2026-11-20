@@ -1,12 +1,12 @@
 ---
 title: "Get All WhatsApp Templates"
-description: "Retrieve all WhatsApp message templates available in your workspace."
+description: "List the templates saved with your WhatsApp agents."
 api: "GET /api/whatsapp/get-all-templates"
 ---
 
 ## Overview
 
-Retrieve all WhatsApp message templates that are available within your workspace. This endpoint returns every template synchronized from your connected WhatsApp Business accounts, making it useful for browsing, selecting templates, or configuring WhatsApp AI Agents and campaigns.
+List the WhatsApp templates saved in Weya for the user who owns the API key, for example the start templates of your WhatsApp agents. These are templates stored in Weya, not a live list from AiSensy: for that, use [Get WhatsApp Templates](/api-reference/WhatsApp/getTemplates).
 
 ## Prerequisites
 
@@ -22,103 +22,17 @@ Your workspace API key. Create one from the profile menu in the dashboard → **
 
 ```bash cURL
 curl --location 'https://api.weya.live/backend/api/whatsapp/get-all-templates' \
---header 'x-api-key: YOUR_API_KEY'
+  --header 'x-api-key: YOUR_API_KEY'
 ```
 
 </RequestExample>
 
 ## Response
 
-<ResponseExample>
-
-```json 200 OK
-{
-  "status": true,
-  "code": 200,
-  "message": "Templates fetched successfully",
-  "data": [
-    {
-      "id": "987654321",
-      "name": "appointment_reminder",
-      "language": "en",
-      "category": "UTILITY",
-      "status": "APPROVED"
-    },
-    {
-      "id": "987654322",
-      "name": "payment_followup",
-      "language": "en",
-      "category": "MARKETING",
-      "status": "APPROVED"
-    },
-    {
-      "id": "987654323",
-      "name": "welcome_message",
-      "language": "en",
-      "category": "AUTHENTICATION",
-      "status": "APPROVED"
-    }
-  ]
-}
-```
-
-</ResponseExample>
-
-<ResponseField name="status" type="boolean">
-Indicates whether the request completed successfully.
-</ResponseField>
-
-<ResponseField name="code" type="integer">
-HTTP status code returned by the API.
-</ResponseField>
-
-<ResponseField name="message" type="string">
-Confirmation message indicating the templates were retrieved successfully.
-</ResponseField>
-
-<ResponseField name="data" type="array">
-List of all WhatsApp templates available in the workspace.
-</ResponseField>
-
-<ResponseField name="data[].id" type="string">
-Unique identifier of the WhatsApp template.
-</ResponseField>
-
-<ResponseField name="data[].name" type="string">
-Registered name of the WhatsApp template.
-</ResponseField>
-
-<ResponseField name="data[].language" type="string">
-Language configured for the template.
-</ResponseField>
-
-<ResponseField name="data[].category" type="string">
-Template category such as Utility, Marketing, or Authentication.
-</ResponseField>
-
-<ResponseField name="data[].status" type="string">
-Current approval status of the template.
-</ResponseField>
+A successful request returns `status: true`, the message `Whatsapp templates fetched successfully`, and the saved templates in `data`. Each has a `templateName`, `templateVariables`, `templateId` and `templateLanguage`. When you have none, the message is `No whatsapp template found` and `data` is empty.
 
 ## Error Handling
 
-| Status | Description |
-|---------|-------------|
-|401|Missing or invalid API key|
-|403|Permission denied|
-|500|Internal server error|
-
-<Note>
-
-Unlike **Get WhatsApp Templates**, which retrieves templates for a specific WhatsApp Business phone number, this endpoint returns every template available across your workspace.
-
-</Note>
-
-<Check>
-
-Related endpoints:
-
-- `GET /api/whatsapp/get-templates/{phoneNumberId}` — Retrieve templates for a specific WhatsApp Business number.
-- `GET /api/whatsapp/get-variable-by-template-id/{phoneNumberId}/{templateId}` — Retrieve variables required by a template.
-
-</Check>
+- **401 Unauthorized** – Missing or invalid API key.
+- **429 Too Many Requests** – More than 1,000 WhatsApp requests in 15 minutes from your IP address.
+- **500 Internal Server Error** – Unexpected server error.

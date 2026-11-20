@@ -1,17 +1,16 @@
 ---
-title: "Update WhatsApp Webhook"
-description: "Update the webhook configuration for a connected WhatsApp Business phone number."
-api: "POST /api/whatsapp/update-whatsapp-webhook"
+title: "Store WhatsApp Conversation Log"
+description: "Save WhatsApp messages of a conversation in your Weya logs."
+api: "POST /api/whatsapp/store-email-and-whatsapp"
 ---
 
 ## Overview
 
-Update the webhook URL associated with a connected WhatsApp Business phone number. The webhook receives incoming message events, delivery statuses, and other WhatsApp events required for AI Agent communication.
+Save messages of a WhatsApp conversation so they appear in your WhatsApp logs. Messages are added to the conversation between the user's number and your number; the conversation is created if it doesn't exist yet. Only WhatsApp is supported.
 
 ## Prerequisites
 
 - An API key for your workspace
-- A connected WhatsApp Business phone number
 
 ## Request
 
@@ -19,29 +18,56 @@ Update the webhook URL associated with a connected WhatsApp Business phone numbe
 Your workspace API key. Create one from the profile menu in the dashboard → **API Keys**.
 </ParamField>
 
+<ParamField query="msg_type" type="string">
+`outbound` or `inbound`. Can be sent in the query or in the body.
+</ParamField>
+
+<ParamField query="service" type="string">
+Must be `whatsapp`. Can be sent in the query or in the body.
+</ParamField>
+
+<ParamField body="user_phone_number" type="string" required>
+  The customer's number.
+</ParamField>
+
+<ParamField body="api_phone_number" type="string" required>
+  Your WhatsApp number.
+</ParamField>
+
+<ParamField body="logs" type="array[object]">
+  The messages to add. Sent as is.
+</ParamField>
+
+<ParamField body="agent_id" type="string">
+  ID of the agent in the conversation.
+</ParamField>
+
+<ParamField body="template_id" type="string">
+  Template name used in the conversation.
+</ParamField>
+
+<ParamField body="call_id" type="string">
+  Related call ID.
+</ParamField>
+
+<ParamField body="sid" type="string">
+  Conversation or session ID.
+</ParamField>
+
 <RequestExample>
 
 ```bash cURL
-curl --location 'https://api.weya.live/backend/api/whatsapp/update-whatsapp-webhook' \
---header 'x-api-key: YOUR_API_KEY' \
---header 'Content-Type: application/json' \
---data '{
-  "phoneNumberId": "123456789012345",
-  "webhookUrl": "https://example.com/webhook"
-}'
+curl --location 'https://api.weya.live/backend/api/whatsapp/store-email-and-whatsapp?msg_type=outbound&service=whatsapp' \
+  --header 'x-api-key: YOUR_API_KEY' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "user_phone_number": "+919876543210",
+    "api_phone_number": "+15551234567",
+    "logs": []
+  }'
 ```
 
 </RequestExample>
-
-## Request Body
-
-<ParamField body="phoneNumberId" type="string" required>
-Unique identifier of the connected WhatsApp Business phone number.
-</ParamField>
-
-<ParamField body="webhookUrl" type="string" required>
-Public HTTPS endpoint that will receive WhatsApp webhook events.
-</ParamField>
 
 ## Response
 
@@ -51,62 +77,26 @@ Public HTTPS endpoint that will receive WhatsApp webhook events.
 {
   "status": true,
   "code": 200,
-  "message": "WhatsApp webhook updated successfully",
-  "data": {
-    "phoneNumberId": "123456789012345",
-    "webhookUrl": "https://example.com/webhook"
-  }
+  "message": "Logs stored successfully",
+  "errorMessage": null,
+  "data": {}
 }
 ```
 
 </ResponseExample>
 
-<ResponseField name="status" type="boolean">
-Indicates whether the request completed successfully.
-</ResponseField>
-
-<ResponseField name="code" type="integer">
-HTTP status code returned by the API.
-</ResponseField>
-
-<ResponseField name="message" type="string">
-Confirmation message indicating the webhook was updated successfully.
-</ResponseField>
-
 <ResponseField name="data" type="object">
-Updated webhook configuration.
-</ResponseField>
-
-<ResponseField name="data.phoneNumberId" type="string">
-WhatsApp Business phone number whose webhook was updated.
-</ResponseField>
-
-<ResponseField name="data.webhookUrl" type="string">
-Configured webhook URL.
+The stored conversation record.
 </ResponseField>
 
 ## Error Handling
 
-| Status | Description |
-|---------|-------------|
-|400|Missing or invalid request parameters|
-|401|Missing or invalid API key|
-|403|Permission denied|
-|404|WhatsApp Business phone number not found|
-|500|Internal server error|
+Errors return `status: false`, with the reason in `errorMessage`.
 
-<Note>
-
-The webhook URL must be publicly accessible over HTTPS so Meta can deliver WhatsApp events successfully.
-
-</Note>
-
-<Check>
-
-Related endpoints:
-
-- `POST /api/whatsapp/validate-whatsapp-number` — Validate a WhatsApp Business number.
-- `POST /api/whatsapp/whatsapp-integration` — Create a new WhatsApp integration.
-- `GET /api/whatsapp/whatsapp-number` — View connected WhatsApp Business numbers.
-
-</Check>
+- **400 Bad Request**
+  - `Valid msg_type (outbound/inbound) is required`.
+  - `Only service=whatsapp is supported`.
+  - `user_phone_number and api_phone_number are required`.
+- **401 Unauthorized** – Missing or invalid API key.
+- **429 Too Many Requests** – More than 1,000 WhatsApp requests in 15 minutes from your IP address.
+- **500 Internal Server Error** – Unexpected server error.

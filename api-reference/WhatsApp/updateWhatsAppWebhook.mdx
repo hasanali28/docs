@@ -1,17 +1,19 @@
 ---
 title: "Update WhatsApp Webhook"
-description: "Update the webhook configuration for a connected WhatsApp Business phone number."
+description: "Point your AiSensy account's webhook at Weya."
 api: "POST /api/whatsapp/update-whatsapp-webhook"
 ---
 
 ## Overview
 
-Update the webhook URL associated with a connected WhatsApp Business phone number. The webhook receives incoming message events, delivery statuses, and other WhatsApp events required for AI Agent communication.
+Set the webhook of your AiSensy account to Weya's WhatsApp webhook address, so incoming WhatsApp messages and events reach Weya. You can't choose the address: it is always Weya's.
+
+Assigning an agent with [Assign Agent to WhatsApp Number](/api-reference/WhatsApp/assignAgentToWhatsAppNumber) already sets the webhook up, so you only need this endpoint to repair it.
 
 ## Prerequisites
 
 - An API key for your workspace
-- A connected WhatsApp Business phone number
+- Your AiSensy API token
 
 ## Request
 
@@ -19,29 +21,22 @@ Update the webhook URL associated with a connected WhatsApp Business phone numbe
 Your workspace API key. Create one from the profile menu in the dashboard → **API Keys**.
 </ParamField>
 
+<ParamField body="token" type="string" required>
+Your AiSensy API token.
+</ParamField>
+
 <RequestExample>
 
 ```bash cURL
 curl --location 'https://api.weya.live/backend/api/whatsapp/update-whatsapp-webhook' \
---header 'x-api-key: YOUR_API_KEY' \
---header 'Content-Type: application/json' \
---data '{
-  "phoneNumberId": "123456789012345",
-  "webhookUrl": "https://example.com/webhook"
-}'
+  --header 'x-api-key: YOUR_API_KEY' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "token": "YOUR_AISENSY_API_TOKEN"
+  }'
 ```
 
 </RequestExample>
-
-## Request Body
-
-<ParamField body="phoneNumberId" type="string" required>
-Unique identifier of the connected WhatsApp Business phone number.
-</ParamField>
-
-<ParamField body="webhookUrl" type="string" required>
-Public HTTPS endpoint that will receive WhatsApp webhook events.
-</ParamField>
 
 ## Response
 
@@ -51,62 +46,23 @@ Public HTTPS endpoint that will receive WhatsApp webhook events.
 {
   "status": true,
   "code": 200,
-  "message": "WhatsApp webhook updated successfully",
-  "data": {
-    "phoneNumberId": "123456789012345",
-    "webhookUrl": "https://example.com/webhook"
-  }
+  "message": "Webhook updated successfully!",
+  "errorMessage": null,
+  "data": {}
 }
 ```
 
 </ResponseExample>
 
-<ResponseField name="status" type="boolean">
-Indicates whether the request completed successfully.
-</ResponseField>
-
-<ResponseField name="code" type="integer">
-HTTP status code returned by the API.
-</ResponseField>
-
-<ResponseField name="message" type="string">
-Confirmation message indicating the webhook was updated successfully.
-</ResponseField>
-
 <ResponseField name="data" type="object">
-Updated webhook configuration.
-</ResponseField>
-
-<ResponseField name="data.phoneNumberId" type="string">
-WhatsApp Business phone number whose webhook was updated.
-</ResponseField>
-
-<ResponseField name="data.webhookUrl" type="string">
-Configured webhook URL.
+The response from AiSensy to the update.
 </ResponseField>
 
 ## Error Handling
 
-| Status | Description |
-|---------|-------------|
-|400|Missing or invalid request parameters|
-|401|Missing or invalid API key|
-|403|Permission denied|
-|404|WhatsApp Business phone number not found|
-|500|Internal server error|
+Errors return `status: false`, with the reason in `errorMessage`.
 
-<Note>
-
-The webhook URL must be publicly accessible over HTTPS so Meta can deliver WhatsApp events successfully.
-
-</Note>
-
-<Check>
-
-Related endpoints:
-
-- `POST /api/whatsapp/validate-whatsapp-number` — Validate a WhatsApp Business number.
-- `POST /api/whatsapp/whatsapp-integration` — Create a new WhatsApp integration.
-- `GET /api/whatsapp/whatsapp-number` — View connected WhatsApp Business numbers.
-
-</Check>
+- **400 Bad Request** – `token is required`, or AiSensy rejected the token.
+- **401 Unauthorized** – Missing or invalid API key.
+- **429 Too Many Requests** – More than 1,000 WhatsApp requests in 15 minutes from your IP address.
+- **500 Internal Server Error** – Unexpected server error, or AiSensy couldn't be reached.
