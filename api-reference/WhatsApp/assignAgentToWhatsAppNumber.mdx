@@ -1,48 +1,48 @@
 ---
 title: "Assign Agent to WhatsApp Number"
-description: "Assign an existing WhatsApp AI Agent to a connected WhatsApp Business phone number."
+description: "Assign a WhatsApp agent to one of your connected WhatsApp numbers."
 api: "POST /api/whatsapp/add-agent-in-whatsapp-number"
 ---
 
 ## Overview
 
-Assign a WhatsApp AI Agent to a connected WhatsApp Business phone number. Once assigned, all incoming WhatsApp conversations on that number will be handled by the selected AI Agent.
+Assign a WhatsApp agent to one of your WhatsApp integrations, so the agent handles conversations on that number. A number has one agent; assigning another one replaces it.
+
+While assigning, Weya sets up the AiSensy webhook for the number so incoming messages reach the agent. For a `pro` integration, the credentials are checked with AiSensy first. If this setup fails, the agent isn't assigned.
 
 ## Prerequisites
 
 - An API key for your workspace
-- A connected WhatsApp Business phone number
-- An existing WhatsApp AI Agent
+- The integration ID (`_id` from [Get WhatsApp Numbers](/api-reference/WhatsApp/getWhatsAppNumbers))
+- A WhatsApp agent ID, from [Get WhatsApp Agents](/api-reference/WhatsApp/getWhatsAppAgents)
 
 ## Request
 
 <ParamField header="x-api-key" type="string" required>
-Your workspace API key. Create one from the profile menu in the dashboard → **API Keys**.
+  Your workspace API key. Create one from the profile menu in the dashboard → **API Keys**.
+</ParamField>
+
+<ParamField body="phoneNumberId" type="string" required>
+  Integration ID (the `_id` from Get WhatsApp Numbers).
+</ParamField>
+
+<ParamField body="agentId" type="string" required>
+  ID of the WhatsApp agent to assign.
 </ParamField>
 
 <RequestExample>
 
 ```bash cURL
 curl --location 'https://api.weya.live/backend/api/whatsapp/add-agent-in-whatsapp-number' \
---header 'x-api-key: YOUR_API_KEY' \
---header 'Content-Type: application/json' \
---data '{
-  "phoneNumberId": "123456789012345",
-  "agentId": "6894a98a7fcde123456789ab"
-}'
+  --header 'x-api-key: YOUR_API_KEY' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "phoneNumberId": "6891f1d0c45d123456789abc",
+    "agentId": "6894a98a7fcde123456789ab"
+  }'
 ```
 
 </RequestExample>
-
-## Request Body
-
-<ParamField body="phoneNumberId" type="string" required>
-Unique identifier of the connected WhatsApp Business phone number.
-</ParamField>
-
-<ParamField body="agentId" type="string" required>
-Unique identifier of the WhatsApp AI Agent to assign.
-</ParamField>
 
 ## Response
 
@@ -52,63 +52,24 @@ Unique identifier of the WhatsApp AI Agent to assign.
 {
   "status": true,
   "code": 200,
-  "message": "Agent assigned successfully",
-  "data": {
-    "phoneNumberId": "123456789012345",
-    "agentId": "6894a98a7fcde123456789ab"
-  }
+  "message": "Agent added to phone number successfully",
+  "errorMessage": null,
+  "data": []
 }
 ```
 
 </ResponseExample>
 
-<ResponseField name="status" type="boolean">
-Indicates whether the request completed successfully.
-</ResponseField>
-
-<ResponseField name="code" type="integer">
-HTTP status code returned by the API.
-</ResponseField>
-
-<ResponseField name="message" type="string">
-Confirmation message indicating the agent was assigned successfully.
-</ResponseField>
-
-<ResponseField name="data" type="object">
-Assignment details.
-</ResponseField>
-
-<ResponseField name="data.phoneNumberId" type="string">
-WhatsApp Business phone number that received the agent assignment.
-</ResponseField>
-
-<ResponseField name="data.agentId" type="string">
-Assigned WhatsApp AI Agent ID.
-</ResponseField>
-
 ## Error Handling
 
-| Status | Description |
-|---------|-------------|
-|400|Missing or invalid request parameters|
-|401|Missing or invalid API key|
-|403|Permission denied|
-|404|WhatsApp number or Agent not found|
-|409|An agent is already assigned to this WhatsApp number|
-|500|Internal server error|
+Errors return `status: false`, with the reason in `errorMessage`.
 
-<Note>
-
-A WhatsApp Business phone number can have only one active AI Agent assigned at a time. Assigning a different agent may replace the existing assignment.
-
-</Note>
+- **400 Bad Request** – `phoneNumberId` or `agentId` is missing or not a valid ID, or `Failed to configure WhatsApp provider webhook: …` (basic plan).
+- **401 Unauthorized** – Missing or invalid API key.
+- **404 Not Found** – `WhatsApp number not found`: it doesn't exist or wasn't connected by the user who owns the API key.
+- **429 Too Many Requests** – More than 1,000 WhatsApp requests in 15 minutes from your IP address.
+- **500 Internal Server Error** – Unexpected server error, or the AiSensy check failed (`pro` plan).
 
 <Check>
-
-Related endpoints:
-
-- `GET /api/whatsapp/whatsapp-number` — List connected WhatsApp numbers.
-- `GET /api/whatsapp/get-whatsapp-agent` — List available WhatsApp Agents.
-- `PUT /api/whatsapp/remove-agent-in-whatsapp-number/{phoneNumberId}` — Remove the assigned agent from a WhatsApp number.
-
+  To undo the assignment, use [Remove Agent from WhatsApp Number](/api-reference/WhatsApp/removeAgentFromWhatsAppNumber).
 </Check>

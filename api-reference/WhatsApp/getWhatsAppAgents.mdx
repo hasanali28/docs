@@ -1,12 +1,12 @@
 ---
 title: "Get WhatsApp Agents"
-description: "Retrieve all WhatsApp AI Agents available in your workspace."
+description: "List your WhatsApp agents."
 api: "GET /api/whatsapp/get-whatsapp-agent"
 ---
 
 ## Overview
 
-Retrieve a list of all WhatsApp AI Agents configured in your workspace. This endpoint is useful for displaying agents, selecting an agent for editing, or managing your WhatsApp automations.
+List the WhatsApp agents created by the user who owns the API key, most recently edited first. The list isn't paginated. Templates aren't included; use [Get WhatsApp Agent By ID](/api-reference/WhatsApp/getWhatsAppAgentById) for the full configuration.
 
 ## Prerequisites
 
@@ -22,7 +22,7 @@ Your workspace API key. Create one from the profile menu in the dashboard → **
 
 ```bash cURL
 curl --location 'https://api.weya.live/backend/api/whatsapp/get-whatsapp-agent' \
---header 'x-api-key: YOUR_API_KEY'
+  --header 'x-api-key: YOUR_API_KEY'
 ```
 
 </RequestExample>
@@ -35,21 +35,19 @@ curl --location 'https://api.weya.live/backend/api/whatsapp/get-whatsapp-agent' 
 {
   "status": true,
   "code": 200,
-  "message": "WhatsApp Agents fetched successfully",
+  "message": "Whatsapp agent fetched successfully",
+  "errorMessage": null,
   "data": [
     {
       "_id": "6894a98a7fcde123456789ab",
       "agentName": "Support Assistant",
-      "phoneNumberId": "123456789012345",
-      "status": "active",
-      "createdAt": "2026-07-21T13:45:18.000Z"
-    },
-    {
-      "_id": "6894ab427fcde123456789ac",
-      "agentName": "Sales Assistant",
-      "phoneNumberId": "123456789012346",
-      "status": "active",
-      "createdAt": "2026-07-20T10:15:30.000Z"
+      "gender": "Female",
+      "systemMessage": "You are a helpful customer support assistant.",
+      "selectedLanguage": ["en-IN"],
+      "sessionTimeout": 30,
+      "phoneNumberId": "6891f1d0c45d123456789abc",
+      "createdAt": "2026-07-21T13:45:18.000Z",
+      "updatedAt": "2026-07-21T14:12:30.000Z"
     }
   ]
 }
@@ -57,62 +55,28 @@ curl --location 'https://api.weya.live/backend/api/whatsapp/get-whatsapp-agent' 
 
 </ResponseExample>
 
-<ResponseField name="status" type="boolean">
-Indicates whether the request completed successfully.
+<ResponseField name="data" type="array[object]">
+Your WhatsApp agents. When you have none, the message is `No whatsapp agent found` and `data` is empty.
 </ResponseField>
 
-<ResponseField name="code" type="integer">
-HTTP status code returned by the API.
+<ResponseField name="data[]._id" type="string">
+Agent ID.
 </ResponseField>
 
-<ResponseField name="message" type="string">
-Human-readable success message.
+<ResponseField name="data[].agentName" type="string">
+Agent name.
 </ResponseField>
 
-<ResponseField name="data" type="array">
-List of WhatsApp Agents available in the workspace.
+<ResponseField name="data[].phoneNumberId" type="string | null">
+ID of the WhatsApp integration the agent is attached to, if any.
 </ResponseField>
 
-<ResponseField name="data._id" type="string">
-Unique identifier of the WhatsApp Agent.
-</ResponseField>
-
-<ResponseField name="data.agentName" type="string">
-Display name of the WhatsApp Agent.
-</ResponseField>
-
-<ResponseField name="data.phoneNumberId" type="string">
-WhatsApp Business Phone Number assigned to the agent.
-</ResponseField>
-
-<ResponseField name="data.status" type="string">
-Current status of the WhatsApp Agent.
-</ResponseField>
-
-<ResponseField name="data.createdAt" type="string">
-Timestamp when the agent was created.
+<ResponseField name="data[].sessionTimeout" type="integer">
+Minutes of user inactivity after which a conversation ends.
 </ResponseField>
 
 ## Error Handling
 
-| Status | Description |
-|---------|-------------|
-|401|Missing or invalid API key|
-|403|You do not have permission to access WhatsApp Agents|
-|500|Internal server error|
-
-<Note>
-
-This endpoint returns all WhatsApp Agents created within your authenticated workspace.
-
-</Note>
-
-<Check>
-
-Use the returned **Agent ID** with:
-
-- `GET /api/whatsapp/get-whatsapp-agent/{agentId}` to retrieve a specific agent.
-- `PUT /api/whatsapp/update-whatsapp-agent/{agentId}` to update an agent.
-- `DELETE /api/whatsapp/delete-whatsapp-agent/{agentId}` to remove an agent.
-
-</Check>
+- **401 Unauthorized** – Missing or invalid API key.
+- **429 Too Many Requests** – More than 1,000 WhatsApp requests in 15 minutes from your IP address.
+- **500 Internal Server Error** – Unexpected server error.

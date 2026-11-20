@@ -1,17 +1,17 @@
 ---
 title: "Remove Agent from WhatsApp Number"
-description: "Remove the assigned WhatsApp AI Agent from a connected WhatsApp Business phone number."
+description: "Unassign the WhatsApp agent from a connected number."
 api: "PUT /api/whatsapp/remove-agent-in-whatsapp-number/{phoneNumberId}"
 ---
 
 ## Overview
 
-Remove the currently assigned WhatsApp AI Agent from a connected WhatsApp Business phone number. After removing the assignment, the number will no longer be handled by an AI Agent until another agent is assigned.
+Remove the agent assigned to one of your WhatsApp integrations. The agent itself isn't deleted, and the integration stays connected. The number has no agent until you assign one with [Assign Agent to WhatsApp Number](/api-reference/WhatsApp/assignAgentToWhatsAppNumber).
 
 ## Prerequisites
 
 - An API key for your workspace
-- A connected WhatsApp Business phone number with an assigned AI Agent
+- The integration ID (`_id` from [Get WhatsApp Numbers](/api-reference/WhatsApp/getWhatsAppNumbers))
 
 ## Request
 
@@ -20,14 +20,14 @@ Your workspace API key. Create one from the profile menu in the dashboard → **
 </ParamField>
 
 <ParamField path="phoneNumberId" type="string" required>
-Unique identifier of the WhatsApp Business phone number.
+Integration ID (the `_id` from Get WhatsApp Numbers).
 </ParamField>
 
 <RequestExample>
 
 ```bash cURL
-curl --location --request PUT 'https://api.weya.live/backend/api/whatsapp/remove-agent-in-whatsapp-number/123456789012345' \
---header 'x-api-key: YOUR_API_KEY'
+curl --location --request PUT 'https://api.weya.live/backend/api/whatsapp/remove-agent-in-whatsapp-number/6891f1d0c45d123456789abc' \
+  --header 'x-api-key: YOUR_API_KEY'
 ```
 
 </RequestExample>
@@ -40,63 +40,22 @@ curl --location --request PUT 'https://api.weya.live/backend/api/whatsapp/remove
 {
   "status": true,
   "code": 200,
-  "message": "Agent removed successfully",
-  "data": {
-    "phoneNumberId": "123456789012345",
-    "agentAssigned": false
-  }
+  "message": "Whatsapp number unlinked successfully",
+  "errorMessage": null,
+  "data": []
 }
 ```
 
 </ResponseExample>
 
-<ResponseField name="status" type="boolean">
-Indicates whether the request completed successfully.
-</ResponseField>
-
-<ResponseField name="code" type="integer">
-HTTP status code returned by the API.
-</ResponseField>
-
-<ResponseField name="message" type="string">
-Confirmation message indicating the agent was removed successfully.
-</ResponseField>
-
-<ResponseField name="data" type="object">
-Details of the updated WhatsApp number.
-</ResponseField>
-
-<ResponseField name="data.phoneNumberId" type="string">
-WhatsApp Business phone number from which the agent was removed.
-</ResponseField>
-
-<ResponseField name="data.agentAssigned" type="boolean">
-Indicates whether an AI Agent is currently assigned to the phone number.
-</ResponseField>
+The request also succeeds when the number has no agent.
 
 ## Error Handling
 
-| Status | Description |
-|---------|-------------|
-|400|Invalid phone number ID|
-|401|Missing or invalid API key|
-|403|Permission denied|
-|404|WhatsApp number not found|
-|409|No agent is currently assigned to this WhatsApp number|
-|500|Internal server error|
+Errors return `status: false`, with the reason in `errorMessage`.
 
-<Note>
-
-Removing an agent does not delete the WhatsApp Agent itself. It only unlinks the agent from the selected WhatsApp Business phone number.
-
-</Note>
-
-<Check>
-
-Related endpoints:
-
-- `POST /api/whatsapp/add-agent-in-whatsapp-number` — Assign an AI Agent to a WhatsApp number.
-- `GET /api/whatsapp/whatsapp-number` — List connected WhatsApp Business numbers.
-- `GET /api/whatsapp/get-whatsapp-agent` — List available WhatsApp AI Agents.
-
-</Check>
+- **400 Bad Request** – `Invalid Phone Number ID`.
+- **401 Unauthorized** – Missing or invalid API key.
+- **404 Not Found** – `WhatsApp number not found`: it doesn't exist or wasn't connected by the user who owns the API key.
+- **429 Too Many Requests** – More than 1,000 WhatsApp requests in 15 minutes from your IP address.
+- **500 Internal Server Error** – Unexpected server error.

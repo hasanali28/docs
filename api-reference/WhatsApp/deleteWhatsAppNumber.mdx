@@ -1,17 +1,23 @@
 ---
 title: "Delete WhatsApp Number"
-description: "Remove a WhatsApp Business number from your Weya AI workspace."
+description: "Remove a connected WhatsApp number from your workspace."
 api: "DELETE /api/whatsapp/delete-whatsapp-number/{phoneNumberId}"
 ---
 
 ## Overview
 
-Delete an existing WhatsApp Business integration from your workspace. Once deleted, the WhatsApp number will no longer receive or send messages through Weya AI, and any associated WhatsApp Agents must be reassigned before they can be used again.
+Permanently delete one of your WhatsApp integrations. For a `pro` integration, Weya also tries to remove its AiSensy subscription; if that fails, the integration is still deleted.
+
+The API doesn't check whether a WhatsApp agent is assigned to the number.
+
+<Warning>
+  This can't be undone. To use the number again, connect it again with [Create WhatsApp Integration](/api-reference/WhatsApp/createWhatsAppIntegration); it gets a new ID.
+</Warning>
 
 ## Prerequisites
 
 - An API key for your workspace
-- Valid WhatsApp Phone Number ID
+- The integration ID (`_id` from [Get WhatsApp Numbers](/api-reference/WhatsApp/getWhatsAppNumbers)), connected by the user who owns the API key
 
 ## Request
 
@@ -20,14 +26,14 @@ Your workspace API key. Create one from the profile menu in the dashboard → **
 </ParamField>
 
 <ParamField path="phoneNumberId" type="string" required>
-Unique identifier of the WhatsApp Business phone number to delete.
+Integration ID (the `_id` from Get WhatsApp Numbers).
 </ParamField>
 
 <RequestExample>
 
 ```bash cURL
-curl --location --request DELETE 'https://api.weya.live/backend/api/whatsapp/delete-whatsapp-number/123456789012345' \
---header 'x-api-key: YOUR_API_KEY'
+curl --location --request DELETE 'https://api.weya.live/backend/api/whatsapp/delete-whatsapp-number/6891f1d0c45d123456789abc' \
+  --header 'x-api-key: YOUR_API_KEY'
 ```
 
 </RequestExample>
@@ -40,46 +46,20 @@ curl --location --request DELETE 'https://api.weya.live/backend/api/whatsapp/del
 {
   "status": true,
   "code": 200,
-  "message": "WhatsApp number deleted successfully"
+  "message": "Whatsapp number deleted successfully",
+  "errorMessage": null,
+  "data": []
 }
 ```
 
 </ResponseExample>
 
-<ResponseField name="status" type="boolean">
-Indicates whether the request completed successfully.
-</ResponseField>
-
-<ResponseField name="code" type="integer">
-HTTP status code returned by the API.
-</ResponseField>
-
-<ResponseField name="message" type="string">
-Confirmation message indicating the WhatsApp number was removed successfully.
-</ResponseField>
-
 ## Error Handling
 
-| Status | Description |
-|---------|-------------|
-|400|Invalid WhatsApp Phone Number ID|
-|401|Missing or invalid API key|
-|403|You do not have permission to delete this WhatsApp integration|
-|404|WhatsApp integration not found|
-|500|Internal server error|
+Errors return `status: false`, with the reason in `errorMessage`.
 
-<Warning>
-
-Deleting a WhatsApp number removes its integration from your workspace. Any WhatsApp Agents assigned to this number should be reassigned before deleting the integration.
-
-</Warning>
-
-<Check>
-
-Before deleting a WhatsApp number, you may want to:
-
-- Retrieve all connected WhatsApp numbers using `GET /api/whatsapp/whatsapp-number`.
-- Remove or reassign any WhatsApp Agent linked to the number.
-- Export any required configuration or templates associated with the integration.
-
-</Check>
+- **400 Bad Request** – `Invalid Phone Number ID`.
+- **401 Unauthorized** – Missing or invalid API key.
+- **404 Not Found** – `WhatsApp number not found`: it doesn't exist, is already deleted, or wasn't connected by the user who owns the API key.
+- **429 Too Many Requests** – More than 1,000 WhatsApp requests in 15 minutes from your IP address.
+- **500 Internal Server Error** – Unexpected server error.
